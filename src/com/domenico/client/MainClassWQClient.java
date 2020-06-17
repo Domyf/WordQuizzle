@@ -9,12 +9,14 @@ public class MainClassWQClient {
     private static final String HELP_COMMAND_ARG = "--help";    //The program argument associated to the usage
 
     private static Scanner scanner;
+    private static String loggedUserName;
 
     public static void main(String[] args) {
         if (args.length == 1 && args[0].equals(HELP_COMMAND_ARG)) {
             System.out.println(Constants.USAGE);
             return;
         }
+        loggedUserName = null;
         scanner = new Scanner(System.in);
         while(true) {
             System.out.print("> ");
@@ -67,38 +69,61 @@ public class MainClassWQClient {
 
     /** Method invoked when the user types logout */
     private static void logout() {
+        if (loggedUserName == null) {
+            System.out.println(Messages.LOGIN_NEEDED);
+            return;
+        }
         // TODO: 17/06/2020 log out the user from this game
         System.out.println("Not implemented yet...");
     }
 
     /** Method invoked when the user types aggiungi_amico <nickAmico> */
     private static void addFriend(String userName) {
+        if (loggedUserName == null) {
+            System.out.println(Messages.LOGIN_NEEDED);
+            return;
+        }
         // TODO: 17/06/2020 add the given user to this user's friends
         System.out.println("Not implemented yet...");
     }
 
     /** Method invoked when the user types mostra_amici */
     private static void showFriendList() {
+        if (loggedUserName == null) {
+            System.out.println(Messages.LOGIN_NEEDED);
+            return;
+        }
         // TODO: 17/06/2020 show the user's friends
         System.out.println("Not implemented yet...");
     }
 
     /** Method invoked when the user types sfida <nickAmico> */
     private static void startGame(String userName) {
+        if (loggedUserName == null) {
+            System.out.println(Messages.LOGIN_NEEDED);
+            return;
+        }
         // TODO: 17/06/2020 start the game between this user and the one passed as argument
         System.out.println("Not implemented yet...");
     }
 
     /** Method invoked when the user types mostra_classifica */
     private static void showLeaderboard() {
+        if (loggedUserName == null) {
+            System.out.println(Messages.LOGIN_NEEDED);
+            return;
+        }
         // TODO: 17/06/2020 print the leaderboard
         System.out.println("Not implemented yet...");
     }
 
     /** Method invoked when the user types mostra_punteggio */
     private static void showScore() {
+        if (loggedUserName == null) {
+            System.out.println(Messages.LOGIN_NEEDED);
+            return;
+        }
         // TODO: 17/06/2020 print the user's score
         System.out.println("Not implemented yet...");
     }
-
 }
