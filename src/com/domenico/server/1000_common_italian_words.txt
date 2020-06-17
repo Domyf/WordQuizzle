@@ -1,4 +1,3 @@
-a
 abbandonare
 abbastanza
 abitare
@@ -20,7 +19,6 @@ affatto
 affermare
 affrontare
 aggiungere
-ah
 aiutare
 aiuto
 albergo
@@ -161,7 +159,6 @@ centro
 cercare
 certamente
 certo
-che
 chi
 chiamare
 chiaro
@@ -171,7 +168,6 @@ chiesa
 chilometro
 chissà
 chiudere
-ci
 ciascuno
 cielo
 cioè
@@ -180,7 +176,6 @@ cittadino
 città
 civile
 civiltà
-ciò
 classe
 collina
 collo
@@ -254,11 +249,9 @@ crisi
 cristiano
 croce
 cucina
-cui
 cultura
 cuore
 cura
-da
 dare
 davanti
 davvero
@@ -274,7 +267,6 @@ desiderio
 destino
 destro
 determinare
-di
 dichiarare
 dietro
 difendere
@@ -313,7 +305,6 @@ domanda
 domandare
 domani
 domenica
-don
 donna
 dopo
 dormire
@@ -325,14 +316,12 @@ dunque
 durante
 durare
 duro
-e
 eccellenza
 eccetera
 ecco
 economico
 effetto
 egli
-eh
 elemento
 elettrico
 elevare
@@ -482,7 +471,6 @@ importare
 impossibile
 impressione
 improvviso
-in
 incontrare
 indicare
 indietro
@@ -513,7 +501,6 @@ inutile
 invece
 inverno
 invitare
-io
 isola
 istante
 istituto
@@ -532,11 +519,9 @@ legare
 legge
 leggere
 leggero
-lei
 lettera
 letto
 levare
-li
 liberare
 libero
 libertà
@@ -546,7 +531,6 @@ limite
 linea
 lingua
 lira
-lo
 lontano
 loro
 lotta
@@ -555,8 +539,6 @@ lui
 luna
 lungo
 luogo
-là
-lì
 ma
 macchina
 madre
@@ -599,7 +581,6 @@ metro
 mettere
 metà
 mezzo
-mi
 migliore
 milione
 militare
@@ -607,7 +588,6 @@ minimo
 ministro
 minore
 minuto
-mio
 misura
 moderno
 modo
@@ -634,7 +614,6 @@ naturalmente
 nave
 nazionale
 nazione
-ne
 neanche
 necessario
 necessità
@@ -644,11 +623,9 @@ neppure
 nero
 nessuno
 niente
-no
 nobile
 noi
 nome
-non
 nord
 normale
 nostro
@@ -662,8 +639,6 @@ nulla
 numero
 numeroso
 nuovo
-né
-o
 occasione
 occhio
 occorrere
@@ -674,7 +649,6 @@ oggetto
 oggi
 ogni
 ognuno
-oh
 oltre
 ombra
 onore
@@ -684,7 +658,6 @@ operazione
 opinione
 opporre
 oppure
-ora
 oramai
 ordinare
 ordine
@@ -727,7 +700,6 @@ pelle
 pena
 pensare
 pensiero
-per
 perché
 perciò
 perdere
@@ -757,7 +729,6 @@ pieno
 pietra
 pietà
 piuttosto
-più
 poco
 poesia
 poeta
@@ -940,7 +911,6 @@ scrittore
 scrivere
 scuola
 scusare
-se
 secolo
 secondo
 sede
@@ -1045,14 +1015,12 @@ subito
 succedere
 successo
 sud
-suo
 suonare
 superare
 superiore
 svegliare
 sviluppo
 svolgere
-sì
 tacere
 tagliare
 tale
@@ -1092,7 +1060,6 @@ triste
 troppo
 trovare
 tu
-tuo
 tuttavia
 tutto
 uccidere
@@ -1102,7 +1069,6 @@ ufficio
 uguale
 ultimo
 umano
-un
 unico
 unire
 università
@@ -1110,7 +1076,6 @@ uno
 uomo
 usare
 uscire
-uso
 utile
 valere
 valle
@@ -1129,7 +1094,6 @@ vero
 verso
 vestire
 vestito
-vi
 via
 viaggio
 vicino
