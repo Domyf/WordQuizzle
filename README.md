@@ -1,2 +1,2 @@
 # WordQuizzle
-Multiplayer game written in Java. Project for the UniPI's networks and internet systems course
+Multiplayer game written in Java. It is the project for the UniPi's networks and internet systems course
