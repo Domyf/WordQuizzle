@@ -26,14 +26,14 @@ public class UDPConnection implements Connection {
 
     @Override
     public void sendRequest(Request request) throws IOException {
-        String requestLine = request.toLine();
+        String requestLine = request.toString();
         byte[] bytes = requestLine.getBytes(StandardCharsets.UTF_8);
         send(bytes);
     }
 
     @Override
     public void sendResponse(Response response) throws IOException {
-        String responseLine = response.toLine();
+        String responseLine = response.toString();
         byte[] bytes = responseLine.getBytes(StandardCharsets.UTF_8);
         send(bytes);
     }

@@ -1,7 +1,6 @@
 package com.domenico.communication;
 
 import java.io.IOException;
-import java.nio.channels.spi.AbstractSelectableChannel;
 
 public interface Connection {
     void sendRequest(Request request) throws IOException;

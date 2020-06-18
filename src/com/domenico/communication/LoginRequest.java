@@ -17,16 +17,16 @@ public class LoginRequest extends Request {
         this.password = line[2];
     }
 
-    @Override
-    String toLine() {
-        return COMMAND+" "+username+" "+password;
-    }
-
     public String getUsername() {
         return username;
     }
 
     public String getPassword() {
         return password;
+    }
+
+    @Override
+    public String toString() {
+        return COMMAND+" "+username+" "+password;
     }
 }

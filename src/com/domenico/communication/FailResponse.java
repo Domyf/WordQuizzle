@@ -5,13 +5,21 @@ public class FailResponse extends Response {
 
     private String failMessage;
 
-    public FailResponse(String[] line) {
-        super();
-        this.failMessage = line[1];
+    public FailResponse(String[] params) {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 1; i < params.length; i++) {
+            builder.append(params[i]).append(" ");
+        }
+        this.failMessage = builder.toString();
     }
 
+    public FailResponse(String failmessage) {
+        this.failMessage = failmessage;
+    }
+
+
     @Override
-    String toLine() {
+    public String toString() {
         return COMMAND+" "+failMessage;
     }
 }

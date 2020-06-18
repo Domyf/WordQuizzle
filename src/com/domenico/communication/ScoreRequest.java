@@ -10,8 +10,12 @@ public class ScoreRequest extends Request {
         this.username = line[1];
     }
 
+    public String getUsername() {
+        return username;
+    }
+
     @Override
-    String toLine() {
+    public String toString() {
         return COMMAND+" "+username;
     }
 }

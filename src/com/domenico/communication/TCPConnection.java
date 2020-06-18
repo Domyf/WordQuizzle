@@ -18,13 +18,13 @@ public class TCPConnection implements Connection {
 
     @Override
     public void sendRequest(Request request) throws IOException {
-        String requestLine = request.toLine();
+        String requestLine = request.toString();
         write(requestLine.getBytes(StandardCharsets.UTF_8));
     }
 
     @Override
     public void sendResponse(Response response) throws IOException {
-        String responseLine = response.toLine();
+        String responseLine = response.toString();
         write(responseLine.getBytes(StandardCharsets.UTF_8));
     }
 
@@ -70,12 +70,4 @@ public class TCPConnection implements Connection {
         buf.flip();
         return buf;
     }
-
-    /*public abstract void login(String username, String password);
-
-    public abstract void logout(String username);
-
-    public abstract void addFriend(String username, String friendUsername);
-
-    public abstract void friendList(String username);*/
 }

@@ -14,8 +14,6 @@ public abstract class Request {
         return null;
     }
 
-    abstract String toLine();
-
     /*LOGIN_REQUEST,
     LOGOUT_REQUEST,
     ADD_FRIEND_REQUEST,
