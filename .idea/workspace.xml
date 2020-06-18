@@ -10,6 +10,7 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
+        <option value="JUnit5 Test Class" />
         <option value="Interface" />
         <option value="Class" />
       </list>
@@ -24,29 +25,45 @@
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="Downloaded.Files.Path.Enabled" value="false" />
+    <property name="Repository.Attach.Annotations" value="false" />
+    <property name="Repository.Attach.JavaDocs" value="false" />
+    <property name="Repository.Attach.Sources" value="false" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
+    <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary" value="JUnit5" />
+    <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit5" value="" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
     <property name="node.js.path.for.package.tslint" value="project" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
+    <property name="project.structure.last.edited" value="Modules" />
+    <property name="project.structure.proportion" value="0.0" />
+    <property name="project.structure.side.proportion" value="0.0" />
   </component>
-  <component name="RunManager" selected="Application.MainClassWQServer">
-    <configuration name="MainClassWQServer" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="com.domenico.server.MainClassWQServer" />
-      <module name="WordQuizzle" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="com.domenico.server.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
+  <component name="RecentsManager">
+    <key name="CreateTestDialog.RecentsKey">
+      <recent name="com.domenico.server" />
+    </key>
+    <key name="MoveMembersDialog.RECENTS_KEY">
+      <recent name="com.domenico.server.MainClassWQServer" />
+      <recent name="com.domenico.communication.TCPConnection" />
+      <recent name="com.domenico.server.Configuration" />
+      <recent name="com.domenico.communication.RMIConnection" />
+    </key>
+    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="com.domenico.server" />
+    </key>
+    <key name="CreateTestDialog.Recents.Supers">
+      <recent name="" />
+    </key>
+    <key name="CreateClassDialog.RecentsKey">
+      <recent name="com.domenico.communication" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Application.Run Server">
     <configuration name="Run Client" type="Application" factoryName="Application" temporary="true">
       <option name="MAIN_CLASS_NAME" value="com.domenico.client.MainClassWQClient" />
       <module name="WordQuizzle" />
@@ -56,14 +73,44 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="Run Server" type="Application" factoryName="Application" temporary="true">
+      <option name="MAIN_CLASS_NAME" value="com.domenico.server.MainClassWQServer" />
+      <module name="WordQuizzle" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.domenico.client.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="UserTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="WordQuizzle" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.domenico.server.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.domenico.server" />
+      <option name="MAIN_CLASS_NAME" value="com.domenico.server.UserTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <list>
       <item itemvalue="Application.Run Client" />
-      <item itemvalue="Application.MainClassWQServer" />
+      <item itemvalue="Application.Run Server" />
+      <item itemvalue="JUnit.UserTest" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.MainClassWQServer" />
         <item itemvalue="Application.Run Client" />
+        <item itemvalue="Application.Run Server" />
+        <item itemvalue="JUnit.UserTest" />
       </list>
     </recent_temporary>
   </component>
@@ -77,7 +124,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1592414219160</updated>
-      <workItem from="1592414223759" duration="10472000" />
+      <workItem from="1592414223759" duration="41968000" />
     </task>
     <servers />
   </component>
@@ -85,42 +132,74 @@
     <option name="version" value="2" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="225" y="88" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1592415775615">
+    <state x="225" y="88" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1592482326661">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state x="225" y="88" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1536.864@0.0.1536.864" timestamp="1592415775615" />
-    <state x="575" y="149" key="#com.intellij.ide.util.MemberChooser" timestamp="1592426583346">
+    <state x="225" y="88" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1536.864@0.0.1536.864" timestamp="1592482326661" />
+    <state x="575" y="149" key="#com.intellij.ide.util.MemberChooser" timestamp="1592503708694">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state x="575" y="149" key="#com.intellij.ide.util.MemberChooser/0.0.1536.864@0.0.1536.864" timestamp="1592426583346" />
-    <state x="553" y="328" width="430" height="215" key="#com.intellij.refactoring.move.moveClassesOrPackages.MoveClassesOrPackagesDialog.classes" timestamp="1592417613701">
+    <state x="575" y="149" key="#com.intellij.ide.util.MemberChooser/0.0.1536.864@0.0.1536.864" timestamp="1592503708694" />
+    <state x="500" y="224" key="#com.intellij.ide.util.TreeClassChooserDialog" timestamp="1592497716269">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state x="553" y="328" width="430" height="215" key="#com.intellij.refactoring.move.moveClassesOrPackages.MoveClassesOrPackagesDialog.classes/0.0.1536.864@0.0.1536.864" timestamp="1592417613700" />
-    <state x="500" y="180" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1592417781712">
+    <state x="500" y="224" key="#com.intellij.ide.util.TreeClassChooserDialog/0.0.1536.864@0.0.1536.864" timestamp="1592497716269" />
+    <state x="553" y="328" width="430" height="266" key="#com.intellij.refactoring.move.moveClassesOrPackages.MoveClassesOrPackagesDialog.classes" timestamp="1592478931341">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state x="500" y="180" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1536.864@0.0.1536.864" timestamp="1592417781712" />
-    <state width="1493" height="224" key="GridCell.Tab.0.bottom" timestamp="1592430837141">
+    <state x="553" y="328" width="430" height="266" key="#com.intellij.refactoring.move.moveClassesOrPackages.MoveClassesOrPackagesDialog.classes/0.0.1536.864@0.0.1536.864" timestamp="1592478931341" />
+    <state x="487" y="241" key="#com.intellij.refactoring.move.moveMembers.MoveMembersDialog" timestamp="1592497717481">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state width="1493" height="224" key="GridCell.Tab.0.bottom/0.0.1536.864@0.0.1536.864" timestamp="1592430837141" />
-    <state width="1493" height="224" key="GridCell.Tab.0.center" timestamp="1592430837141">
+    <state x="487" y="241" key="#com.intellij.refactoring.move.moveMembers.MoveMembersDialog/0.0.1536.864@0.0.1536.864" timestamp="1592497717481" />
+    <state x="399" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1592482306779">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state width="1493" height="224" key="GridCell.Tab.0.center/0.0.1536.864@0.0.1536.864" timestamp="1592430837141" />
-    <state width="1493" height="224" key="GridCell.Tab.0.left" timestamp="1592430837141">
+    <state x="399" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.0.1536.864@0.0.1536.864" timestamp="1592482306779" />
+    <state x="500" y="180" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1592488853171">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state width="1493" height="224" key="GridCell.Tab.0.left/0.0.1536.864@0.0.1536.864" timestamp="1592430837141" />
-    <state width="1493" height="224" key="GridCell.Tab.0.right" timestamp="1592430837141">
+    <state x="500" y="180" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1536.864@0.0.1536.864" timestamp="1592488853171" />
+    <state width="1493" height="224" key="GridCell.Tab.0.bottom" timestamp="1592496270645">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state width="1493" height="224" key="GridCell.Tab.0.right/0.0.1536.864@0.0.1536.864" timestamp="1592430837141" />
-    <state x="426" y="197" key="run.anything.popup" timestamp="1592416506292">
+    <state width="1493" height="224" key="GridCell.Tab.0.bottom/0.0.1536.864@0.0.1536.864" timestamp="1592496270645" />
+    <state width="1493" height="224" key="GridCell.Tab.0.center" timestamp="1592496270645">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state x="426" y="197" key="run.anything.popup/0.0.1536.864@0.0.1536.864" timestamp="1592416506292" />
+    <state width="1493" height="224" key="GridCell.Tab.0.center/0.0.1536.864@0.0.1536.864" timestamp="1592496270645" />
+    <state width="1493" height="224" key="GridCell.Tab.0.left" timestamp="1592496270645">
+      <screen x="0" y="0" width="1536" height="864" />
+    </state>
+    <state width="1493" height="224" key="GridCell.Tab.0.left/0.0.1536.864@0.0.1536.864" timestamp="1592496270645" />
+    <state width="1493" height="224" key="GridCell.Tab.0.right" timestamp="1592496270645">
+      <screen x="0" y="0" width="1536" height="864" />
+    </state>
+    <state width="1493" height="224" key="GridCell.Tab.0.right/0.0.1536.864@0.0.1536.864" timestamp="1592496270645" />
+    <state x="250" y="8" key="SettingsEditor" timestamp="1592474767143">
+      <screen x="0" y="0" width="1536" height="864" />
+    </state>
+    <state x="250" y="8" key="SettingsEditor/0.0.1536.864@0.0.1536.864" timestamp="1592474767143" />
+    <state x="498" y="325" key="com.intellij.jarRepository.RepositoryAttachDialog-DOWNLOAD" timestamp="1592474803651">
+      <screen x="0" y="0" width="1536" height="864" />
+    </state>
+    <state x="498" y="325" key="com.intellij.jarRepository.RepositoryAttachDialog-DOWNLOAD/0.0.1536.864@0.0.1536.864" timestamp="1592474803651" />
+    <state x="541" y="240" key="com.intellij.testIntegration.createTest.CreateTestDialog" timestamp="1592474784489">
+      <screen x="0" y="0" width="1536" height="864" />
+    </state>
+    <state x="541" y="240" key="com.intellij.testIntegration.createTest.CreateTestDialog/0.0.1536.864@0.0.1536.864" timestamp="1592474784489" />
+    <state x="500" y="184" key="extract.method.dialog" timestamp="1592491977058">
+      <screen x="0" y="0" width="1536" height="864" />
+    </state>
+    <state x="500" y="184" key="extract.method.dialog/0.0.1536.864@0.0.1536.864" timestamp="1592491977058" />
+    <state x="477" y="191" key="refactoring.ChangeSignatureDialog" timestamp="1592487825977">
+      <screen x="0" y="0" width="1536" height="864" />
+    </state>
+    <state x="477" y="191" key="refactoring.ChangeSignatureDialog/0.0.1536.864@0.0.1536.864" timestamp="1592487825977" />
+    <state x="426" y="197" key="run.anything.popup" timestamp="1592501171441">
+      <screen x="0" y="0" width="1536" height="864" />
+    </state>
+    <state x="426" y="197" key="run.anything.popup/0.0.1536.864@0.0.1536.864" timestamp="1592501171441" />
     <state x="431" y="182" width="672" height="678" key="search.everywhere.popup" timestamp="1592428786923">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
