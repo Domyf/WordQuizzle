@@ -5,9 +5,9 @@ public class FailResponse extends Response {
 
     private String failMessage;
 
-    public FailResponse(String[] line) {
+    public FailResponse(String failMessage) {
         super();
-        this.failMessage = line[1];
+        this.failMessage = failMessage;
     }
 
     @Override

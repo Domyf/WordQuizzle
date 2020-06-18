@@ -8,7 +8,8 @@ public abstract class Response {
             case SuccessResponse.COMMAND:
                 return new SuccessResponse();
             case FailResponse.COMMAND:
-                return new FailResponse(splittedLine);
+                String message = line.substring(splittedLine[0].length()+1);
+                return new FailResponse(message);
         }
 
         return null;

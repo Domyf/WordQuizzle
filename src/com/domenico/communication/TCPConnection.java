@@ -18,7 +18,7 @@ public class TCPConnection implements Connection {
 
     @Override
     public void sendRequest(Request request) throws IOException {
-        String requestLine = request.toLine();
+        String requestLine = request.toString();
         write(requestLine.getBytes(StandardCharsets.UTF_8));
     }
 

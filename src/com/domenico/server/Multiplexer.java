@@ -4,6 +4,7 @@ import com.domenico.communication.UDPConnection;
 
 import java.io.IOException;
 import java.nio.channels.DatagramChannel;
+import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.spi.AbstractSelectableChannel;
@@ -12,10 +13,10 @@ import java.util.Set;
 
 public abstract class Multiplexer extends Thread {
 
-    protected AbstractSelectableChannel channel;
+    protected SelectableChannel channel;
     protected Selector selector;
 
-    public Multiplexer(AbstractSelectableChannel channel, int firstOp) throws IOException {
+    public Multiplexer(SelectableChannel channel, int firstOp) throws IOException {
         this.channel = channel;
         channel.configureBlocking(false);
         selector = Selector.open();
