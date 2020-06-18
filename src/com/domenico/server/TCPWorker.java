@@ -42,6 +42,7 @@ public class TCPWorker extends Multiplexer {
         // TODO: 18/06/2020 parse the data received to understand what response should be sent to the client
         ConnectionData response = parseRequest(connectionData);
         Object[] attachment = {tcpConnection, response};
+
         client.register(selector, SelectionKey.OP_WRITE, attachment);
     }
 
@@ -64,26 +65,27 @@ public class TCPWorker extends Multiplexer {
     private ConnectionData parseRequest(ConnectionData connectionData) {
         // TODO: 18/06/2020 parse the data received to understand what response should be sent to the client
         if (ConnectionData.Validator.isLoginRequest(connectionData)) {
-            String username = connectionData.getParam(0);
-            String password = connectionData.getParam(1);
+            String username = connectionData.getUsername();
+            String password = connectionData.getPassword();
             return ConnectionData.Factory.newFailResponse("Requested to login with username and password: "+username+", "+password);
         } else if (ConnectionData.Validator.isLogoutRequest(connectionData)) {
-            String username = connectionData.getParam(0);
+            String username = connectionData.getUsername();
             return ConnectionData.Factory.newFailResponse("Requested to logout with username: "+username);
         } else if (ConnectionData.Validator.isAddFriendRequest(connectionData)) {
-            String username = connectionData.getParam(0);
-            String friend = connectionData.getParam(1);
+            String username = connectionData.getUsername();
+            String friend = connectionData.getFriendUsername();
             return ConnectionData.Factory.newFailResponse("Requested to add friend with username and friend's username: "+username+", "+friend);
         } else if (ConnectionData.Validator.isFriendListRequest(connectionData)) {
-            String username = connectionData.getParam(0);
+            String username = connectionData.getUsername();
             return ConnectionData.Factory.newFailResponse("Requested to show the friend list with username: "+username);
         } else if (ConnectionData.Validator.isScoreRequest(connectionData)) {
-            String username = connectionData.getParam(0);
+            String username = connectionData.getUsername();
             return ConnectionData.Factory.newFailResponse("Requested to show the score with username: "+username);
         } else if (ConnectionData.Validator.isLeaderboardRequest(connectionData)) {
-            String username = connectionData.getParam(0);
+            String username = connectionData.getUsername();
             return ConnectionData.Factory.newFailResponse("Requested to show the leaderboard with username: "+username);
         }
+
         return ConnectionData.Factory.newFailResponse("Request parsing not implemented yet");
     }
 }

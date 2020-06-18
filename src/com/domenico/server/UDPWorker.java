@@ -14,13 +14,11 @@ public class UDPWorker extends Multiplexer {
         super(channel, SelectionKey.OP_READ, new UDPConnection(channel));
         DatagramSocket datagramSocket = channel.socket();
         datagramSocket.bind(new InetSocketAddress(UDPConnection.PORT));
-        print("Listening on port " + UDPConnection.PORT);
+        print("Bound on port " + UDPConnection.PORT);
     }
 
     @Override
-    void onClientAcceptable(SelectionKey key) {
-        //it is a UDP connection, accept() is not needed
-    }
+    void onClientAcceptable(SelectionKey key) {}
 
     @Override
     void onClientReadable(SelectionKey key) throws IOException {

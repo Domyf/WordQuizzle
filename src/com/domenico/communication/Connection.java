@@ -17,7 +17,7 @@ public abstract class Connection {
         ByteBuffer lenBuffer = receiveByLength(Integer.BYTES);
         ByteBuffer dataBuffer = receiveByLength(lenBuffer.getInt());
         String line = new String(dataBuffer.array(), StandardCharsets.UTF_8);
-        return ConnectionData.parseLine(line);
+        return ConnectionData.Factory.parseLine(line);
     }
 
     private ByteBuffer wrapData(byte[] data) {
