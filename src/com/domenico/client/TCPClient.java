@@ -1,7 +1,6 @@
 package com.domenico.client;
 
-import com.domenico.communication.Request;
-import com.domenico.communication.Request.RequestFactory;
+import com.domenico.communication.LoginRequest;
 import com.domenico.communication.Response;
 import com.domenico.communication.TCPConnection;
 
@@ -21,7 +20,7 @@ public class TCPClient {
     }
 
     public void login(String username, String password) throws IOException {
-        Request request = RequestFactory.newLoginRequest(username, password);
+        LoginRequest request = new LoginRequest(username, password);
         tcpConnection.sendRequest(request);
         Response response = tcpConnection.getResponse();
         System.out.println("Ritornato: "+response.toString());
@@ -40,10 +39,7 @@ public class TCPClient {
     }
 
     public void showScore(String username) throws IOException {
-        Request request = RequestFactory.newScoreRequest(username);
-        tcpConnection.sendRequest(request);
-        Response response = tcpConnection.getResponse();
-        System.out.println("Ritornato: "+response.toString());
+        //tcpConnection.sendRequest(request);
     }
 
     public void showLeaderboard(String username) throws IOException {

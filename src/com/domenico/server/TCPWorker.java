@@ -1,6 +1,9 @@
 package com.domenico.server;
 
-import com.domenico.communication.*;
+import com.domenico.communication.Request;
+import com.domenico.communication.Response;
+import com.domenico.communication.SuccessResponse;
+import com.domenico.communication.TCPConnection;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -39,7 +42,9 @@ public class TCPWorker extends Multiplexer {
         SocketChannel client = (SocketChannel) key.channel();
         TCPConnection tcpConnection = (TCPConnection) key.attachment();
         Request request = tcpConnection.getRequest();
-        Response response = parseRequest(request);
+
+        // TODO: 18/06/2020 parse the data received to understand what response should be sent to the client
+        Response response = new SuccessResponse();
         Object[] attachment = {tcpConnection, response};
         client.register(selector, SelectionKey.OP_WRITE, attachment);
     }
@@ -58,13 +63,5 @@ public class TCPWorker extends Multiplexer {
 
     private void print(String string) {
         System.out.println("[TCP]: "+string);
-    }
-
-    private Response parseRequest(Request request) {
-        // TODO: 18/06/2020 parse the data received to understand what response should be sent to the client
-        if (Request.isLoginRequest(request)) {
-            return new SuccessResponse();
-        }
-        return new FailResponse("Invalid request");
     }
 }

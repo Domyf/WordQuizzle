@@ -26,7 +26,7 @@ public class UDPConnection implements Connection {
 
     @Override
     public void sendRequest(Request request) throws IOException {
-        String requestLine = request.toString();
+        String requestLine = request.toLine();
         byte[] bytes = requestLine.getBytes(StandardCharsets.UTF_8);
         send(bytes);
     }
