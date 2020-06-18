@@ -38,10 +38,9 @@ public class TCPWorker extends Multiplexer {
     protected void onClientReadable(SelectionKey key) throws IOException {
         SocketChannel client = (SocketChannel) key.channel();
         TCPConnection tcpConnection = (TCPConnection) key.attachment();
-        Request request = tcpConnection.getRequest();
-
+        ConnectionData connectionData = tcpConnection.receiveData();
         // TODO: 18/06/2020 parse the data received to understand what response should be sent to the client
-        Response response = parseRequest(request);
+        ConnectionData response = parseRequest(connectionData);
         Object[] attachment = {tcpConnection, response};
         client.register(selector, SelectionKey.OP_WRITE, attachment);
     }
@@ -52,8 +51,8 @@ public class TCPWorker extends Multiplexer {
         SocketChannel client = (SocketChannel) key.channel();
         Object[] attachment = (Object[]) key.attachment();
         TCPConnection tcpConnection = (TCPConnection) attachment[0];
-        Response response = (Response) attachment[1];
-        tcpConnection.sendResponse(response);
+        ConnectionData response = (ConnectionData) attachment[1];
+        tcpConnection.sendData(response);
 
         client.register(selector, SelectionKey.OP_READ, tcpConnection);
     }
@@ -62,15 +61,29 @@ public class TCPWorker extends Multiplexer {
         System.out.println("[TCP]: "+string);
     }
 
-    private Response parseRequest(Request request) {
+    private ConnectionData parseRequest(ConnectionData connectionData) {
         // TODO: 18/06/2020 parse the data received to understand what response should be sent to the client
-        if (request instanceof LoginRequest) {
-            LoginRequest loginRequest = (LoginRequest) request;
-            System.out.println("QUI");
-            return new FailResponse("Invalid username: "+loginRequest.getUsername()+" password: "+loginRequest.getPassword());
-        } else if (request instanceof ScoreRequest) {
-            ScoreRequest scoreRequest = (ScoreRequest) request;
+        if (ConnectionData.Validator.isLoginRequest(connectionData)) {
+            String username = connectionData.getParam(0);
+            String password = connectionData.getParam(1);
+            return ConnectionData.Factory.newFailResponse("Requested to login with username and password: "+username+", "+password);
+        } else if (ConnectionData.Validator.isLogoutRequest(connectionData)) {
+            String username = connectionData.getParam(0);
+            return ConnectionData.Factory.newFailResponse("Requested to logout with username: "+username);
+        } else if (ConnectionData.Validator.isAddFriendRequest(connectionData)) {
+            String username = connectionData.getParam(0);
+            String friend = connectionData.getParam(1);
+            return ConnectionData.Factory.newFailResponse("Requested to add friend with username and friend's username: "+username+", "+friend);
+        } else if (ConnectionData.Validator.isFriendListRequest(connectionData)) {
+            String username = connectionData.getParam(0);
+            return ConnectionData.Factory.newFailResponse("Requested to show the friend list with username: "+username);
+        } else if (ConnectionData.Validator.isScoreRequest(connectionData)) {
+            String username = connectionData.getParam(0);
+            return ConnectionData.Factory.newFailResponse("Requested to show the score with username: "+username);
+        } else if (ConnectionData.Validator.isLeaderboardRequest(connectionData)) {
+            String username = connectionData.getParam(0);
+            return ConnectionData.Factory.newFailResponse("Requested to show the leaderboard with username: "+username);
         }
-        return new FailResponse("Invalid request");
+        return ConnectionData.Factory.newFailResponse("Request parsing not implemented yet");
     }
 }

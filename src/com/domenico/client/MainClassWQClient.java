@@ -33,7 +33,8 @@ public class MainClassWQClient {
         }
         loggedUserName = null;
         scanner = new Scanner(System.in);
-        while(true) {
+        boolean exit = false;
+        while(!exit) {
             System.out.print("> ");
             String line = scanner.nextLine();
             Command command = new Command(line);
@@ -68,7 +69,16 @@ public class MainClassWQClient {
                 case Constants.SHOW_LEADERBOARD:
                     showLeaderboard();
                     break;
+                case Constants.EXIT:
+                    exit = true;
+                    break;
             }
+        }
+        try {
+            tcpClient.exit();
+            udpClient.exit();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

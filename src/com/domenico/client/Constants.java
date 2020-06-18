@@ -11,6 +11,7 @@ public class Constants {
     public static final String CHALLENGE = "sfida";
     public static final String SHOW_SCORE = "mostra_punteggio";
     public static final String SHOW_LEADERBOARD = "mostra_classifica";
+    public static final String EXIT = "esci";
 
     //The usage of this program
     public static final String USAGE = "usage : COMMAND [ ARGS ...]\n" +
@@ -22,6 +23,6 @@ public class Constants {
             "   "+FRIEND_LIST+" mostra la lista dei propri amici\n" +
             "   "+CHALLENGE+" <nickAmico> richiesta di una sfida a nickAmico\n" +
             "   "+SHOW_SCORE+" mostra il punteggio dell’utente\n" +
-            "   "+SHOW_LEADERBOARD+" mostra una classifica degli amici dell’utente (incluso l’utente stesso)";
-
+            "   "+SHOW_LEADERBOARD+" mostra una classifica degli amici dell’utente (incluso l’utente stesso)\n" +
+            "   "+EXIT+" esce dal programma";
 }

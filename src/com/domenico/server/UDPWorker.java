@@ -1,9 +1,5 @@
 package com.domenico.server;
 
-import com.domenico.client.Command;
-import com.domenico.communication.Request;
-import com.domenico.communication.Response;
-import com.domenico.communication.TCPConnection;
 import com.domenico.communication.UDPConnection;
 
 import java.io.IOException;
@@ -30,7 +26,6 @@ public class UDPWorker extends Multiplexer {
     void onClientReadable(SelectionKey key) throws IOException {
         DatagramChannel client = (DatagramChannel) key.channel();
         UDPConnection udpConnection = (UDPConnection) key.attachment();
-
         client.register(selector, SelectionKey.OP_WRITE, udpConnection);
     }
 

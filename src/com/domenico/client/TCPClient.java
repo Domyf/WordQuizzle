@@ -1,7 +1,6 @@
 package com.domenico.client;
 
-import com.domenico.communication.LoginRequest;
-import com.domenico.communication.Response;
+import com.domenico.communication.ConnectionData;
 import com.domenico.communication.TCPConnection;
 
 import java.io.IOException;
@@ -20,29 +19,48 @@ public class TCPClient {
     }
 
     public void login(String username, String password) throws IOException {
-        LoginRequest request = new LoginRequest(username, password);
-        tcpConnection.sendRequest(request);
-        Response response = tcpConnection.getResponse();
+        ConnectionData request = ConnectionData.Factory.newLoginRequest(username, password);
+        tcpConnection.sendData(request);
+        ConnectionData response = tcpConnection.receiveData();
         System.out.println("Ritornato: "+response.toString());
     }
 
     public void logout(String username) throws IOException {
-        //tcpConnection.sendRequest(request);
+        ConnectionData request = ConnectionData.Factory.newLogoutRequest(username);
+        tcpConnection.sendData(request);
+        ConnectionData response = tcpConnection.receiveData();
+        System.out.println("Ritornato: "+response.toString());
     }
 
     public void addFriend(String username, String friendUsername) throws IOException {
-        //tcpConnection.sendRequest(request);
+        ConnectionData request = ConnectionData.Factory.newAddFriendRequest(username, friendUsername);
+        tcpConnection.sendData(request);
+        ConnectionData response = tcpConnection.receiveData();
+        System.out.println("Ritornato: "+response.toString());
     }
 
     public void friendList(String username) throws IOException {
-        //tcpConnection.sendRequest(request);
+        ConnectionData request = ConnectionData.Factory.newFriendListRequest(username);
+        tcpConnection.sendData(request);
+        ConnectionData response = tcpConnection.receiveData();
+        System.out.println("Ritornato: "+response.toString());
     }
 
     public void showScore(String username) throws IOException {
-        //tcpConnection.sendRequest(request);
+        ConnectionData request = ConnectionData.Factory.newScoreRequest(username);
+        tcpConnection.sendData(request);
+        ConnectionData response = tcpConnection.receiveData();
+        System.out.println("Ritornato: "+response.toString());
     }
 
     public void showLeaderboard(String username) throws IOException {
-        //tcpConnection.sendRequest(request);
+        ConnectionData request = ConnectionData.Factory.newLeaderboardRequest(username);
+        tcpConnection.sendData(request);
+        ConnectionData response = tcpConnection.receiveData();
+        System.out.println("Ritornato: "+response.toString());
+    }
+
+    public void exit() throws IOException {
+        tcpConnection.endConnection();
     }
 }

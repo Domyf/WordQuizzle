@@ -24,4 +24,8 @@ public class UDPClient {
         //udpConnection.sendRequest(request);
         //udpConnection.getResponse(request);
     }
+
+    public void exit() throws IOException {
+        udpConnection.endConnection();
+    }
 }
