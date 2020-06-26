@@ -20,13 +20,19 @@ public class ConnectionData {
         FAIL_RESPONSE
     }
 
-    private CMD cmd;
-    private String[] params;
-    private String senderUsername;
-    private String senderPassword;
-    private String friendUsername;
-    private String message;
+    private CMD cmd;                //The command of the request/response
+    private String[] params;        //The parameters of the request/response
+    private String senderUsername;  //The username of who sent the message. It is always used
+    private String senderPassword;  //The password of who sent the message.
+    private String friendUsername;  //The friend's username. Used for the ADD_FRIEND request
+    private String message;         //A message. It is used for the success and fail responses
 
+    /**
+     * Private constructor. It creates this by using the given parameters. The attributes are set as null. The only way
+     * to instantiate a ConnectionData is by using the methods available in the Factory class.
+     * @param cmd the command
+     * @param params the array of parameters
+     */
     private ConnectionData(CMD cmd, String[] params) {
         this.cmd = cmd;
         this.params = params;
@@ -52,6 +58,10 @@ public class ConnectionData {
         return message;
     }
 
+    /**
+     * Transforms this into a string. The returned string has the following pattern: <command> <parameter1> <parameter2> ...
+     * @return returns a string that represents this object.
+     */
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
@@ -61,41 +71,68 @@ public class ConnectionData {
         return cmd.toString()+" "+builder.toString();
     }
 
+    /**
+     * Factory class for the ConnectionData object. This class has the methods to create a valid ConnectionData object.
+     * In general the methods available can instantiate a specific request or response by parsing a string or by some
+     * given arguments.
+     */
     public static class Factory {
+        /**
+         * This method instantiate a ConnectionData object by parsing a given string. The given string should represent
+         * a ConnectionData object like the string returned by ConnectionData.toString() method does.
+         * @param line the string that should be parsed. It should start with the command and it should have the parameters
+         *             if any. The command and the parameters should be separated by a blank character.
+         * @return a valid ConnectionData object that represents the given line or null if the line doesn't represent a
+         * valid ConnectionData object.
+         */
         public static ConnectionData parseLine(String line) {
             String[] splittedLine = line.split(" ");
-            String cmd;
-            if (splittedLine.length > 0) {
-                String[] params = new String[0];
-                cmd = splittedLine[0];
-                if (splittedLine.length > 1)
-                    params = Arrays.copyOfRange(splittedLine, 1, splittedLine.length);
-                switch (CMD.valueOf(cmd)) {
-                    case LOGIN_REQUEST:
+
+            String[] params = new String[0];
+            String cmd = splittedLine[0];
+            if (splittedLine.length > 1)
+                params = Arrays.copyOfRange(splittedLine, 1, splittedLine.length);
+            switch (CMD.valueOf(cmd)) {
+                case LOGIN_REQUEST:
+                    if (params.length == 2)
                         return newLoginRequest(params[0], params[1]);
-                    case LOGOUT_REQUEST:
+                case LOGOUT_REQUEST:
+                    if (params.length == 1)
                         return newLogoutRequest(params[0]);
-                    case ADD_FRIEND_REQUEST:
+                case ADD_FRIEND_REQUEST:
+                    if (params.length == 2)
                         return newAddFriendRequest(params[0], params[1]);
-                    case FRIEND_LIST_REQUEST:
+                case FRIEND_LIST_REQUEST:
+                    if (params.length == 1)
                         return newFriendListRequest(params[0]);
-                    case SCORE_REQUEST:
+                case SCORE_REQUEST:
+                    if (params.length == 1)
                         return newScoreRequest(params[0]);
-                    case LEADERBOARD_REQUEST:
+                case LEADERBOARD_REQUEST:
+                    if (params.length == 1)
                         return newLeaderboardRequest(params[0]);
-                    case SUCCESS_RESPONSE:
+                case SUCCESS_RESPONSE:
+                    if (params.length == 0)
                         return newSuccessResponse();
-                    case FAIL_RESPONSE:
+                case FAIL_RESPONSE:
+                    if (params.length > 0) {
                         StringBuilder builder = new StringBuilder();
                         for (int i = 0; i < params.length; i++) {
                             builder.append(params[i]).append(" ");
                         }
                         return newFailResponse(builder.toString());
-                }
+                    }
             }
+
             return null;
         }
 
+        /**
+         * Builds a ConnectionData object that represents a login request
+         * @param username the username of who is sending the request
+         * @param password the password of who is sending the request
+         * @return a ConnectionData object that represents a login request
+         */
         public static ConnectionData newLoginRequest(String username, String password) {
             ConnectionData connectionData = new ConnectionData(CMD.LOGIN_REQUEST, new String[]{username, password});
             connectionData.senderUsername = username;
@@ -103,12 +140,23 @@ public class ConnectionData {
             return connectionData;
         }
 
+        /**
+         * Builds a ConnectionData object that represents a logout request
+         * @param username the username of who is sending the request
+         * @return a ConnectionData object that represents a logout request
+         */
         public static ConnectionData newLogoutRequest(String username) {
             ConnectionData connectionData = new ConnectionData(CMD.LOGOUT_REQUEST, new String[]{username});
             connectionData.senderUsername = username;
             return connectionData;
         }
 
+        /**
+         * Builds a ConnectionData object that represents an add friend request
+         * @param username the username of who is sending the request
+         * @param friendUsername the friend's username
+         * @return a ConnectionData object that represents an add friend request
+         */
         public static ConnectionData newAddFriendRequest(String username, String friendUsername) {
             ConnectionData connectionData = new ConnectionData(CMD.ADD_FRIEND_REQUEST, new String[]{username, friendUsername});
             connectionData.senderUsername = username;
@@ -116,28 +164,52 @@ public class ConnectionData {
             return connectionData;
         }
 
+        /**
+         * Builds a ConnectionData object that represents a friend list request
+         * @param username the username of who is sending the request
+         * @return a ConnectionData object that represents a friend list request
+         */
         public static ConnectionData newFriendListRequest(String username) {
             ConnectionData connectionData = new ConnectionData(CMD.FRIEND_LIST_REQUEST, new String[]{username});
             connectionData.senderUsername = username;
             return connectionData;
         }
 
+        /**
+         * Builds a ConnectionData object that represents a score request
+         * @param username the username of who is sending the request
+         * @return a ConnectionData object that represents a score request
+         */
         public static ConnectionData newScoreRequest(String username) {
             ConnectionData connectionData = new ConnectionData(CMD.SCORE_REQUEST, new String[]{username});
             connectionData.senderUsername = username;
             return connectionData;
         }
 
+        /**
+         * Builds a ConnectionData object that represents a leaderboard request
+         * @param username the username of who is sending the request
+         * @return a ConnectionData object that represents a leaderboard request
+         */
         public static ConnectionData newLeaderboardRequest(String username) {
             ConnectionData connectionData = new ConnectionData(CMD.LEADERBOARD_REQUEST, new String[]{username});
             connectionData.senderUsername = username;
             return connectionData;
         }
 
+        /**
+         * Builds a ConnectionData object that represents a success response
+         * @return a ConnectionData object that represents a success response
+         */
         public static ConnectionData newSuccessResponse() {
             return new ConnectionData(CMD.SUCCESS_RESPONSE, new String[]{});
         }
 
+        /**
+         * Builds a ConnectionData object that represents a fail response
+         * @param failmessage the failure message that the fail response should have
+         * @return a ConnectionData object that represents a fail response
+         */
         public static ConnectionData newFailResponse(String failmessage) {
             ConnectionData connectionData = new ConnectionData(CMD.FAIL_RESPONSE, new String[]{failmessage});
             connectionData.message = failmessage;
