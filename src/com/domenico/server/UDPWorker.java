@@ -18,17 +18,17 @@ public class UDPWorker extends Multiplexer {
     }
 
     @Override
-    void onClientAcceptable(SelectionKey key) {}
+    void onAcceptable(SelectionKey key) {}
 
     @Override
-    void onClientReadable(SelectionKey key) throws IOException {
+    void onReadable(SelectionKey key) throws IOException {
         DatagramChannel client = (DatagramChannel) key.channel();
         UDPConnection udpConnection = (UDPConnection) key.attachment();
         client.register(selector, SelectionKey.OP_WRITE, udpConnection);
     }
 
     @Override
-    void onClientWritable(SelectionKey key) throws IOException {
+    void onWritable(SelectionKey key) throws IOException {
         DatagramChannel client = (DatagramChannel) key.channel();
         UDPConnection udpConnection = (UDPConnection) key.attachment();
         client.register(selector, SelectionKey.OP_READ, udpConnection);

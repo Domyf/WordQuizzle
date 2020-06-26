@@ -24,7 +24,7 @@ public class TCPWorker extends Multiplexer {
 
     /** Called when the method accept() will not block the thread */
     @Override
-    protected void onClientAcceptable(SelectionKey key) throws IOException {
+    protected void onAcceptable(SelectionKey key) throws IOException {
         ServerSocketChannel channel = (ServerSocketChannel) key.channel();
         SocketChannel client = channel.accept();
         print("Accepted connection for "+client.getRemoteAddress());
@@ -35,7 +35,7 @@ public class TCPWorker extends Multiplexer {
 
     /** Called when the method read() will not block the thread */
     @Override
-    protected void onClientReadable(SelectionKey key) throws IOException {
+    protected void onReadable(SelectionKey key) throws IOException {
         SocketChannel client = (SocketChannel) key.channel();
         TCPConnection tcpConnection = (TCPConnection) key.attachment();
         ConnectionData connectionData = tcpConnection.receiveData();
@@ -48,7 +48,7 @@ public class TCPWorker extends Multiplexer {
 
     /** Called when the method write() will not block the thread */
     @Override
-    protected void onClientWritable(SelectionKey key) throws IOException {
+    protected void onWritable(SelectionKey key) throws IOException {
         SocketChannel client = (SocketChannel) key.channel();
         Object[] attachment = (Object[]) key.attachment();
         TCPConnection tcpConnection = (TCPConnection) attachment[0];
