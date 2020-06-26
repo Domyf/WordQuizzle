@@ -88,7 +88,7 @@ public class TCPWorker extends Multiplexer {
                 String username = connectionData.getUsername();
                 // TODO: 26/06/2020 get the leaderboard
             }
-        } catch (IllegalArgumentException e) {
+        } catch (UsersManagementException e) {
             failMessage = e.getMessage();
         }
 
