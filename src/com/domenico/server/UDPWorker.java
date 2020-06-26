@@ -8,6 +8,10 @@ import java.net.InetSocketAddress;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 
+/**
+ * This is a worker class that manages all the UDP communications. It implements channel multiplexing to efficiently
+ * manage all the clients by extending the Multiplexer class.
+ */
 public class UDPWorker extends Multiplexer {
 
     public UDPWorker(DatagramChannel channel) throws IOException {

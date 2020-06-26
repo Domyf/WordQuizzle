@@ -18,25 +18,38 @@ public class TCPClient {
         tcpConnection = new TCPConnection(channel);
     }
 
-    public void login(String username, String password) throws IOException {
+    public boolean login(String username, String password) throws IOException {
         ConnectionData request = ConnectionData.Factory.newLoginRequest(username, password);
         tcpConnection.sendData(request);
         ConnectionData response = tcpConnection.receiveData();
-        System.out.println("Ritornato: "+response.toString());
+        if (ConnectionData.Validator.isSuccessResponse(response)) {
+            System.out.println("Login eseguito con successo");
+            return true;
+        }
+
+        if (ConnectionData.Validator.isFailResponse(response))
+            System.out.println(response.getMessage());
+        return false;
     }
 
     public void logout(String username) throws IOException {
         ConnectionData request = ConnectionData.Factory.newLogoutRequest(username);
         tcpConnection.sendData(request);
         ConnectionData response = tcpConnection.receiveData();
-        System.out.println("Ritornato: "+response.toString());
+        if (ConnectionData.Validator.isSuccessResponse(response))
+            System.out.println("Logout eseguito con successo");
+        else if (ConnectionData.Validator.isFailResponse(response))
+            System.out.println(response.getMessage());
     }
 
     public void addFriend(String username, String friendUsername) throws IOException {
         ConnectionData request = ConnectionData.Factory.newAddFriendRequest(username, friendUsername);
         tcpConnection.sendData(request);
         ConnectionData response = tcpConnection.receiveData();
-        System.out.println("Ritornato: "+response.toString());
+        if (ConnectionData.Validator.isSuccessResponse(response))
+            System.out.println("Tu e "+friendUsername+" siete ora amici!");
+        else if (ConnectionData.Validator.isFailResponse(response))
+            System.out.println(response.getMessage());
     }
 
     public void friendList(String username) throws IOException {

@@ -40,8 +40,15 @@ public class MainClassWQClient {
             switch (command.getCmd()) {
                 case Constants.REGISTER_USER:
                     if (command.hasParams(2)) {
-                        registerUser(command.getParam(0), command.getParam(1));
-                        loginUser(command.getParam(0), command.getParam(1));
+                        boolean done = registerUser(command.getParam(0), command.getParam(1));
+                        if (done) {
+                            System.out.println("Vuoi eseguire il log in? (SI/NO oppure S/N)");
+                            System.out.print("> ");
+                            String answer = scanner.nextLine();
+                            answer = answer.trim().toLowerCase();
+                            if (answer.equals("si") || answer.equals("s"))
+                                loginUser(command.getParam(0), command.getParam(1));
+                        }
                     }
                     break;
                 case Constants.LOGIN:
@@ -82,21 +89,30 @@ public class MainClassWQClient {
     }
 
     /** Method invoked when the user types registra_utente <nickUtente> <password> */
-    private static void registerUser(String username, String password) {
-        // TODO: 18/06/2020 Check if the user was registered or not
+    private static boolean registerUser(String username, String password) {
+        if (isLogged()) {
+            System.out.println(Messages.LOGOUT_NEEDED);
+            return false;
+        }
+        boolean done = false;
         try {
-            rmiClient.register(username, password);
+            done = rmiClient.register(username, password);
         } catch (RemoteException e) {
             e.printStackTrace();
         }
+        return done;
     }
 
     /** Method invoked when the user types login <nickUtente> <password> */
     private static void loginUser(String username, String password) {
-        // TODO: 17/06/2020 log in the user to this game
+        if (isLogged()) {
+            System.out.println(Messages.LOGOUT_NEEDED);
+            return;
+        }
         try {
-            tcpClient.login(username, password);
-            loggedUserName = "fake";// TODO: 18/06/2020 remove this
+            boolean logged = tcpClient.login(username, password);
+            if (logged)
+                loggedUserName = username;
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -104,13 +120,13 @@ public class MainClassWQClient {
 
     /** Method invoked when the user types logout */
     private static void logout() {
-        if (loggedUserName == null) {
+        if (!isLogged()) {
             System.out.println(Messages.LOGIN_NEEDED);
             return;
         }
-        // TODO: 17/06/2020 log out the user from this game
         try {
             tcpClient.logout(loggedUserName);
+            loggedUserName = null;
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -118,11 +134,10 @@ public class MainClassWQClient {
 
     /** Method invoked when the user types aggiungi_amico <nickAmico> */
     private static void addFriend(String otherUsername) {
-        if (loggedUserName == null) {
+        if (!isLogged()) {
             System.out.println(Messages.LOGIN_NEEDED);
             return;
         }
-        // TODO: 17/06/2020 add the given user to this user's friends
         try {
             tcpClient.addFriend(loggedUserName, otherUsername);
         } catch (IOException e) {
@@ -132,7 +147,7 @@ public class MainClassWQClient {
 
     /** Method invoked when the user types mostra_amici */
     private static void showFriendList() {
-        if (loggedUserName == null) {
+        if (!isLogged()) {
             System.out.println(Messages.LOGIN_NEEDED);
             return;
         }
@@ -146,7 +161,7 @@ public class MainClassWQClient {
 
     /** Method invoked when the user types sfida <nickAmico> */
     private static void startGame(String friendUsername) {
-        if (loggedUserName == null) {
+        if (!isLogged()) {
             System.out.println(Messages.LOGIN_NEEDED);
             return;
         }
@@ -160,7 +175,7 @@ public class MainClassWQClient {
 
     /** Method invoked when the user types mostra_classifica */
     private static void showLeaderboard() {
-        if (loggedUserName == null) {
+        if (!isLogged()) {
             System.out.println(Messages.LOGIN_NEEDED);
             return;
         }
@@ -174,7 +189,7 @@ public class MainClassWQClient {
 
     /** Method invoked when the user types mostra_punteggio */
     private static void showScore() {
-        if (loggedUserName == null) {
+        if (!isLogged()) {
             System.out.println(Messages.LOGIN_NEEDED);
             return;
         }
@@ -184,5 +199,9 @@ public class MainClassWQClient {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private static boolean isLogged() {
+        return loggedUserName != null;
     }
 }

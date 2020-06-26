@@ -21,12 +21,12 @@ public class MainClassWQServer {
             e.printStackTrace();
             return;
         }
-        UsersManagement usersManagement = UsersManager.getInstance();
+        UsersManagement usersManagement = UsersManagementImpl.getInstance();
         Thread tcpWorker;
         Thread udpWorker;
         try {
             UserRegistrationService.newRegistrationService(usersManagement);
-            tcpWorker = new TCPWorker();
+            tcpWorker = new TCPWorker(usersManagement);
             udpWorker = new UDPWorker(DatagramChannel.open());
             tcpWorker.start();
             udpWorker.start();

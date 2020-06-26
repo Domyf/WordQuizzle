@@ -8,5 +8,5 @@ public interface RMIConnection extends Remote {
     String SERVICE_NAME = "REGISTER_USER_SERVICE";
     int REGISTRY_PORT = 9999;
 
-    void register(String username, String password) throws RemoteException;
+    String register(String username, String password) throws RemoteException;
 }

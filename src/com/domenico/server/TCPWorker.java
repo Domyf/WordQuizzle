@@ -8,18 +8,22 @@ import java.net.ServerSocket;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.util.List;
 
 /**
  * This is a worker class that manages all the TCP communications. It implements channel multiplexing to efficiently
- * manage all the clients.
+ * manage all the clients by extending the Multiplexer class.
  */
 public class TCPWorker extends Multiplexer {
 
-    public TCPWorker() throws IOException {
+    private UsersManagement usersManagement;
+
+    public TCPWorker(UsersManagement usersManagement) throws IOException {
         super(ServerSocketChannel.open(), SelectionKey.OP_ACCEPT);
         ServerSocket serverSocket = ((ServerSocketChannel) channel).socket();
         serverSocket.bind(new InetSocketAddress(TCPConnection.SERVER_PORT));
         print("Listening on port " + TCPConnection.SERVER_PORT);
+        this.usersManagement = usersManagement;
     }
 
     /** Called when the method accept() will not block the thread */
@@ -63,29 +67,34 @@ public class TCPWorker extends Multiplexer {
     }
 
     private ConnectionData parseRequest(ConnectionData connectionData) {
-        // TODO: 18/06/2020 parse the data received to understand what response should be sent to the client
-        if (ConnectionData.Validator.isLoginRequest(connectionData)) {
-            String username = connectionData.getUsername();
-            String password = connectionData.getPassword();
-            return ConnectionData.Factory.newFailResponse("Requested to login with username and password: "+username+", "+password);
-        } else if (ConnectionData.Validator.isLogoutRequest(connectionData)) {
-            String username = connectionData.getUsername();
-            return ConnectionData.Factory.newFailResponse("Requested to logout with username: "+username);
-        } else if (ConnectionData.Validator.isAddFriendRequest(connectionData)) {
-            String username = connectionData.getUsername();
-            String friend = connectionData.getFriendUsername();
-            return ConnectionData.Factory.newFailResponse("Requested to add friend with username and friend's username: "+username+", "+friend);
-        } else if (ConnectionData.Validator.isFriendListRequest(connectionData)) {
-            String username = connectionData.getUsername();
-            return ConnectionData.Factory.newFailResponse("Requested to show the friend list with username: "+username);
-        } else if (ConnectionData.Validator.isScoreRequest(connectionData)) {
-            String username = connectionData.getUsername();
-            return ConnectionData.Factory.newFailResponse("Requested to show the score with username: "+username);
-        } else if (ConnectionData.Validator.isLeaderboardRequest(connectionData)) {
-            String username = connectionData.getUsername();
-            return ConnectionData.Factory.newFailResponse("Requested to show the leaderboard with username: "+username);
+        String failMessage = "";
+        try {
+            if (ConnectionData.Validator.isLoginRequest(connectionData)) {
+                String username = connectionData.getUsername();
+                String password = connectionData.getPassword();
+                usersManagement.login(new User(username, password));
+            } else if (ConnectionData.Validator.isLogoutRequest(connectionData)) {
+                usersManagement.logout(connectionData.getUsername());
+            } else if (ConnectionData.Validator.isAddFriendRequest(connectionData)) {
+                String username = connectionData.getUsername();
+                String friend = connectionData.getFriendUsername();
+                usersManagement.addFriend(username, friend);
+            } else if (ConnectionData.Validator.isFriendListRequest(connectionData)) {
+                List<String> friendList = usersManagement.getFriendList(connectionData.getUsername());
+            } else if (ConnectionData.Validator.isScoreRequest(connectionData)) {
+                String username = connectionData.getUsername();
+                // TODO: 26/06/2020 get the score
+            } else if (ConnectionData.Validator.isLeaderboardRequest(connectionData)) {
+                String username = connectionData.getUsername();
+                // TODO: 26/06/2020 get the leaderboard
+            }
+        } catch (IllegalArgumentException e) {
+            failMessage = e.getMessage();
         }
 
-        return ConnectionData.Factory.newFailResponse("Request parsing not implemented yet");
+        if (failMessage.length() == 0)
+            return ConnectionData.Factory.newSuccessResponse();
+
+        return ConnectionData.Factory.newFailResponse(failMessage);
     }
 }

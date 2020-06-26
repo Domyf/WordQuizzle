@@ -1,5 +1,7 @@
 package com.domenico.client;
 
+import com.domenico.communication.Connection;
+import com.domenico.communication.ConnectionData;
 import com.domenico.communication.UDPConnection;
 
 import java.io.IOException;
@@ -21,8 +23,10 @@ public class UDPClient {
     }
 
     public void startGame(String username, String friendUsername) throws IOException {
-        //udpConnection.sendRequest(request);
-        //udpConnection.getResponse(request);
+        /*udpConnection.sendData(ConnectionData.Factory.newChallengeRequest);
+        ConnectionData response = udpConnection.receiveData();
+        System.out.println("Ritornato: "+response.toString());*/
+        System.out.println("To be implemented...");
     }
 
     public void exit() throws IOException {

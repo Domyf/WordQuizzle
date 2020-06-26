@@ -18,9 +18,13 @@ public class UserRegistrationService extends RemoteServer implements RMIConnecti
     }
 
     @Override
-    public void register(String username, String password) throws RemoteException {
-        usersManagement.register(new User(username, password));
-        System.out.println("Registration for the user "+username+" done");
+    public String register(String username, String password) throws RemoteException {
+        try {
+            usersManagement.register(new User(username, password));
+        } catch (IllegalArgumentException e) {
+            return e.getMessage();
+        }
+        return null;
     }
 
     public static UserRegistrationService newRegistrationService(UsersManagement usersManagement) throws RemoteException {

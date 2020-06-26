@@ -14,6 +14,7 @@ public class ConnectionData {
         LOGOUT_REQUEST,
         ADD_FRIEND_REQUEST,
         FRIEND_LIST_REQUEST,
+        //TODO CHALLENGE_REQUEST
         SCORE_REQUEST,
         LEADERBOARD_REQUEST,
         SUCCESS_RESPONSE,
