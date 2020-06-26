@@ -42,6 +42,7 @@
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.0" />
     <property name="project.structure.side.proportion" value="0.0" />
+    <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
   </component>
   <component name="RecentsManager">
     <key name="CreateTestDialog.RecentsKey">
@@ -125,6 +126,7 @@
       <option name="presentableId" value="Default" />
       <updated>1592414219160</updated>
       <workItem from="1592414223759" duration="41968000" />
+      <workItem from="1593156720811" duration="2386000" />
     </task>
     <servers />
   </component>
@@ -136,10 +138,10 @@
       <screen x="0" y="0" width="1536" height="864" />
     </state>
     <state x="225" y="88" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1536.864@0.0.1536.864" timestamp="1592482326661" />
-    <state x="575" y="149" key="#com.intellij.ide.util.MemberChooser" timestamp="1592519560516">
+    <state x="575" y="149" key="#com.intellij.ide.util.MemberChooser" timestamp="1593157624406">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state x="575" y="149" key="#com.intellij.ide.util.MemberChooser/0.0.1536.864@0.0.1536.864" timestamp="1592519560516" />
+    <state x="575" y="149" key="#com.intellij.ide.util.MemberChooser/0.0.1536.864@0.0.1536.864" timestamp="1593157624406" />
     <state x="500" y="224" key="#com.intellij.ide.util.TreeClassChooserDialog" timestamp="1592497716269">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
@@ -160,6 +162,10 @@
       <screen x="0" y="0" width="1536" height="864" />
     </state>
     <state x="500" y="180" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1536.864@0.0.1536.864" timestamp="1592516352299" />
+    <state x="522" y="329" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1" timestamp="1593157449629">
+      <screen x="0" y="0" width="1536" height="864" />
+    </state>
+    <state x="522" y="329" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1/0.0.1536.864@0.0.1536.864" timestamp="1593157449629" />
     <state width="1493" height="224" key="GridCell.Tab.0.bottom" timestamp="1592520924545">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
@@ -180,10 +186,10 @@
       <screen x="0" y="0" width="1536" height="864" />
     </state>
     <state x="250" y="8" key="SettingsEditor/0.0.1536.864@0.0.1536.864" timestamp="1592474767143" />
-    <state x="498" y="325" key="com.intellij.jarRepository.RepositoryAttachDialog-DOWNLOAD" timestamp="1592474803651">
+    <state x="498" y="325" key="com.intellij.jarRepository.RepositoryAttachDialog-DOWNLOAD" timestamp="1593157436693">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state x="498" y="325" key="com.intellij.jarRepository.RepositoryAttachDialog-DOWNLOAD/0.0.1536.864@0.0.1536.864" timestamp="1592474803651" />
+    <state x="498" y="325" key="com.intellij.jarRepository.RepositoryAttachDialog-DOWNLOAD/0.0.1536.864@0.0.1536.864" timestamp="1593157436693" />
     <state x="541" y="240" key="com.intellij.testIntegration.createTest.CreateTestDialog" timestamp="1592474784489">
       <screen x="0" y="0" width="1536" height="864" />
     </state>

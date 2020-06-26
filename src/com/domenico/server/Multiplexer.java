@@ -11,6 +11,7 @@ public abstract class Multiplexer extends Thread {
 
     protected AbstractSelectableChannel channel;
     protected Selector selector;
+    private boolean running;
 
     public Multiplexer(AbstractSelectableChannel channel, int firstOp) throws IOException {
         this.channel = channel;
@@ -26,8 +27,9 @@ public abstract class Multiplexer extends Thread {
 
     @Override
     public void run() {
+        running = true;
         try {
-            while (true) {
+            while (running) {
                 selector.select();
                 Set<SelectionKey> selectedKeys = selector.selectedKeys();
                 Iterator<SelectionKey> iterator = selectedKeys.iterator();
@@ -70,4 +72,9 @@ public abstract class Multiplexer extends Thread {
      * Called when the method write() will not block the thread
      */
     abstract void onClientWritable(SelectionKey key) throws IOException;
+
+    protected void close() throws IOException {
+        running = false;
+        channel.close();
+    }
 }

@@ -11,7 +11,6 @@ public class MainClassWQClient {
 
     private static final String HELP_COMMAND_ARG = "--help";    //The program argument associated to the usage
 
-    private static Scanner scanner;
     private static String loggedUserName;
     private static RMIClient rmiClient;
     private static TCPClient tcpClient;
@@ -32,7 +31,7 @@ public class MainClassWQClient {
             return;
         }
         loggedUserName = null;
-        scanner = new Scanner(System.in);
+        Scanner scanner = new Scanner(System.in);
         boolean exit = false;
         while(!exit) {
             System.out.print("> ");
