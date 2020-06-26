@@ -1,5 +1,7 @@
 package com.domenico.client;
 
+import com.domenico.server.User;
+
 import java.io.IOException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -13,7 +15,7 @@ public class MainClassWQClient {
     public static final String USAGE = "usage : COMMAND [ ARGS ...]";
     private static final String HELP_COMMAND_ARG = "--help";    //The program argument associated to the usage
 
-    private static String loggedUserName;
+    private static String loggedUserName = null;
     private static RMIClient rmiClient;
     private static TCPClient tcpClient;
     private static UDPClient udpClient;
@@ -33,7 +35,6 @@ public class MainClassWQClient {
             e.printStackTrace();
             return;
         }
-        loggedUserName = null;
         Scanner scanner = new Scanner(System.in);
         boolean exit = false;
         while(!exit) {
@@ -44,20 +45,27 @@ public class MainClassWQClient {
             switch (userCommand.getCmd()) {
                 case UserCommand.REGISTER_USER:
                     if (userCommand.hasParams(2)) {
-                        boolean done = registerUser(userCommand.getParam(0), userCommand.getParam(1));
-                        if (done) {
-                            System.out.println("Vuoi eseguire il login? (SI/NO oppure S/N)");
+                        boolean registered = registerUser(userCommand.getParam(0), userCommand.getParam(1));
+                        if (registered) {
+                            System.out.println(Messages.ASK_LOGIN+" (SI/NO oppure S/N)");
                             System.out.print("> ");
                             String answer = scanner.nextLine();
                             answer = answer.trim().toLowerCase();
                             if (answer.equals("si") || answer.equals("s"))
                                 loginUser(userCommand.getParam(0), userCommand.getParam(1));
                         }
+                    } else {
+                        System.out.println(Messages.BAD_COMMAND_SINTAX);
+                        System.out.println(UserCommand.getCommandUsage(UserCommand.REGISTER_USER));
                     }
                     break;
                 case UserCommand.LOGIN:
                     if (userCommand.hasParams(2))
                         loginUser(userCommand.getParam(0), userCommand.getParam(1));
+                    else {
+                        System.out.println(Messages.BAD_COMMAND_SINTAX);
+                        System.out.println(UserCommand.getCommandUsage(UserCommand.LOGIN));
+                    }
                     break;
                 case UserCommand.LOGOUT:
                     logout();
@@ -65,6 +73,10 @@ public class MainClassWQClient {
                 case UserCommand.ADD_FRIEND:
                     if (userCommand.hasParams(1))
                         addFriend(userCommand.getParam(0));
+                    else {
+                        System.out.println(Messages.BAD_COMMAND_SINTAX);
+                        System.out.println(UserCommand.getCommandUsage(UserCommand.ADD_FRIEND));
+                    }
                     break;
                 case UserCommand.FRIEND_LIST:
                     showFriendList();
@@ -72,6 +84,10 @@ public class MainClassWQClient {
                 case UserCommand.CHALLENGE:
                     if (userCommand.hasParams(1))
                         startGame(userCommand.getParam(0));
+                    else {
+                        System.out.println(Messages.BAD_COMMAND_SINTAX);
+                        System.out.println(UserCommand.getCommandUsage(UserCommand.CHALLENGE));
+                    }
                     break;
                 case UserCommand.SHOW_SCORE:
                     showScore();
@@ -83,7 +99,7 @@ public class MainClassWQClient {
                     exit = true;
                     break;
                 default:
-                    System.out.println("Questo comando non esiste. Ecco una lista dei comandi disponibili ed il loro utilizzo");
+                    System.out.println(Messages.INVALID_COMMAND);
                     printCommandsUsage();
             }
         }
@@ -95,6 +111,9 @@ public class MainClassWQClient {
         }
     }
 
+    /**
+     * Prints the usage of each command
+     */
     private static void printCommandsUsage() {
         System.out.println("Commands:\n" +
                 "   "+UserCommand.getCommandUsage(UserCommand.REGISTER_USER)+"\n"+
@@ -221,6 +240,9 @@ public class MainClassWQClient {
         }
     }
 
+    /**
+     * @return true if the client's user is logged in
+     */
     private static boolean isLogged() {
         return loggedUserName != null;
     }

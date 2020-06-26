@@ -26,7 +26,7 @@ public class ConnectionData {
     private String senderUsername;  //The username of who sent the message. It is always used
     private String senderPassword;  //The password of who sent the message.
     private String friendUsername;  //The friend's username. Used for the ADD_FRIEND request
-    private String message;         //A message. It is used for the success and fail responses
+    private String responseData;    //The data which is used as failure message by the fail response or as data by the success response
 
     /**
      * Private constructor. It creates this by using the given parameters. The attributes are set as null. The only way
@@ -40,7 +40,7 @@ public class ConnectionData {
         senderUsername = null;
         senderPassword = null;
         friendUsername = null;
-        message = null;
+        responseData = null;
     }
 
     public String getUsername() {
@@ -55,8 +55,8 @@ public class ConnectionData {
         return friendUsername;
     }
 
-    public String getMessage() {
-        return message;
+    public String getResponseData() {
+        return responseData;
     }
 
     /**
@@ -113,8 +113,15 @@ public class ConnectionData {
                     if (params.length == 1)
                         return newLeaderboardRequest(params[0]);
                 case SUCCESS_RESPONSE:
-                    if (params.length == 0)
+                    if (params.length == 0) {
                         return newSuccessResponse();
+                    } else {
+                        StringBuilder builder = new StringBuilder();
+                        for (int i = 0; i < params.length; i++) {
+                            builder.append(params[i]).append(" ");
+                        }
+                        return newSuccessResponse(builder.toString());
+                    }
                 case FAIL_RESPONSE:
                     if (params.length > 0) {
                         StringBuilder builder = new StringBuilder();
@@ -206,6 +213,13 @@ public class ConnectionData {
             return new ConnectionData(CMD.SUCCESS_RESPONSE, new String[]{});
         }
 
+        // TODO: 26/06/2020 this doc
+        public static ConnectionData newSuccessResponse(String data) {
+            ConnectionData connectionData = new ConnectionData(CMD.SUCCESS_RESPONSE, new String[]{data});
+            connectionData.responseData = data;
+            return connectionData;
+        }
+
         /**
          * Builds a ConnectionData object that represents a fail response
          * @param failmessage the failure message that the fail response should have
@@ -213,7 +227,7 @@ public class ConnectionData {
          */
         public static ConnectionData newFailResponse(String failmessage) {
             ConnectionData connectionData = new ConnectionData(CMD.FAIL_RESPONSE, new String[]{failmessage});
-            connectionData.message = failmessage;
+            connectionData.responseData = failmessage;
             return connectionData;
         }
     }
@@ -318,7 +332,7 @@ public class ConnectionData {
          * @return true if the response has the fail response's cmd and not null message, false otherwise.
          */
         public static boolean isFailResponse(ConnectionData response) {
-            return hasSameCMD(CMD.FAIL_RESPONSE, response.cmd) && notNull(response.message);
+            return hasSameCMD(CMD.FAIL_RESPONSE, response.cmd) && notNull(response.responseData);
         }
     }
 }

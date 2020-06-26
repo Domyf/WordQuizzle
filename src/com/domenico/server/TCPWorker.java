@@ -43,7 +43,6 @@ public class TCPWorker extends Multiplexer {
         SocketChannel client = (SocketChannel) key.channel();
         TCPConnection tcpConnection = (TCPConnection) key.attachment();
         ConnectionData connectionData = tcpConnection.receiveData();
-        // TODO: 18/06/2020 parse the data received to understand what response should be sent to the client
         ConnectionData response = parseRequest(connectionData);
         Object[] attachment = {tcpConnection, response};
 
@@ -67,7 +66,6 @@ public class TCPWorker extends Multiplexer {
     }
 
     private ConnectionData parseRequest(ConnectionData connectionData) {
-        String failMessage = "";
         try {
             if (ConnectionData.Validator.isLoginRequest(connectionData)) {
                 String username = connectionData.getUsername();
@@ -81,20 +79,24 @@ public class TCPWorker extends Multiplexer {
                 usersManagement.addFriend(username, friend);
             } else if (ConnectionData.Validator.isFriendListRequest(connectionData)) {
                 List<String> friendList = usersManagement.getFriendList(connectionData.getUsername());
+                StringBuilder builder = new StringBuilder();
+                for (String friendUsername :friendList) {
+                    builder.append(friendUsername).append(" ");
+                }
+                return ConnectionData.Factory.newSuccessResponse(builder.toString());
             } else if (ConnectionData.Validator.isScoreRequest(connectionData)) {
-                String username = connectionData.getUsername();
-                // TODO: 26/06/2020 get the score
+                int score = usersManagement.getScore(connectionData.getUsername());
+                // TODO: 26/06/2020 get the real score
+                return ConnectionData.Factory.newSuccessResponse(""+score);
             } else if (ConnectionData.Validator.isLeaderboardRequest(connectionData)) {
                 String username = connectionData.getUsername();
                 // TODO: 26/06/2020 get the leaderboard
+                return ConnectionData.Factory.newSuccessResponse("Leaderboard as not been implemented yet");
             }
         } catch (UsersManagementException e) {
-            failMessage = e.getMessage();
+            return ConnectionData.Factory.newFailResponse(e.getMessage());
         }
 
-        if (failMessage.length() == 0)
-            return ConnectionData.Factory.newSuccessResponse();
-
-        return ConnectionData.Factory.newFailResponse(failMessage);
+        return ConnectionData.Factory.newSuccessResponse();
     }
 }

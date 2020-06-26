@@ -23,12 +23,12 @@ public class TCPClient {
         tcpConnection.sendData(request);
         ConnectionData response = tcpConnection.receiveData();
         if (ConnectionData.Validator.isSuccessResponse(response)) {
-            System.out.println("Login eseguito con successo");
+            System.out.println(Messages.LOGIN_SUCCESS);
             return true;
         }
 
         if (ConnectionData.Validator.isFailResponse(response))
-            System.out.println(response.getMessage());
+            System.out.println(response.getResponseData());
         return false;
     }
 
@@ -37,9 +37,9 @@ public class TCPClient {
         tcpConnection.sendData(request);
         ConnectionData response = tcpConnection.receiveData();
         if (ConnectionData.Validator.isSuccessResponse(response))
-            System.out.println("Logout eseguito con successo");
+            System.out.println(Messages.LOGOUT_SUCCESS);
         else if (ConnectionData.Validator.isFailResponse(response))
-            System.out.println(response.getMessage());
+            System.out.println(response.getResponseData());
     }
 
     public void addFriend(String username, String friendUsername) throws IOException {
@@ -49,28 +49,31 @@ public class TCPClient {
         if (ConnectionData.Validator.isSuccessResponse(response))
             System.out.println("Tu e "+friendUsername+" siete ora amici!");
         else if (ConnectionData.Validator.isFailResponse(response))
-            System.out.println(response.getMessage());
+            System.out.println(response.getResponseData());
     }
 
     public void friendList(String username) throws IOException {
         ConnectionData request = ConnectionData.Factory.newFriendListRequest(username);
         tcpConnection.sendData(request);
         ConnectionData response = tcpConnection.receiveData();
-        System.out.println("Ritornato: "+response.toString());
+        if (response.getResponseData() == null)
+            System.out.println("Non hai nessun amico");
+        else
+            System.out.println("I tuoi amici sono: "+response.getResponseData());
     }
 
     public void showScore(String username) throws IOException {
         ConnectionData request = ConnectionData.Factory.newScoreRequest(username);
         tcpConnection.sendData(request);
         ConnectionData response = tcpConnection.receiveData();
-        System.out.println("Ritornato: "+response.toString());
+        System.out.println("Il tuo punteggio è: "+response.getResponseData());
     }
 
     public void showLeaderboard(String username) throws IOException {
         ConnectionData request = ConnectionData.Factory.newLeaderboardRequest(username);
         tcpConnection.sendData(request);
         ConnectionData response = tcpConnection.receiveData();
-        System.out.println("Ritornato: "+response.toString());
+        System.out.println(response.getResponseData());
     }
 
     public void exit() throws IOException {

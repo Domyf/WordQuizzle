@@ -6,9 +6,11 @@ public class UsersManagement {
 
     private static UsersManagement instance;
     private HashMap<User, List<String>> users;  //map user -> its friend's usernames
+    private Leaderboard leaderboard;
 
     private UsersManagement() {
         this.users = new HashMap<>();
+        this.leaderboard = new Leaderboard();
     }
 
     public static UsersManagement getInstance() {
@@ -45,6 +47,8 @@ public class UsersManagement {
     }
 
     public void addFriend(String username, String friendUsername) throws UsersManagementException {
+        if (username.equals(friendUsername))
+            throw new UsersManagementException("Non puoi diventare amico con te stesso");
         User user = findByUsername(username);
         User friendUser = findByUsername(friendUsername);
         if (user == null)
@@ -69,6 +73,10 @@ public class UsersManagement {
         }
         // TODO: 26/06/2020 return a JSON object
         return users.get(found);
+    }
+
+    public int getScore(String username) {
+        return leaderboard.getScore(username);
     }
 
     private User find(User user) {
