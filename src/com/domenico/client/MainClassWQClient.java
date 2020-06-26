@@ -9,6 +9,8 @@ import java.util.Scanner;
  *  The usage can be printed with the --help argument (java MainClassWQClient --help) */
 public class MainClassWQClient {
 
+    //The usage of this program
+    public static final String USAGE = "usage : COMMAND [ ARGS ...]";
     private static final String HELP_COMMAND_ARG = "--help";    //The program argument associated to the usage
 
     private static String loggedUserName;
@@ -18,7 +20,8 @@ public class MainClassWQClient {
 
     public static void main(String[] args) {
         if (args.length == 1 && args[0].equals(HELP_COMMAND_ARG)) {
-            System.out.println(Constants.USAGE);
+            System.out.println(USAGE);
+            printCommandsUsage();
             return;
         }
 
@@ -35,49 +38,53 @@ public class MainClassWQClient {
         boolean exit = false;
         while(!exit) {
             System.out.print("> ");
-            String line = scanner.nextLine();
-            Command command = new Command(line);
-            switch (command.getCmd()) {
-                case Constants.REGISTER_USER:
-                    if (command.hasParams(2)) {
-                        boolean done = registerUser(command.getParam(0), command.getParam(1));
+            String line = scanner.nextLine().trim();
+            UserCommand userCommand = new UserCommand(line);
+            if (line.isBlank()) continue;
+            switch (userCommand.getCmd()) {
+                case UserCommand.REGISTER_USER:
+                    if (userCommand.hasParams(2)) {
+                        boolean done = registerUser(userCommand.getParam(0), userCommand.getParam(1));
                         if (done) {
-                            System.out.println("Vuoi eseguire il log in? (SI/NO oppure S/N)");
+                            System.out.println("Vuoi eseguire il login? (SI/NO oppure S/N)");
                             System.out.print("> ");
                             String answer = scanner.nextLine();
                             answer = answer.trim().toLowerCase();
                             if (answer.equals("si") || answer.equals("s"))
-                                loginUser(command.getParam(0), command.getParam(1));
+                                loginUser(userCommand.getParam(0), userCommand.getParam(1));
                         }
                     }
                     break;
-                case Constants.LOGIN:
-                    if (command.hasParams(2))
-                        loginUser(command.getParam(0), command.getParam(1));
+                case UserCommand.LOGIN:
+                    if (userCommand.hasParams(2))
+                        loginUser(userCommand.getParam(0), userCommand.getParam(1));
                     break;
-                case Constants.LOGOUT:
+                case UserCommand.LOGOUT:
                     logout();
                     break;
-                case Constants.ADD_FRIEND:
-                    if (command.hasParams(1))
-                        addFriend(command.getParam(0));
+                case UserCommand.ADD_FRIEND:
+                    if (userCommand.hasParams(1))
+                        addFriend(userCommand.getParam(0));
                     break;
-                case Constants.FRIEND_LIST:
+                case UserCommand.FRIEND_LIST:
                     showFriendList();
                     break;
-                case Constants.CHALLENGE:
-                    if (command.hasParams(1))
-                        startGame(command.getParam(0));
+                case UserCommand.CHALLENGE:
+                    if (userCommand.hasParams(1))
+                        startGame(userCommand.getParam(0));
                     break;
-                case Constants.SHOW_SCORE:
+                case UserCommand.SHOW_SCORE:
                     showScore();
                     break;
-                case Constants.SHOW_LEADERBOARD:
+                case UserCommand.SHOW_LEADERBOARD:
                     showLeaderboard();
                     break;
-                case Constants.EXIT:
+                case UserCommand.EXIT:
                     exit = true;
                     break;
+                default:
+                    System.out.println("Questo comando non esiste. Ecco una lista dei comandi disponibili ed il loro utilizzo");
+                    printCommandsUsage();
             }
         }
         try {
@@ -86,6 +93,19 @@ public class MainClassWQClient {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private static void printCommandsUsage() {
+        System.out.println("Commands:\n" +
+                "   "+UserCommand.getCommandUsage(UserCommand.REGISTER_USER)+"\n"+
+                "   "+UserCommand.getCommandUsage(UserCommand.LOGIN)+"\n" +
+                "   "+UserCommand.getCommandUsage(UserCommand.LOGOUT)+"\n" +
+                "   "+UserCommand.getCommandUsage(UserCommand.ADD_FRIEND)+"\n" +
+                "   "+UserCommand.getCommandUsage(UserCommand.FRIEND_LIST)+"\n" +
+                "   "+UserCommand.getCommandUsage(UserCommand.CHALLENGE)+"\n" +
+                "   "+UserCommand.getCommandUsage(UserCommand.SHOW_SCORE)+"\n" +
+                "   "+UserCommand.getCommandUsage(UserCommand.SHOW_LEADERBOARD)+"\n" +
+                "   "+UserCommand.getCommandUsage(UserCommand.EXIT));
     }
 
     /** Method invoked when the user types registra_utente <nickUtente> <password> */

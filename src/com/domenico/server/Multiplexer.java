@@ -68,7 +68,6 @@ public abstract class Multiplexer extends Thread {
                             onWritable(key);    //The write() method will not block
                         }
                     } catch (IOException e) {
-                        e.printStackTrace();
                         key.cancel();
                         key.channel().close();
                     }

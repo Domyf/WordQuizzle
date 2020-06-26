@@ -21,7 +21,7 @@ public class UserRegistrationService extends RemoteServer implements RMIConnecti
     public String register(String username, String password) throws RemoteException {
         try {
             usersManagement.register(new User(username, password));
-        } catch (IllegalArgumentException e) {
+        } catch (UsersManagementException e) {
             return e.getMessage();
         }
         return null;
