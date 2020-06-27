@@ -24,6 +24,9 @@ public class UDPWorker extends Multiplexer {
     @Override
     void onAcceptable(SelectionKey key) {}
 
+    /**
+     * Called when the method read() will not block the thread
+     */
     @Override
     void onReadable(SelectionKey key) throws IOException {
         DatagramChannel client = (DatagramChannel) key.channel();
@@ -31,11 +34,21 @@ public class UDPWorker extends Multiplexer {
         client.register(selector, SelectionKey.OP_WRITE, udpConnection);
     }
 
+    /**
+     * Called when the method write() will not block the thread
+     */
     @Override
     void onWritable(SelectionKey key) throws IOException {
         DatagramChannel client = (DatagramChannel) key.channel();
         UDPConnection udpConnection = (UDPConnection) key.attachment();
         client.register(selector, SelectionKey.OP_READ, udpConnection);
+    }
+
+    /** Called when it is needed to close the connection with the endpoint */
+    @Override
+    void onEndConnection(SelectionKey key) throws IOException {
+        UDPConnection udpConnection = (UDPConnection) key.attachment();
+        udpConnection.endConnection();
     }
 
     private void print(String string) {

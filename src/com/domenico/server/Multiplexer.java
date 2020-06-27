@@ -68,8 +68,8 @@ public abstract class Multiplexer extends Thread {
                             onWritable(key);    //The write() method will not block
                         }
                     } catch (IOException e) {
-                        key.cancel();
-                        key.channel().close();
+                        key.cancel();   //This endpoint will not be taken in account in the next selections
+                        onEndConnection(key);   //The connection with the endpoint should be ended
                     }
                 }
             }
@@ -101,11 +101,9 @@ public abstract class Multiplexer extends Thread {
     abstract void onWritable(SelectionKey key) throws IOException;
 
     /**
-     * Closes the channel. It will also stop this thread.
+     * Called when it is needed to close the connection with the endpoint
+     * @param key the selection key relative to that channel that should be closed
      * @throws IOException if an I/O error occurs
      */
-    protected void close() throws IOException {
-        running = false;
-        channel.close();
-    }
+    abstract void onEndConnection(SelectionKey key) throws IOException;
 }

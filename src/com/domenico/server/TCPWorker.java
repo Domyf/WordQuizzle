@@ -9,7 +9,6 @@ import java.net.ServerSocket;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -36,31 +35,48 @@ public class TCPWorker extends Multiplexer {
         print("Accepted connection for "+client.getRemoteAddress());
         client.configureBlocking(false);    //non-blocking
         TCPConnection tcpConnection = new TCPConnection(client);
-        client.register(selector, SelectionKey.OP_READ, tcpConnection);
+        Object[] attachment = new Object[]{tcpConnection, null};
+
+        client.register(selector, SelectionKey.OP_READ, attachment);
     }
 
-    /** Called when the method read() will not block the thread */
+    /**
+     * Called when the method read() will not block the thread
+     */
     @Override
     protected void onReadable(SelectionKey key) throws IOException {
         SocketChannel client = (SocketChannel) key.channel();
-        TCPConnection tcpConnection = (TCPConnection) key.attachment();
+        Object[] attachment = (Object[]) key.attachment();  //get the attachment reference
+        TCPConnection tcpConnection = (TCPConnection) attachment[0];
         ConnectionData connectionData = tcpConnection.receiveData();
-        ConnectionData response = parseRequest(connectionData);
-        Object[] attachment = {tcpConnection, response};
 
+        attachment[1] = parseRequest(connectionData);
         client.register(selector, SelectionKey.OP_WRITE, attachment);
     }
 
-    /** Called when the method write() will not block the thread */
+    /**
+     * Called when the method write() will not block the thread
+     */
     @Override
     protected void onWritable(SelectionKey key) throws IOException {
         SocketChannel client = (SocketChannel) key.channel();
-        Object[] attachment = (Object[]) key.attachment();
+        Object[] attachment = (Object[]) key.attachment();  //get the attachment reference
         TCPConnection tcpConnection = (TCPConnection) attachment[0];
         ConnectionData response = (ConnectionData) attachment[1];
-        tcpConnection.sendData(response);
 
-        client.register(selector, SelectionKey.OP_READ, tcpConnection);
+        tcpConnection.sendData(response);
+        client.register(selector, SelectionKey.OP_READ, attachment);
+    }
+
+    /**
+     * Called when it is needed to close the connection with the endpoint
+     */
+    @Override
+    void onEndConnection(SelectionKey key) throws IOException {
+        Object[] attachment = (Object[]) key.attachment();  //get the attachment reference
+        TCPConnection tcpConnection = (TCPConnection) attachment[0];
+
+        tcpConnection.endConnection();
     }
 
     private void print(String string) {
