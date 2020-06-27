@@ -2,10 +2,15 @@ package com.domenico.client;
 
 import com.domenico.communication.ConnectionData;
 import com.domenico.communication.TCPConnection;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.SocketChannel;
+import java.util.Iterator;
 
 public class TCPClient {
 
@@ -56,10 +61,20 @@ public class TCPClient {
         ConnectionData request = ConnectionData.Factory.newFriendListRequest(username);
         tcpConnection.sendData(request);
         ConnectionData response = tcpConnection.receiveData();
-        if (response.getResponseData() == null)
-            System.out.println("Non hai nessun amico");
-        else
-            System.out.println("I tuoi amici sono: "+response.getResponseData());
+        String jsonString = response.getResponseData();
+        try {
+            JSONParser parser = new JSONParser();
+            JSONArray jsonArray = (JSONArray) parser.parse(jsonString);
+            if (jsonArray.isEmpty()) {
+                System.out.println("Non hai nessun amico");
+            } else {
+                System.out.print("I tuoi amici sono: ");
+                String friendList = Utils.stringify(jsonArray, ", ");
+                System.out.println(friendList);
+            }
+        } catch (ParseException e) {
+            System.out.println("C'è stato un problema, riprova più tardi");
+        }
     }
 
     public void showScore(String username) throws IOException {

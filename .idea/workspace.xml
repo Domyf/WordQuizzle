@@ -33,15 +33,16 @@
     <property name="aspect.path.notification.shown" value="true" />
     <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary" value="JUnit5" />
     <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit5" value="" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/json-simple-1.1.1.jar!/" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
     <property name="node.js.path.for.package.tslint" value="project" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
-    <property name="project.structure.last.edited" value="Modules" />
+    <property name="project.structure.last.edited" value="Libraries" />
     <property name="project.structure.proportion" value="0.0" />
-    <property name="project.structure.side.proportion" value="0.0" />
+    <property name="project.structure.side.proportion" value="0.2" />
     <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
   </component>
   <component name="RecentsManager">
@@ -65,7 +66,7 @@
       <recent name="com.domenico.communication" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.Run Server">
+  <component name="RunManager" selected="Application.Run Client">
     <configuration name="Run Client" type="Application" factoryName="Application" temporary="true">
       <option name="MAIN_CLASS_NAME" value="com.domenico.client.MainClassWQClient" />
       <module name="WordQuizzle" />
@@ -129,6 +130,7 @@
       <workItem from="1592414223759" duration="41968000" />
       <workItem from="1593156720811" duration="17271000" />
       <workItem from="1593201430255" duration="8643000" />
+      <workItem from="1593288566154" duration="1871000" />
     </task>
     <servers />
   </component>
@@ -168,26 +170,30 @@
       <screen x="0" y="0" width="1536" height="864" />
     </state>
     <state x="522" y="329" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1/0.0.1536.864@0.0.1536.864" timestamp="1593157449629" />
-    <state width="1493" height="362" key="GridCell.Tab.0.bottom" timestamp="1593210112350">
+    <state x="475" y="175" key="FileChooserDialogImpl" timestamp="1593288762282">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state width="1493" height="362" key="GridCell.Tab.0.bottom/0.0.1536.864@0.0.1536.864" timestamp="1593210112350" />
-    <state width="1493" height="362" key="GridCell.Tab.0.center" timestamp="1593210112350">
+    <state x="475" y="175" key="FileChooserDialogImpl/0.0.1536.864@0.0.1536.864" timestamp="1593288762282" />
+    <state width="1493" height="362" key="GridCell.Tab.0.bottom" timestamp="1593290152029">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state width="1493" height="362" key="GridCell.Tab.0.center/0.0.1536.864@0.0.1536.864" timestamp="1593210112350" />
-    <state width="1493" height="362" key="GridCell.Tab.0.left" timestamp="1593210112350">
+    <state width="1493" height="362" key="GridCell.Tab.0.bottom/0.0.1536.864@0.0.1536.864" timestamp="1593290152029" />
+    <state width="1493" height="362" key="GridCell.Tab.0.center" timestamp="1593290152029">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state width="1493" height="362" key="GridCell.Tab.0.left/0.0.1536.864@0.0.1536.864" timestamp="1593210112350" />
-    <state width="1493" height="362" key="GridCell.Tab.0.right" timestamp="1593210112350">
+    <state width="1493" height="362" key="GridCell.Tab.0.center/0.0.1536.864@0.0.1536.864" timestamp="1593290152029" />
+    <state width="1493" height="362" key="GridCell.Tab.0.left" timestamp="1593290152029">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state width="1493" height="362" key="GridCell.Tab.0.right/0.0.1536.864@0.0.1536.864" timestamp="1593210112350" />
-    <state x="250" y="8" key="SettingsEditor" timestamp="1592474767143">
+    <state width="1493" height="362" key="GridCell.Tab.0.left/0.0.1536.864@0.0.1536.864" timestamp="1593290152029" />
+    <state width="1493" height="362" key="GridCell.Tab.0.right" timestamp="1593290152029">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state x="250" y="8" key="SettingsEditor/0.0.1536.864@0.0.1536.864" timestamp="1592474767143" />
+    <state width="1493" height="362" key="GridCell.Tab.0.right/0.0.1536.864@0.0.1536.864" timestamp="1593290152029" />
+    <state x="250" y="8" key="SettingsEditor" timestamp="1593288766924">
+      <screen x="0" y="0" width="1536" height="864" />
+    </state>
+    <state x="250" y="8" key="SettingsEditor/0.0.1536.864@0.0.1536.864" timestamp="1593288766924" />
     <state x="498" y="325" key="com.intellij.jarRepository.RepositoryAttachDialog-DOWNLOAD" timestamp="1593157436693">
       <screen x="0" y="0" width="1536" height="864" />
     </state>

@@ -1,6 +1,7 @@
 package com.domenico.server;
 
 import com.domenico.communication.*;
+import org.json.simple.JSONArray;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -8,6 +9,7 @@ import java.net.ServerSocket;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -79,11 +81,12 @@ public class TCPWorker extends Multiplexer {
                 usersManagement.addFriend(username, friend);
             } else if (ConnectionData.Validator.isFriendListRequest(connectionData)) {
                 List<String> friendList = usersManagement.getFriendList(connectionData.getUsername());
-                StringBuilder builder = new StringBuilder();
+                String jsonString = JSONArray.toJSONString(friendList);
+                /*StringBuilder builder = new StringBuilder();
                 for (String friendUsername :friendList) {
                     builder.append(friendUsername).append(" ");
-                }
-                return ConnectionData.Factory.newSuccessResponse(builder.toString());
+                }*/
+                return ConnectionData.Factory.newSuccessResponse(jsonString);
             } else if (ConnectionData.Validator.isScoreRequest(connectionData)) {
                 int score = usersManagement.getScore(connectionData.getUsername());
                 // TODO: 26/06/2020 get the real score
