@@ -97,7 +97,7 @@ public class MainClassWQClient {
                     break;
                 case UserCommand.EXIT:
                     exit = true;
-                    if (isLogged())
+                    if (isLogged()) //If the user is logged in then the logout is done
                         logout();
                     break;
                 default:

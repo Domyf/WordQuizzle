@@ -1,5 +1,7 @@
 package com.domenico.communication;
 
+import com.domenico.shared.Utils;
+
 import java.util.Arrays;
 
 /**
@@ -116,19 +118,13 @@ public class ConnectionData {
                     if (params.length == 0) {
                         return newSuccessResponse();
                     } else {
-                        StringBuilder builder = new StringBuilder();
-                        for (int i = 0; i < params.length; i++) {
-                            builder.append(params[i]).append(" ");
-                        }
-                        return newSuccessResponse(builder.toString());
+                        String paramsRow = Utils.stringify(params, " ");
+                        return newSuccessResponse(paramsRow);
                     }
                 case FAIL_RESPONSE:
                     if (params.length > 0) {
-                        StringBuilder builder = new StringBuilder();
-                        for (int i = 0; i < params.length; i++) {
-                            builder.append(params[i]).append(" ");
-                        }
-                        return newFailResponse(builder.toString());
+                        String paramsRow = Utils.stringify(params, " ");
+                        return newFailResponse(paramsRow);
                     }
             }
 

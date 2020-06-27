@@ -2,15 +2,14 @@ package com.domenico.client;
 
 import com.domenico.communication.ConnectionData;
 import com.domenico.communication.TCPConnection;
+import com.domenico.shared.Utils;
 import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.SocketChannel;
-import java.util.Iterator;
 
 public class TCPClient {
 

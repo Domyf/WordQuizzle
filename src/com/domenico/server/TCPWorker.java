@@ -82,10 +82,6 @@ public class TCPWorker extends Multiplexer {
             } else if (ConnectionData.Validator.isFriendListRequest(connectionData)) {
                 List<String> friendList = usersManagement.getFriendList(connectionData.getUsername());
                 String jsonString = JSONArray.toJSONString(friendList);
-                /*StringBuilder builder = new StringBuilder();
-                for (String friendUsername :friendList) {
-                    builder.append(friendUsername).append(" ");
-                }*/
                 return ConnectionData.Factory.newSuccessResponse(jsonString);
             } else if (ConnectionData.Validator.isScoreRequest(connectionData)) {
                 int score = usersManagement.getScore(connectionData.getUsername());
