@@ -97,6 +97,7 @@ public class MainClassWQClient {
                     break;
                 case UserCommand.EXIT:
                     exit = true;
+                    logout();
                     break;
                 default:
                     System.out.println(Messages.INVALID_COMMAND);
