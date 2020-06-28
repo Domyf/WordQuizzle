@@ -152,8 +152,11 @@ public class MainClassWQClient {
         }
         try {
             boolean logged = tcpClient.login(username, password);
-            if (logged)
+            if (logged) {
                 loggedUserName = username;
+                udpClient.setLoggedUsername(username);
+                udpClient.start();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -207,11 +210,6 @@ public class MainClassWQClient {
             return;
         }
         // TODO: 17/06/2020 start the game between this user and the one passed as argument
-        try {
-            udpClient.startGame(loggedUserName, friendUsername);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     /** Method invoked when the user types mostra_classifica */

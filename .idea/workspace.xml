@@ -66,7 +66,7 @@
       <recent name="com.domenico.communication" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.Run Server">
+  <component name="RunManager" selected="Application.Run Client">
     <configuration name="Run Client" type="Application" factoryName="Application" temporary="true">
       <option name="MAIN_CLASS_NAME" value="com.domenico.client.MainClassWQClient" />
       <module name="WordQuizzle" />
@@ -78,6 +78,32 @@
     </configuration>
     <configuration name="Run Server" type="Application" factoryName="Application" temporary="true">
       <option name="MAIN_CLASS_NAME" value="com.domenico.server.MainClassWQServer" />
+      <module name="WordQuizzle" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.domenico.shared.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="clie" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.domenico.shared.clie" />
+      <module name="WordQuizzle" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.domenico.shared.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="serv" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.domenico.shared.serv" />
       <module name="WordQuizzle" />
       <extension name="coverage">
         <pattern>
@@ -108,11 +134,15 @@
       <item itemvalue="Application.Run Client" />
       <item itemvalue="Application.Run Server" />
       <item itemvalue="JUnit.UserTest" />
+      <item itemvalue="Application.serv" />
+      <item itemvalue="Application.clie" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.Run Server" />
         <item itemvalue="Application.Run Client" />
+        <item itemvalue="Application.Run Server" />
+        <item itemvalue="Application.clie" />
+        <item itemvalue="Application.serv" />
         <item itemvalue="JUnit.UserTest" />
       </list>
     </recent_temporary>
@@ -130,7 +160,8 @@
       <workItem from="1592414223759" duration="41968000" />
       <workItem from="1593156720811" duration="17271000" />
       <workItem from="1593201430255" duration="8643000" />
-      <workItem from="1593288566154" duration="4734000" />
+      <workItem from="1593288566154" duration="13925000" />
+      <workItem from="1593353652921" duration="14826000" />
     </task>
     <servers />
   </component>
@@ -138,34 +169,34 @@
     <option name="version" value="2" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="225" y="88" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1592482326661">
+    <state x="225" y="88" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1593366068392">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state x="225" y="88" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1536.864@0.0.1536.864" timestamp="1592482326661" />
-    <state x="575" y="149" key="#com.intellij.ide.util.MemberChooser" timestamp="1593292327862">
+    <state x="225" y="88" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1536.864@0.0.1536.864" timestamp="1593366068392" />
+    <state x="575" y="149" key="#com.intellij.ide.util.MemberChooser" timestamp="1593357562535">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state x="575" y="149" key="#com.intellij.ide.util.MemberChooser/0.0.1536.864@0.0.1536.864" timestamp="1593292327862" />
+    <state x="575" y="149" key="#com.intellij.ide.util.MemberChooser/0.0.1536.864@0.0.1536.864" timestamp="1593357562535" />
     <state x="500" y="224" key="#com.intellij.ide.util.TreeClassChooserDialog" timestamp="1593203725516">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
     <state x="500" y="224" key="#com.intellij.ide.util.TreeClassChooserDialog/0.0.1536.864@0.0.1536.864" timestamp="1593203725516" />
-    <state x="553" y="328" width="430" height="266" key="#com.intellij.refactoring.move.moveClassesOrPackages.MoveClassesOrPackagesDialog.classes" timestamp="1592478931341">
+    <state x="553" y="328" width="430" height="266" key="#com.intellij.refactoring.move.moveClassesOrPackages.MoveClassesOrPackagesDialog.classes" timestamp="1593297170272">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state x="553" y="328" width="430" height="266" key="#com.intellij.refactoring.move.moveClassesOrPackages.MoveClassesOrPackagesDialog.classes/0.0.1536.864@0.0.1536.864" timestamp="1592478931341" />
+    <state x="553" y="328" width="430" height="266" key="#com.intellij.refactoring.move.moveClassesOrPackages.MoveClassesOrPackagesDialog.classes/0.0.1536.864@0.0.1536.864" timestamp="1593297170272" />
     <state x="487" y="241" key="#com.intellij.refactoring.move.moveMembers.MoveMembersDialog" timestamp="1593203727951">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
     <state x="487" y="241" key="#com.intellij.refactoring.move.moveMembers.MoveMembersDialog/0.0.1536.864@0.0.1536.864" timestamp="1593203727951" />
-    <state x="399" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1593203778223">
+    <state x="399" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1593300433919">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state x="399" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.0.1536.864@0.0.1536.864" timestamp="1593203778223" />
-    <state x="500" y="180" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1593203787770">
+    <state x="399" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.0.1536.864@0.0.1536.864" timestamp="1593300433919" />
+    <state x="500" y="180" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1593364841828">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state x="500" y="180" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1536.864@0.0.1536.864" timestamp="1593203787770" />
+    <state x="500" y="180" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1536.864@0.0.1536.864" timestamp="1593364841828" />
     <state x="522" y="329" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1" timestamp="1593157449629">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
@@ -174,22 +205,22 @@
       <screen x="0" y="0" width="1536" height="864" />
     </state>
     <state x="475" y="175" key="FileChooserDialogImpl/0.0.1536.864@0.0.1536.864" timestamp="1593288762282" />
-    <state width="1493" height="362" key="GridCell.Tab.0.bottom" timestamp="1593293043259">
+    <state width="1493" height="319" key="GridCell.Tab.0.bottom" timestamp="1593368697066">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state width="1493" height="362" key="GridCell.Tab.0.bottom/0.0.1536.864@0.0.1536.864" timestamp="1593293043259" />
-    <state width="1493" height="362" key="GridCell.Tab.0.center" timestamp="1593293043259">
+    <state width="1493" height="319" key="GridCell.Tab.0.bottom/0.0.1536.864@0.0.1536.864" timestamp="1593368697066" />
+    <state width="1493" height="319" key="GridCell.Tab.0.center" timestamp="1593368697066">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state width="1493" height="362" key="GridCell.Tab.0.center/0.0.1536.864@0.0.1536.864" timestamp="1593293043259" />
-    <state width="1493" height="362" key="GridCell.Tab.0.left" timestamp="1593293043259">
+    <state width="1493" height="319" key="GridCell.Tab.0.center/0.0.1536.864@0.0.1536.864" timestamp="1593368697066" />
+    <state width="1493" height="319" key="GridCell.Tab.0.left" timestamp="1593368697066">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state width="1493" height="362" key="GridCell.Tab.0.left/0.0.1536.864@0.0.1536.864" timestamp="1593293043259" />
-    <state width="1493" height="362" key="GridCell.Tab.0.right" timestamp="1593293043259">
+    <state width="1493" height="319" key="GridCell.Tab.0.left/0.0.1536.864@0.0.1536.864" timestamp="1593368697066" />
+    <state width="1493" height="319" key="GridCell.Tab.0.right" timestamp="1593368697066">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state width="1493" height="362" key="GridCell.Tab.0.right/0.0.1536.864@0.0.1536.864" timestamp="1593293043259" />
+    <state width="1493" height="319" key="GridCell.Tab.0.right/0.0.1536.864@0.0.1536.864" timestamp="1593368697066" />
     <state x="250" y="8" key="SettingsEditor" timestamp="1593288766924">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
@@ -210,13 +241,13 @@
       <screen x="0" y="0" width="1536" height="864" />
     </state>
     <state x="477" y="191" key="refactoring.ChangeSignatureDialog/0.0.1536.864@0.0.1536.864" timestamp="1592487825977" />
-    <state x="426" y="197" key="run.anything.popup" timestamp="1593194294107">
+    <state x="426" y="197" key="run.anything.popup" timestamp="1593367716100">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state x="426" y="197" key="run.anything.popup/0.0.1536.864@0.0.1536.864" timestamp="1593194294107" />
-    <state x="431" y="182" width="672" height="678" key="search.everywhere.popup" timestamp="1593181940322">
+    <state x="426" y="197" key="run.anything.popup/0.0.1536.864@0.0.1536.864" timestamp="1593367716100" />
+    <state x="431" y="182" width="672" height="678" key="search.everywhere.popup" timestamp="1593359975584">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state x="431" y="182" width="672" height="678" key="search.everywhere.popup/0.0.1536.864@0.0.1536.864" timestamp="1593181940322" />
+    <state x="431" y="182" width="672" height="678" key="search.everywhere.popup/0.0.1536.864@0.0.1536.864" timestamp="1593359975584" />
   </component>
 </project>

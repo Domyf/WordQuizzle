@@ -5,12 +5,20 @@ import java.util.*;
 public class UsersManagement {
 
     private static UsersManagement instance;
-    private HashMap<User, List<String>> users;  //map user -> its friend's usernames
+
+    private Map<User, List<String>> users;  //map user -> its friend's usernames
     private Leaderboard leaderboard;
 
     private UsersManagement() {
-        this.users = new HashMap<>();
+        this.users = new Hashtable<>();
         this.leaderboard = new Leaderboard();
+
+        /*try {
+            // TODO: 28/06/2020 remove this fake registration
+            register(new User("Domenico", "dom"));
+        } catch (UsersManagementException e) {
+            e.printStackTrace();
+        }*/
     }
 
     public static UsersManagement getInstance() {
@@ -71,12 +79,15 @@ public class UsersManagement {
         if (found == null) {
             throw new UsersManagementException("Invalid username");
         }
-        // TODO: 26/06/2020 return a JSON object
         return users.get(found);
     }
 
     public int getScore(String username) {
         return leaderboard.getScore(username);
+    }
+
+    public List<String> getLeaderboard(String username) {
+        return leaderboard.getUserLeaderboard(null);
     }
 
     private User find(User user) {
