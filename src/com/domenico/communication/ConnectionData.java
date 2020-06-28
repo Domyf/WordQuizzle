@@ -16,7 +16,7 @@ public class ConnectionData {
         LOGOUT_REQUEST,
         ADD_FRIEND_REQUEST,
         FRIEND_LIST_REQUEST,
-        CHALLENGE_REQUEST,
+        //TODO CHALLENGE_REQUEST
         SCORE_REQUEST,
         LEADERBOARD_REQUEST,
         SUCCESS_RESPONSE,
@@ -67,8 +67,11 @@ public class ConnectionData {
      */
     @Override
     public String toString() {
-        String parameters = Utils.stringify(params, " ");
-        return cmd.toString()+" "+parameters;
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < params.length; i++) {
+            builder.append(params[i]).append(" ");
+        }
+        return cmd.toString()+" "+builder.toString();
     }
 
     /**
@@ -87,6 +90,7 @@ public class ConnectionData {
          */
         public static ConnectionData parseLine(String line) {
             String[] splittedLine = line.split(" ");
+
             String[] params = new String[0];
             String cmd = splittedLine[0];
             if (splittedLine.length > 1)
@@ -95,31 +99,21 @@ public class ConnectionData {
                 case LOGIN_REQUEST:
                     if (params.length == 2)
                         return newLoginRequest(params[0], params[1]);
-                    break;
                 case LOGOUT_REQUEST:
                     if (params.length == 1)
                         return newLogoutRequest(params[0]);
-                    break;
                 case ADD_FRIEND_REQUEST:
                     if (params.length == 2)
                         return newAddFriendRequest(params[0], params[1]);
-                    break;
                 case FRIEND_LIST_REQUEST:
                     if (params.length == 1)
                         return newFriendListRequest(params[0]);
-                    break;
-                case CHALLENGE_REQUEST:
-                    if (params.length == 2)
-                        return newChallengeRequest(params[0], params[1]);
-                    break;
                 case SCORE_REQUEST:
                     if (params.length == 1)
                         return newScoreRequest(params[0]);
-                    break;
                 case LEADERBOARD_REQUEST:
                     if (params.length == 1)
                         return newLeaderboardRequest(params[0]);
-                    break;
                 case SUCCESS_RESPONSE:
                     if (params.length == 0) {
                         return newSuccessResponse();
@@ -132,7 +126,6 @@ public class ConnectionData {
                         String paramsRow = Utils.stringify(params, " ");
                         return newFailResponse(paramsRow);
                     }
-                    break;
             }
 
             return null;
@@ -187,19 +180,6 @@ public class ConnectionData {
         }
 
         /**
-         * Builds a ConnectionData object that represents a challenge request from the sender user to its specified friend
-         * @param username the username of who is sending the request
-         * @param friendUsername the friend's username
-         * @return a ConnectionData object that represents a friend list request
-         */
-        public static ConnectionData newChallengeRequest(String username, String friendUsername) {
-            ConnectionData connectionData = new ConnectionData(CMD.CHALLENGE_REQUEST, new String[]{username, friendUsername});
-            connectionData.senderUsername = username;
-            connectionData.friendUsername = friendUsername;
-            return connectionData;
-        }
-
-        /**
          * Builds a ConnectionData object that represents a score request
          * @param username the username of who is sending the request
          * @return a ConnectionData object that represents a score request
@@ -229,10 +209,7 @@ public class ConnectionData {
             return new ConnectionData(CMD.SUCCESS_RESPONSE, new String[]{});
         }
 
-        /**
-         * Builds a ConnectionData object that represents a success response with a string of data
-         * @return a ConnectionData object that represents a success response that has data after it
-         */
+        // TODO: 26/06/2020 this doc
         public static ConnectionData newSuccessResponse(String data) {
             ConnectionData connectionData = new ConnectionData(CMD.SUCCESS_RESPONSE, new String[]{data});
             connectionData.responseData = data;
@@ -311,17 +288,6 @@ public class ConnectionData {
          */
         public static boolean isFriendListRequest(ConnectionData request) {
             return hasSameCMD(CMD.FRIEND_LIST_REQUEST, request.cmd) && notNull(request.senderUsername);
-        }
-
-        /**
-         * Checks if the given request represents a valid challenge request, which means it has the right CMD and has not
-         * null parameters. The return value is true if the given request is a valid challenge request, false otherwise.
-         * @param request the request that should be evaluated
-         * @return true if the request has the challenge request's cmd and not null username and friend's username,
-         * false otherwise.
-         */
-        public static boolean isChallengeRequest(ConnectionData request) {
-            return hasSameCMD(CMD.CHALLENGE_REQUEST, request.cmd) && notNull(request.senderUsername) && notNull(request.friendUsername);
         }
 
         /**

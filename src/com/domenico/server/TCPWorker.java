@@ -10,7 +10,6 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.List;
-import java.util.Map;
 
 /**
  * This is a worker class that manages all the TCP communications. It implements channel multiplexing to efficiently
@@ -19,8 +18,6 @@ import java.util.Map;
 public class TCPWorker extends Multiplexer {
 
     private UsersManagement usersManagement;
-    private UDPWorker udpWorker;
-    private Map<String, SelectionKey> loggedUsers;
 
     public TCPWorker(UsersManagement usersManagement) throws IOException {
         super(ServerSocketChannel.open(), SelectionKey.OP_ACCEPT);
@@ -53,17 +50,7 @@ public class TCPWorker extends Multiplexer {
         TCPConnection tcpConnection = (TCPConnection) attachment[0];
         ConnectionData connectionData = tcpConnection.receiveData();
 
-        ConnectionData response;
-        if (ConnectionData.Validator.isChallengeRequest(connectionData)) {
-            String username = connectionData.getUsername();
-            String friend = connectionData.getFriendUsername();
-            response = null;
-            //udpWorker.forwardChallengeRequest(username, friend);
-        } else {
-            response = parseRequest(connectionData);
-        }
-
-        attachment[1] = response;
+        attachment[1] = parseRequest(connectionData);
         client.register(selector, SelectionKey.OP_WRITE, attachment);
     }
 
@@ -76,9 +63,8 @@ public class TCPWorker extends Multiplexer {
         Object[] attachment = (Object[]) key.attachment();  //get the attachment reference
         TCPConnection tcpConnection = (TCPConnection) attachment[0];
         ConnectionData response = (ConnectionData) attachment[1];
-        if (response != null) { //The response is not ready because the challenge has not been accepted or declined yet
-            tcpConnection.sendData(response);
-        }
+
+        tcpConnection.sendData(response);
         client.register(selector, SelectionKey.OP_READ, attachment);
     }
 
@@ -90,7 +76,7 @@ public class TCPWorker extends Multiplexer {
         Object[] attachment = (Object[]) key.attachment();  //get the attachment reference
         TCPConnection tcpConnection = (TCPConnection) attachment[0];
 
-        tcpConnection.closeConnection();
+        tcpConnection.endConnection();
     }
 
     private void print(String string) {
@@ -119,19 +105,13 @@ public class TCPWorker extends Multiplexer {
                 return ConnectionData.Factory.newSuccessResponse(""+score);
             } else if (ConnectionData.Validator.isLeaderboardRequest(connectionData)) {
                 String username = connectionData.getUsername();
-                List<String> leaderboardList = usersManagement.getLeaderboard(username);
-                String jsonString = JSONArray.toJSONString(leaderboardList);
                 // TODO: 26/06/2020 get the leaderboard
-                return ConnectionData.Factory.newSuccessResponse(jsonString);
+                return ConnectionData.Factory.newSuccessResponse("Leaderboard as not been implemented yet");
             }
         } catch (UsersManagementException e) {
             return ConnectionData.Factory.newFailResponse(e.getMessage());
         }
 
         return ConnectionData.Factory.newSuccessResponse();
-    }
-
-    public void sendChallengeBack(String challengeFrom, String challengeTo) {
-
     }
 }

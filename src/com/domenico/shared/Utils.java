@@ -12,7 +12,7 @@ public class Utils {
      * The elements are separated by the given divider. The divider is not present at the end of the string. The returned
      * string doesn't contain the new line character at the end.
      * @param iterable an iterable object
-     * @param divider the string that is used to separate each element
+     * @param divider the string that will separate each element
      * @return a string that contains all the elements of the iterable. Each element is separated by the given divider
      */
     public static String stringify(Iterable<Object> iterable, String divider) {
@@ -33,7 +33,7 @@ public class Utils {
      * separated by the given divider. The divider is not present at the end of the string. The returned string
      * doesn't contain the new line character at the end.
      * @param objects an array of objects
-     * @param divider the string that is used to separate each element
+     * @param divider the string that will separate each element
      * @return a string that contains all the elements of the array. Each element is separated by the given divider
      */
     public static String stringify(Object[] objects, String divider) {

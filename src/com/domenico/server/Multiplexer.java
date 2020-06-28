@@ -106,5 +106,4 @@ public abstract class Multiplexer extends Thread {
      * @throws IOException if an I/O error occurs
      */
     abstract void onEndConnection(SelectionKey key) throws IOException;
-
 }

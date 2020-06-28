@@ -87,22 +87,10 @@ public class TCPClient {
         ConnectionData request = ConnectionData.Factory.newLeaderboardRequest(username);
         tcpConnection.sendData(request);
         ConnectionData response = tcpConnection.receiveData();
-        String jsonString = response.getResponseData();
-        try {
-            JSONParser parser = new JSONParser();
-            JSONArray jsonArray = (JSONArray) parser.parse(jsonString);
-            StringBuilder builder = new StringBuilder();
-            builder.append("Classifica: \n");
-            for (int i = 0; i < jsonArray.size(); i++) {
-                builder.append(i).append(") ").append(jsonArray.get(i)).append("\n");
-            }
-            System.out.print(builder.toString());
-        } catch (ParseException e) {
-            System.out.println("C'è stato un problema, riprova più tardi");
-        }
+        System.out.println(response.getResponseData());
     }
 
     public void exit() throws IOException {
-        tcpConnection.closeConnection();
+        tcpConnection.endConnection();
     }
 }
