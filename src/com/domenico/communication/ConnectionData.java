@@ -16,7 +16,7 @@ public class ConnectionData {
         LOGOUT_REQUEST,
         ADD_FRIEND_REQUEST,
         FRIEND_LIST_REQUEST,
-        //TODO CHALLENGE_REQUEST
+        CHALLENGE_REQUEST,
         SCORE_REQUEST,
         LEADERBOARD_REQUEST,
         SUCCESS_RESPONSE,
@@ -87,12 +87,10 @@ public class ConnectionData {
          */
         public static ConnectionData parseLine(String line) {
             String[] splittedLine = line.split(" ");
-            System.out.println("Line: "+line);
             String[] params = new String[0];
             String cmd = splittedLine[0];
             if (splittedLine.length > 1)
                 params = Arrays.copyOfRange(splittedLine, 1, splittedLine.length);
-            System.out.println(cmd);
             switch (CMD.valueOf(cmd)) {
                 case LOGIN_REQUEST:
                     if (params.length == 2)
@@ -131,7 +129,7 @@ public class ConnectionData {
                     }
             }
 
-            return null;
+            return newFailResponse("Invalid command");
         }
 
         /**
@@ -179,6 +177,19 @@ public class ConnectionData {
         public static ConnectionData newFriendListRequest(String username) {
             ConnectionData connectionData = new ConnectionData(CMD.FRIEND_LIST_REQUEST, new String[]{username});
             connectionData.senderUsername = username;
+            return connectionData;
+        }
+
+        /**
+         * Builds a ConnectionData object that represents an challenge request
+         * @param username the username of who is sending the request
+         * @param friendUsername the friend's username
+         * @return a ConnectionData object that represents a challenge request
+         */
+        public static ConnectionData newChallengeRequest(String username, String friendUsername) {
+            ConnectionData connectionData = new ConnectionData(CMD.CHALLENGE_REQUEST, new String[]{username, friendUsername});
+            connectionData.senderUsername = username;
+            connectionData.friendUsername = friendUsername;
             return connectionData;
         }
 
@@ -291,6 +302,17 @@ public class ConnectionData {
          */
         public static boolean isFriendListRequest(ConnectionData request) {
             return hasSameCMD(CMD.FRIEND_LIST_REQUEST, request.cmd) && notNull(request.senderUsername);
+        }
+
+        /**
+         * Checks if the given request represents a valid challenge request, which means it has the right CMD and has not
+         * null parameters. The return value is true if the given request is a valid challenge request, false otherwise.
+         * @param request the request that should be evaluated
+         * @return true if the request has the challenge request's cmd and not null username and friend's username,
+         * false otherwise.
+         */
+        public static boolean isChallengeRequest(ConnectionData request) {
+            return hasSameCMD(CMD.CHALLENGE_REQUEST, request.cmd) && notNull(request.senderUsername) && notNull(request.friendUsername);
         }
 
         /**
