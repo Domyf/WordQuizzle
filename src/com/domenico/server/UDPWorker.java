@@ -1,5 +1,6 @@
 package com.domenico.server;
 
+import com.domenico.communication.ConnectionData;
 import com.domenico.communication.UDPConnection;
 
 import java.io.IOException;
@@ -15,7 +16,7 @@ import java.nio.channels.SelectionKey;
 public class UDPWorker extends Multiplexer {
 
     public UDPWorker(DatagramChannel channel) throws IOException {
-        super(channel, SelectionKey.OP_READ, new UDPConnection(channel));
+        super(channel, SelectionKey.OP_READ, null);
         DatagramSocket datagramSocket = channel.socket();
         datagramSocket.bind(new InetSocketAddress(UDPConnection.PORT));
         print("Bound on port " + UDPConnection.PORT);
@@ -30,7 +31,9 @@ public class UDPWorker extends Multiplexer {
     @Override
     void onReadable(SelectionKey key) throws IOException {
         DatagramChannel client = (DatagramChannel) key.channel();
-        UDPConnection udpConnection = (UDPConnection) key.attachment();
+        UDPConnection udpConnection = new UDPConnection(client);
+        ConnectionData connectionData = udpConnection.receiveData();
+        print(connectionData.getUsername());
         client.register(selector, SelectionKey.OP_WRITE, udpConnection);
     }
 
@@ -41,6 +44,7 @@ public class UDPWorker extends Multiplexer {
     void onWritable(SelectionKey key) throws IOException {
         DatagramChannel client = (DatagramChannel) key.channel();
         UDPConnection udpConnection = (UDPConnection) key.attachment();
+        udpConnection.sendData(ConnectionData.Factory.newSuccessResponse());
         client.register(selector, SelectionKey.OP_READ, udpConnection);
     }
 

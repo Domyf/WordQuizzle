@@ -67,11 +67,8 @@ public class ConnectionData {
      */
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < params.length; i++) {
-            builder.append(params[i]).append(" ");
-        }
-        return cmd.toString()+" "+builder.toString();
+        String parameters = Utils.stringify(params, " ");
+        return cmd.toString()+" "+parameters;
     }
 
     /**
@@ -90,27 +87,33 @@ public class ConnectionData {
          */
         public static ConnectionData parseLine(String line) {
             String[] splittedLine = line.split(" ");
-
+            System.out.println("Line: "+line);
             String[] params = new String[0];
             String cmd = splittedLine[0];
             if (splittedLine.length > 1)
                 params = Arrays.copyOfRange(splittedLine, 1, splittedLine.length);
+            System.out.println(cmd);
             switch (CMD.valueOf(cmd)) {
                 case LOGIN_REQUEST:
                     if (params.length == 2)
                         return newLoginRequest(params[0], params[1]);
+                    break;
                 case LOGOUT_REQUEST:
                     if (params.length == 1)
                         return newLogoutRequest(params[0]);
+                    break;
                 case ADD_FRIEND_REQUEST:
                     if (params.length == 2)
                         return newAddFriendRequest(params[0], params[1]);
+                    break;
                 case FRIEND_LIST_REQUEST:
                     if (params.length == 1)
                         return newFriendListRequest(params[0]);
+                    break;
                 case SCORE_REQUEST:
                     if (params.length == 1)
                         return newScoreRequest(params[0]);
+                    break;
                 case LEADERBOARD_REQUEST:
                     if (params.length == 1)
                         return newLeaderboardRequest(params[0]);

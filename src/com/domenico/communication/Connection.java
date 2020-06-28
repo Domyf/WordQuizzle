@@ -22,8 +22,13 @@ public abstract class Connection {
     public void sendData(ConnectionData connectionData) throws IOException {
         String line = connectionData.toString();
         byte[] data = line.getBytes(StandardCharsets.UTF_8);
-        ByteBuffer buffer = wrapData(data);
-        write(buffer);
+
+        ByteBuffer lenBuf = ByteBuffer.allocate(Integer.BYTES);
+        lenBuf.putInt(data.length);
+        lenBuf.flip();
+        write(lenBuf);
+
+        write(ByteBuffer.wrap(data));
     }
 
     /**
@@ -34,22 +39,9 @@ public abstract class Connection {
     public ConnectionData receiveData() throws IOException {
         ByteBuffer lenBuffer = receiveByLength(Integer.BYTES);
         ByteBuffer dataBuffer = receiveByLength(lenBuffer.getInt());
+
         String line = new String(dataBuffer.array(), StandardCharsets.UTF_8);
         return ConnectionData.Factory.parseLine(line);
-    }
-
-    /**
-     * Wraps the given data by following the protocol which means that the returned buffer will contain the data's length
-     * and then the data itself
-     * @param data the data that should be contained inside the buffer
-     * @return a ByteBuffer object that contains the data's length followed by the data itself. The buffer is ready to be read.
-     */
-    private ByteBuffer wrapData(byte[] data) {
-        ByteBuffer buffer = ByteBuffer.allocate(Integer.BYTES+data.length);
-        buffer.putInt(data.length);
-        buffer.put(data);
-        buffer.flip();
-        return buffer;
     }
 
     /**

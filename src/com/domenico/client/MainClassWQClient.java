@@ -152,8 +152,11 @@ public class MainClassWQClient {
         }
         try {
             boolean logged = tcpClient.login(username, password);
-            if (logged)
+            if (logged) {
+                udpClient.setLoggedUsername(username);
                 loggedUserName = username;
+                new Thread(udpClient).start();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
