@@ -101,6 +101,7 @@ public class NetWorker extends Multiplexer implements Runnable {
                 validateChallengeRequest(received); //throws an exception if the request is not valid
                 //otherwise the challenge request is handled
                 attachment.challengePending = handleChallengeRequest(received);
+                attachment.response = ConnectionData.Factory.newSuccessResponse();
 
             } else if (ConnectionData.Validator.isScoreRequest(received)) {
                 attachment.response = handleScoreRequest(received);
@@ -206,7 +207,10 @@ public class NetWorker extends Multiplexer implements Runnable {
         if (attachment.response != null) {
             print(attachment.response.toString());
             tcpConnection.sendData(attachment.response);
-
+            if (attachment.challengePending != null) {
+                attachment.response = null;
+                return;
+            }
         } else if (attachment.challengePending != null && attachment.challengePending.isDone()) {
             try {
                 ConnectionData challengeResponse = attachment.challengePending.get();
@@ -236,7 +240,7 @@ public class NetWorker extends Multiplexer implements Runnable {
         } catch (UsersManagementException e) {
 
         }
-        
+
         print("Ended connection with "+client.getRemoteAddress());
     }
 
