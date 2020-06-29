@@ -1,7 +1,6 @@
 package com.domenico.server;
 
 import java.io.*;
-import java.nio.channels.DatagramChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -25,7 +24,7 @@ public class MainClassWQServer {
         try {
             UsersManagement usersManagement = UsersManagement.getInstance();
             UserRegistrationService.newRegistrationService(usersManagement);
-            Thread tcpWorker = new Thread(new TCPWorker());
+            Thread tcpWorker = new Thread(new NetWorker());
             tcpWorker.start();
             tcpWorker.join();
         } catch (IOException | InterruptedException e) {

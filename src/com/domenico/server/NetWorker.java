@@ -20,7 +20,7 @@ import java.util.concurrent.FutureTask;
  * This is a worker class that manages all the TCP communications. It implements channel multiplexing to efficiently
  * manage all the clients by extending the Multiplexer class.
  */
-public class TCPWorker extends Multiplexer implements Runnable {
+public class NetWorker extends Multiplexer implements Runnable {
 
     private UsersManagement usersManagement;
     private DatagramChannel datagramChannel;
@@ -32,9 +32,10 @@ public class TCPWorker extends Multiplexer implements Runnable {
         int udpPort;
         InetAddress address;
         FutureTask<ConnectionData> challengePending = null;
+        String username;
     }
 
-    public TCPWorker() throws IOException {
+    public NetWorker() throws IOException {
         super(ServerSocketChannel.open(), SelectionKey.OP_ACCEPT);
         ServerSocket serverSocket = ((ServerSocketChannel) channel).socket();
         serverSocket.bind(new InetSocketAddress(TCPConnection.SERVER_PORT));
@@ -97,6 +98,8 @@ public class TCPWorker extends Multiplexer implements Runnable {
                 attachment.response = handleFriendListRequest(received);
 
             } else if (ConnectionData.Validator.isChallengeRequest(received)) {
+                validateChallengeRequest(received); //throws an exception if the request is not valid
+                //otherwise the challenge request is handled
                 attachment.challengePending = handleChallengeRequest(received);
 
             } else if (ConnectionData.Validator.isScoreRequest(received)) {
@@ -113,11 +116,23 @@ public class TCPWorker extends Multiplexer implements Runnable {
         client.register(selector, SelectionKey.OP_WRITE, attachment);
     }
 
+    private void validateChallengeRequest(ConnectionData request) throws UsersManagementException {
+        String from = request.getUsername();
+        String to = request.getFriendUsername();
+        if (from.equals(to))
+            throw new UsersManagementException("Non puoi sfidare te stesso");
+        if (!usersManagement.areFriends(from, to))
+            throw new UsersManagementException("Tu e "+to+" non siete amici");
+        if (!usersManagement.isOnline(to))
+            throw new UsersManagementException(to+" non è online in questo momento");
+    }
+
     private ConnectionData handleLoginRequest(ConnectionData connectionData, UserRecord userRecord, SelectionKey key) throws UsersManagementException {
         String username = connectionData.getUsername();
         String password = connectionData.getPassword();
         usersManagement.login(new User(username, password));
         userRecord.udpPort = Integer.parseUnsignedInt(connectionData.getResponseData());
+        userRecord.username = username;
         mapToKey.put(username, key);
 
         return ConnectionData.Factory.newSuccessResponse();
@@ -150,8 +165,8 @@ public class TCPWorker extends Multiplexer implements Runnable {
     private FutureTask<ConnectionData> handleChallengeRequest(ConnectionData received) throws IOException {
         // TODO: 29/06/2020 avoid multiple challenges
         String from = received.getUsername();
-
         String to = received.getFriendUsername();
+
         System.out.println("Challenge arrived: "+from+" wants to challenge "+to);
         SelectionKey toKey = mapToKey.get(to);
         UserRecord toRecord = (UserRecord) toKey.attachment();
@@ -215,9 +230,13 @@ public class TCPWorker extends Multiplexer implements Runnable {
     void onEndConnection(SelectionKey key) throws IOException {
         SocketChannel client = (SocketChannel) key.channel();
         UserRecord attachment = (UserRecord) key.attachment();
-        TCPConnection tcpConnection = attachment.tcpConnection;
 
-        //tcpConnection.endConnection();
+        try {
+            usersManagement.logout(attachment.username);
+        } catch (UsersManagementException e) {
+
+        }
+        
         print("Ended connection with "+client.getRemoteAddress());
     }
 

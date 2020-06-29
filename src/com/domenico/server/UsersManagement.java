@@ -79,6 +79,22 @@ public class UsersManagement {
         return leaderboard.getScore(username);
     }
 
+    public boolean areFriends(String first, String second) {
+        User firstUser = findByUsername(first);
+        if (firstUser == null)
+            return false;
+        User secondUser = findByUsername(second);
+        if (secondUser == null)
+            return false;
+
+        return areFriends(firstUser, secondUser);
+    }
+
+    public boolean isOnline(String username) {
+        User user = findByUsername(username);
+        return user != null && user.isLoggedIn();
+    }
+
     private User find(User user) {
         for (User registeredUser:users.keySet()) {
             if (registeredUser.equals(user))

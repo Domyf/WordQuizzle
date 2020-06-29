@@ -79,12 +79,20 @@ public class TCPClient {
     public void challenge(String username, String friendUsername) throws IOException {
         ConnectionData request = ConnectionData.Factory.newChallengeRequest(username, friendUsername);
         tcpConnection.sendData(request);
-        System.out.println("Sfida inviata a "+friendUsername+". In attesa di risposta...");
         ConnectionData response = tcpConnection.receiveData();
-        if (ConnectionData.Validator.isSuccessResponse(response))
-            System.out.println(friendUsername+" ha accettato la sfida!");
-        else if (ConnectionData.Validator.isFailResponse(response))
+        if (ConnectionData.Validator.isSuccessResponse(response)) {   //The challenge has been forwarded
+            System.out.println("Sfida inviata a "+friendUsername+". In attesa di risposta...");
+
+            response = tcpConnection.receiveData();
+            if (ConnectionData.Validator.isSuccessResponse(response))
+                System.out.println(friendUsername+" ha accettato la sfida!");
+            else if (ConnectionData.Validator.isFailResponse(response))
+                System.out.println(response.getResponseData());
+
+        } else if (ConnectionData.Validator.isFailResponse(response)) { //The challenge cannot be forwarded
             System.out.println(response.getResponseData());
+        }
+
     }
 
     public void showScore(String username) throws IOException {
