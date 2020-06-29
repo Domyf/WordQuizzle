@@ -14,11 +14,13 @@ import java.util.Set;
  * and the relative selection key is passed. When the write() method call will not block on a channel, the method
  * onWritable is called and the relative selection key is passed.
  */
-public abstract class Multiplexer extends Thread {
+public abstract class Multiplexer {
 
     protected AbstractSelectableChannel channel;
     protected Selector selector;
+
     private boolean running;
+    private int timeout;
 
     /**
      * Instantiates this with the given channel. The first operation registered is that one given as argument. It is
@@ -29,29 +31,32 @@ public abstract class Multiplexer extends Thread {
      */
     public Multiplexer(AbstractSelectableChannel channel, int firstOp) throws IOException {
         this.channel = channel;
-        channel.configureBlocking(false);
-        selector = Selector.open();
-        channel.register(selector, firstOp);
+        this.timeout = 0;
+        this.selector = Selector.open();
+        this.channel.configureBlocking(false);
+        this.channel.register(selector, firstOp);
     }
 
     /**
-     * A secondary constructor that calls the main constructor but then attaches the given attachment to the channel
+     * A secondary constructor that calls the main constructor and takes the timeout value as well
      * @param channel the channel on which the multiplexing is done
-     * @param op the first operation on which the channel should be registered
-     * @param attachment the first attachment that should be attached to the channel
+     * @param firstOp the first operation on which the channel should be registered
+     * @param timeout the timeout done for the selection. Zero for infinite timeout. Must be non negative
      * @throws IOException if an I/O error occurs
      */
-    public Multiplexer(AbstractSelectableChannel channel, int op, Object attachment) throws IOException {
-        this(channel, op);
-        channel.register(selector, op, attachment);
+    public Multiplexer(AbstractSelectableChannel channel, int firstOp, int timeout) throws IOException {
+        this(channel, firstOp);
+        this.timeout = timeout;
     }
 
-    @Override
-    public void run() {
+    public void startProcessing() {
         running = true;
         try {
             while (running) {
-                selector.select();
+                if (selector.select(timeout) == 0) {
+                    onTimeout();
+                    continue;
+                }
                 Set<SelectionKey> selectedKeys = selector.selectedKeys();
                 Iterator<SelectionKey> iterator = selectedKeys.iterator();
                 while (iterator.hasNext()) {
@@ -69,15 +74,21 @@ public abstract class Multiplexer extends Thread {
                         }
                     } catch (IOException e) {
                         key.cancel();   //This endpoint will not be taken in account in the next selections
-                        onEndConnection(key);   //The connection with the endpoint should be ended
+                        if (key.channel().isOpen())
+                            onEndConnection(key);   //The connection with the endpoint should be ended
                     }
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
-            running = false;
+            stopProcessing();
         }
     }
+
+    protected void stopProcessing() {
+        running = false;
+    }
+
+    protected abstract void onTimeout() throws IOException;
 
     /**
      * Called when the method accept() will not block the thread.

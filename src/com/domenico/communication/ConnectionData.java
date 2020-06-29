@@ -93,8 +93,8 @@ public class ConnectionData {
                 params = Arrays.copyOfRange(splittedLine, 1, splittedLine.length);
             switch (CMD.valueOf(cmd)) {
                 case LOGIN_REQUEST:
-                    if (params.length == 2)
-                        return newLoginRequest(params[0], params[1]);
+                    if (params.length == 3)
+                        return newLoginRequest(params[0], params[1], Integer.parseUnsignedInt(params[2]));
                     break;
                 case LOGOUT_REQUEST:
                     if (params.length == 1)
@@ -107,6 +107,10 @@ public class ConnectionData {
                 case FRIEND_LIST_REQUEST:
                     if (params.length == 1)
                         return newFriendListRequest(params[0]);
+                    break;
+                case CHALLENGE_REQUEST:
+                    if (params.length == 2)
+                        return newChallengeRequest(params[0], params[1]);
                     break;
                 case SCORE_REQUEST:
                     if (params.length == 1)
@@ -136,12 +140,14 @@ public class ConnectionData {
          * Builds a ConnectionData object that represents a login request
          * @param username the username of who is sending the request
          * @param password the password of who is sending the request
+         * @param udpPort
          * @return a ConnectionData object that represents a login request
          */
-        public static ConnectionData newLoginRequest(String username, String password) {
-            ConnectionData connectionData = new ConnectionData(CMD.LOGIN_REQUEST, new String[]{username, password});
+        public static ConnectionData newLoginRequest(String username, String password, int udpPort) {
+            ConnectionData connectionData = new ConnectionData(CMD.LOGIN_REQUEST, new String[]{username, password, ""+udpPort});
             connectionData.senderUsername = username;
             connectionData.senderPassword = password;
+            connectionData.responseData = ""+udpPort;
             return connectionData;
         }
 

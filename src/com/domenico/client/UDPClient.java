@@ -1,6 +1,5 @@
 package com.domenico.client;
 
-import com.domenico.communication.Connection;
 import com.domenico.communication.ConnectionData;
 import com.domenico.communication.UDPConnection;
 
@@ -26,26 +25,27 @@ public class UDPClient implements Runnable {
         this.loggedUsername = loggedUsername;
     }
 
-    public void startGame(String username, String friendUsername) throws IOException {
-        /*udpConnection.sendData(ConnectionData.Factory.newChallengeRequest);
-        ConnectionData response = udpConnection.receiveData();
-        System.out.println("Ritornato: "+response.toString());*/
-        System.out.println("To be implemented...");
-    }
-
     public void exit() throws IOException {
         udpConnection.endConnection();
+    }
+
+    public int getUDPPort() {
+        return channel.socket().getLocalPort();
     }
 
     @Override
     public void run() {
         try {
-            udpConnection.sendData(ConnectionData.Factory.newAddFriendRequest(loggedUsername, "placeholder"));
-            ConnectionData receiveData = udpConnection.receiveData();
-            if (ConnectionData.Validator.isSuccessResponse(receiveData))
-                System.out.println("CONNESSO via UDP");
-        } catch (IOException e) {
-            e.printStackTrace();
+            while (true) {
+                ConnectionData receiveData = udpConnection.receiveData();
+                if (ConnectionData.Validator.isChallengeRequest(receiveData)) {
+                    System.out.println("Hai ricevuto una sfida da "+receiveData.getUsername());
+                    Thread.sleep(8000);
+                    //udpConnection.sendData(ConnectionData.Factory.newSuccessResponse());
+                }
+            }
+        } catch (IOException | InterruptedException e) {
+
         }
     }
 }

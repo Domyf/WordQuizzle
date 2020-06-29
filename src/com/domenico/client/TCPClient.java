@@ -22,8 +22,8 @@ public class TCPClient {
         tcpConnection = new TCPConnection(channel);
     }
 
-    public boolean login(String username, String password) throws IOException {
-        ConnectionData request = ConnectionData.Factory.newLoginRequest(username, password);
+    public boolean login(String username, String password, int udpPort) throws IOException {
+        ConnectionData request = ConnectionData.Factory.newLoginRequest(username, password, udpPort);
         tcpConnection.sendData(request);
         ConnectionData response = tcpConnection.receiveData();
         if (ConnectionData.Validator.isSuccessResponse(response)) {
@@ -74,6 +74,17 @@ public class TCPClient {
         } catch (ParseException e) {
             System.out.println("C'è stato un problema, riprova più tardi");
         }
+    }
+
+    public void challenge(String username, String friendUsername) throws IOException {
+        ConnectionData request = ConnectionData.Factory.newChallengeRequest(username, friendUsername);
+        tcpConnection.sendData(request);
+        System.out.println("Sfida inviata a "+friendUsername+". In attesa di risposta...");
+        ConnectionData response = tcpConnection.receiveData();
+        if (ConnectionData.Validator.isSuccessResponse(response))
+            System.out.println(friendUsername+" ha accettato la sfida!");
+        else if (ConnectionData.Validator.isFailResponse(response))
+            System.out.println(response.getResponseData());
     }
 
     public void showScore(String username) throws IOException {

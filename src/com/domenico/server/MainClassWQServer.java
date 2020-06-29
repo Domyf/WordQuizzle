@@ -25,12 +25,9 @@ public class MainClassWQServer {
         try {
             UsersManagement usersManagement = UsersManagement.getInstance();
             UserRegistrationService.newRegistrationService(usersManagement);
-            Thread tcpWorker = new TCPWorker(usersManagement);
-            Thread udpWorker = new UDPWorker(DatagramChannel.open());
+            Thread tcpWorker = new Thread(new TCPWorker());
             tcpWorker.start();
-            udpWorker.start();
             tcpWorker.join();
-            udpWorker.join();
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }

@@ -2,6 +2,7 @@ package com.domenico.communication;
 
 import java.io.IOException;
 import java.net.SocketAddress;
+import java.net.SocketException;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 
@@ -22,7 +23,7 @@ public class UDPConnection extends Connection {
      * @param channel UDP channel on which the communication is done
      * @param address the endpoint address
      */
-    public UDPConnection(DatagramChannel channel, SocketAddress address) {
+    public UDPConnection(DatagramChannel channel, SocketAddress address) throws SocketException {
         this.channel = channel;
         this.address = address;
     }
@@ -47,6 +48,7 @@ public class UDPConnection extends Connection {
 
     @Override
     public void endConnection() throws IOException {
+        System.out.println("UDP end conn");
         channel.close();
     }
 }

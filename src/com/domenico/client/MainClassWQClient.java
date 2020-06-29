@@ -106,7 +106,6 @@ public class MainClassWQClient {
             }
         }
         try {
-            tcpClient.exit();
             udpClient.exit();
         } catch (IOException e) {
             e.printStackTrace();
@@ -151,7 +150,7 @@ public class MainClassWQClient {
             return;
         }
         try {
-            boolean logged = tcpClient.login(username, password);
+            boolean logged = tcpClient.login(username, password, udpClient.getUDPPort());
             if (logged) {
                 udpClient.setLoggedUsername(username);
                 loggedUserName = username;
@@ -211,7 +210,7 @@ public class MainClassWQClient {
         }
         // TODO: 17/06/2020 start the game between this user and the one passed as argument
         try {
-            udpClient.startGame(loggedUserName, friendUsername);
+            tcpClient.challenge(loggedUserName, friendUsername);
         } catch (IOException e) {
             e.printStackTrace();
         }
