@@ -1,7 +1,5 @@
 package com.domenico.client;
 
-import com.domenico.server.User;
-
 import java.io.IOException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -9,16 +7,17 @@ import java.util.Scanner;
 
 /** Starting point for the client.
  *  The usage can be printed with the --help argument (java MainClassWQClient --help) */
-public class MainClassWQClient {
+public class MainClassWQClient implements OnChallengeArrivedListener {
 
     //The usage of this program
     public static final String USAGE = "usage : COMMAND [ ARGS ...]";
     private static final String HELP_COMMAND_ARG = "--help";    //The program argument associated to the usage
 
-    private static String loggedUserName = null;
-    private static RMIClient rmiClient;
-    private static TCPClient tcpClient;
-    private static UDPClient udpClient;
+    private String loggedUserName = null;
+    private RMIClient rmiClient;
+    private TCPClient tcpClient;
+    private UDPClient udpClient;
+    private CLI cli;
 
     public static void main(String[] args) {
         if (args.length == 1 && args[0].equals(HELP_COMMAND_ARG)) {
@@ -27,33 +26,31 @@ public class MainClassWQClient {
             return;
         }
 
+        MainClassWQClient client = new MainClassWQClient();
+        client.loop();
+
+    }
+
+    public MainClassWQClient() {
         try {
             rmiClient = new RMIClient();
             tcpClient = new TCPClient();
-            udpClient = new UDPClient();
+            udpClient = new UDPClient(this);
+            cli = new CLI(new Scanner(System.in));
         } catch (NotBoundException | IOException e) {
             e.printStackTrace();
             return;
         }
-        Scanner scanner = new Scanner(System.in);
-        boolean exit = false;
-        while(!exit) {
-            System.out.print("> ");
-            String line = scanner.nextLine().trim();
-            UserCommand userCommand = new UserCommand(line);
-            if (line.isBlank()) continue;
+    }
+
+    private void loop() {
+        boolean run = true;
+        while(run) {
+            UserCommand userCommand = cli.askForCommand();
             switch (userCommand.getCmd()) {
                 case UserCommand.REGISTER_USER:
                     if (userCommand.hasParams(2)) {
-                        boolean registered = registerUser(userCommand.getParam(0), userCommand.getParam(1));
-                        if (registered) {
-                            System.out.println(Messages.ASK_LOGIN+" (SI/NO oppure S/N)");
-                            System.out.print("> ");
-                            String answer = scanner.nextLine();
-                            answer = answer.trim().toLowerCase();
-                            if (answer.equals("si") || answer.equals("s"))
-                                loginUser(userCommand.getParam(0), userCommand.getParam(1));
-                        }
+                        handleRegister(userCommand.getParam(0), userCommand.getParam(1));
                     } else {
                         System.out.println(Messages.BAD_COMMAND_SINTAX);
                         System.out.println(UserCommand.getCommandUsage(UserCommand.REGISTER_USER));
@@ -61,44 +58,44 @@ public class MainClassWQClient {
                     break;
                 case UserCommand.LOGIN:
                     if (userCommand.hasParams(2))
-                        loginUser(userCommand.getParam(0), userCommand.getParam(1));
+                        handleLogin(userCommand.getParam(0), userCommand.getParam(1));
                     else {
                         System.out.println(Messages.BAD_COMMAND_SINTAX);
                         System.out.println(UserCommand.getCommandUsage(UserCommand.LOGIN));
                     }
                     break;
                 case UserCommand.LOGOUT:
-                    logout();
+                    handleLogout();
                     break;
                 case UserCommand.ADD_FRIEND:
                     if (userCommand.hasParams(1))
-                        addFriend(userCommand.getParam(0));
+                        handleAddFriend(userCommand.getParam(0));
                     else {
                         System.out.println(Messages.BAD_COMMAND_SINTAX);
                         System.out.println(UserCommand.getCommandUsage(UserCommand.ADD_FRIEND));
                     }
                     break;
                 case UserCommand.FRIEND_LIST:
-                    showFriendList();
+                    handleShowFriendList();
                     break;
                 case UserCommand.CHALLENGE:
                     if (userCommand.hasParams(1))
-                        startGame(userCommand.getParam(0));
+                        handleSendChallengeRequest(userCommand.getParam(0));
                     else {
                         System.out.println(Messages.BAD_COMMAND_SINTAX);
                         System.out.println(UserCommand.getCommandUsage(UserCommand.CHALLENGE));
                     }
                     break;
                 case UserCommand.SHOW_SCORE:
-                    showScore();
+                    handleShowScore();
                     break;
                 case UserCommand.SHOW_LEADERBOARD:
-                    showLeaderboard();
+                    handleShowLeaderboard();
                     break;
                 case UserCommand.EXIT:
-                    exit = true;
+                    run = false;
                     if (isLogged()) //If the user is logged in then the logout is done
-                        logout();
+                        handleLogout();
                     break;
                 default:
                     System.out.println(Messages.INVALID_COMMAND);
@@ -129,22 +126,26 @@ public class MainClassWQClient {
     }
 
     /** Method invoked when the user types registra_utente <nickUtente> <password> */
-    private static boolean registerUser(String username, String password) {
+    private void handleRegister(String username, String password) {
         if (isLogged()) {
             System.out.println(Messages.LOGOUT_NEEDED);
-            return false;
+            return;
         }
-        boolean done = false;
+
         try {
-            done = rmiClient.register(username, password);
+            boolean done = rmiClient.register(username, password);
+            if (done) {
+                boolean shouldLogin = cli.askChoice(Messages.ASK_LOGIN+" (SI/NO oppure S/N)");
+                if (shouldLogin)
+                    handleLogin(username, password);
+            }
         } catch (RemoteException e) {
             e.printStackTrace();
         }
-        return done;
     }
 
     /** Method invoked when the user types login <nickUtente> <password> */
-    private static void loginUser(String username, String password) {
+    private void handleLogin(String username, String password) {
         if (isLogged()) {
             System.out.println(Messages.LOGOUT_NEEDED);
             return;
@@ -162,7 +163,7 @@ public class MainClassWQClient {
     }
 
     /** Method invoked when the user types logout */
-    private static void logout() {
+    private void handleLogout() {
         if (!isLogged()) {
             System.out.println(Messages.LOGIN_NEEDED);
             return;
@@ -176,7 +177,7 @@ public class MainClassWQClient {
     }
 
     /** Method invoked when the user types aggiungi_amico <nickAmico> */
-    private static void addFriend(String otherUsername) {
+    private void handleAddFriend(String otherUsername) {
         if (!isLogged()) {
             System.out.println(Messages.LOGIN_NEEDED);
             return;
@@ -189,7 +190,7 @@ public class MainClassWQClient {
     }
 
     /** Method invoked when the user types mostra_amici */
-    private static void showFriendList() {
+    private void handleShowFriendList() {
         if (!isLogged()) {
             System.out.println(Messages.LOGIN_NEEDED);
             return;
@@ -203,7 +204,7 @@ public class MainClassWQClient {
     }
 
     /** Method invoked when the user types sfida <nickAmico> */
-    private static void startGame(String friendUsername) {
+    private void handleSendChallengeRequest(String friendUsername) {
         if (!isLogged()) {
             System.out.println(Messages.LOGIN_NEEDED);
             return;
@@ -217,7 +218,7 @@ public class MainClassWQClient {
     }
 
     /** Method invoked when the user types mostra_classifica */
-    private static void showLeaderboard() {
+    private void handleShowLeaderboard() {
         if (!isLogged()) {
             System.out.println(Messages.LOGIN_NEEDED);
             return;
@@ -231,7 +232,7 @@ public class MainClassWQClient {
     }
 
     /** Method invoked when the user types mostra_punteggio */
-    private static void showScore() {
+    private void handleShowScore() {
         if (!isLogged()) {
             System.out.println(Messages.LOGIN_NEEDED);
             return;
@@ -247,7 +248,12 @@ public class MainClassWQClient {
     /**
      * @return true if the client's user is logged in
      */
-    private static boolean isLogged() {
+    private boolean isLogged() {
         return loggedUserName != null;
+    }
+
+    @Override
+    public boolean onChallengeArrived(String from) {
+        return cli.askChoice("\rHai ricevuto una sfida da "+from+". Vuoi accettarla?");
     }
 }

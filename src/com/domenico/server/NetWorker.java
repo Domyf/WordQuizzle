@@ -98,10 +98,7 @@ public class NetWorker extends Multiplexer implements Runnable {
                 attachment.response = handleFriendListRequest(received);
 
             } else if (ConnectionData.Validator.isChallengeRequest(received)) {
-                validateChallengeRequest(received); //throws an exception if the request is not valid
-                //otherwise the challenge request is handled
-                attachment.challengePending = handleChallengeRequest(received);
-                attachment.response = ConnectionData.Factory.newSuccessResponse();
+                attachment.response = handleChallengeRequest(received, attachment);
 
             } else if (ConnectionData.Validator.isScoreRequest(received)) {
                 attachment.response = handleScoreRequest(received);
@@ -115,17 +112,6 @@ public class NetWorker extends Multiplexer implements Runnable {
         }
 
         client.register(selector, SelectionKey.OP_WRITE, attachment);
-    }
-
-    private void validateChallengeRequest(ConnectionData request) throws UsersManagementException {
-        String from = request.getUsername();
-        String to = request.getFriendUsername();
-        if (from.equals(to))
-            throw new UsersManagementException("Non puoi sfidare te stesso");
-        if (!usersManagement.areFriends(from, to))
-            throw new UsersManagementException("Tu e "+to+" non siete amici");
-        if (!usersManagement.isOnline(to))
-            throw new UsersManagementException(to+" non è online in questo momento");
     }
 
     private ConnectionData handleLoginRequest(ConnectionData connectionData, UserRecord userRecord, SelectionKey key) throws UsersManagementException {
@@ -163,22 +149,30 @@ public class NetWorker extends Multiplexer implements Runnable {
         return ConnectionData.Factory.newSuccessResponse(jsonString);
     }
 
-    private FutureTask<ConnectionData> handleChallengeRequest(ConnectionData received) throws IOException {
+    private ConnectionData handleChallengeRequest(ConnectionData received, UserRecord fromUserRecord) throws IOException, UsersManagementException {
         // TODO: 29/06/2020 avoid multiple challenges
+        //Throws an exception if the request is not valid and the error is sent back to who requested the challenge
         String from = received.getUsername();
         String to = received.getFriendUsername();
+        if (from.equals(to))
+            throw new UsersManagementException("Non puoi sfidare te stesso");
+        if (!usersManagement.areFriends(from, to))
+            throw new UsersManagementException("Tu e "+to+" non siete amici");
+        if (!usersManagement.isOnline(to))
+            throw new UsersManagementException(to+" non è online in questo momento");
 
-        System.out.println("Challenge arrived: "+from+" wants to challenge "+to);
+        print("Challenge arrived: "+from+" wants to challenge "+to);
+
         SelectionKey toKey = mapToKey.get(to);
         UserRecord toRecord = (UserRecord) toKey.attachment();
         SocketAddress toUDPAddress = new InetSocketAddress(toRecord.address, toRecord.udpPort);
-
+        //the challenge request is handled
         Callable<ConnectionData> callable = new UDPRequest(datagramChannel, toUDPAddress, from, to);
         FutureTask<ConnectionData> futureTask = new FutureTask<>(callable);
-
         new Thread(futureTask).start();
+        fromUserRecord.challengePending = futureTask;
 
-        return futureTask;
+        return ConnectionData.Factory.newSuccessResponse();
     }
 
     private ConnectionData handleScoreRequest(ConnectionData received) {

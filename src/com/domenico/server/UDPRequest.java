@@ -19,7 +19,7 @@ public class UDPRequest extends Multiplexer implements Callable<ConnectionData> 
 
     public UDPRequest(DatagramChannel channel, SocketAddress remoteAddress, String from, String to) throws IOException {
         super(channel, SelectionKey.OP_WRITE, MAX_WAITING_TIME);
-        udpConnection = new UDPConnection(channel, remoteAddress);
+        this.udpConnection = new UDPConnection(channel, remoteAddress);
         this.from = from;
         this.to = to;
     }
@@ -27,7 +27,8 @@ public class UDPRequest extends Multiplexer implements Callable<ConnectionData> 
     @Override
     public ConnectionData call() throws Exception {
         response = null;
-        startProcessing();  //loops until time is out or connection is closed
+        print("Forwarding challenge request from "+from+" to "+to);
+        super.startProcessing();  //loops until time is out or connection is closed
         if (response == null)
             response = ConnectionData.Factory.newFailResponse("Tempo scaduto");
 
@@ -36,7 +37,7 @@ public class UDPRequest extends Multiplexer implements Callable<ConnectionData> 
 
     @Override
     protected void onTimeout() throws IOException {
-        stopProcessing();
+        super.stopProcessing();
     }
 
     @Override
@@ -45,7 +46,7 @@ public class UDPRequest extends Multiplexer implements Callable<ConnectionData> 
     @Override
     void onReadable(SelectionKey key) throws IOException {
         response = udpConnection.receiveData();
-        stopProcessing();
+        super.stopProcessing();
     }
 
     @Override
@@ -56,6 +57,10 @@ public class UDPRequest extends Multiplexer implements Callable<ConnectionData> 
 
     @Override
     void onEndConnection(SelectionKey key) throws IOException {
-        stopProcessing();
+        super.stopProcessing();
+    }
+
+    public void print(String str) {
+        System.out.println("[UDP]: "+str);
     }
 }
