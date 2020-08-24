@@ -2,7 +2,6 @@ package com.domenico.client;
 
 import com.domenico.communication.ConnectionData;
 import com.domenico.communication.TCPConnection;
-import com.domenico.shared.Utils;
 import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -22,91 +21,85 @@ public class TCPClient {
         tcpConnection = new TCPConnection(channel);
     }
 
-    public boolean login(String username, String password, int udpPort) throws IOException {
+    private ConnectionData sendTCPRequest(ConnectionData request) throws IOException {
+        tcpConnection.sendData(request);
+        return tcpConnection.receiveData();
+    }
+
+    public String login(String username, String password, int udpPort) throws IOException {
         ConnectionData request = ConnectionData.Factory.newLoginRequest(username, password, udpPort);
-        tcpConnection.sendData(request);
-        ConnectionData response = tcpConnection.receiveData();
+        ConnectionData response = sendTCPRequest(request);
         if (ConnectionData.Validator.isSuccessResponse(response)) {
-            System.out.println(Messages.LOGIN_SUCCESS);
-            return true;
-        }
-
-        if (ConnectionData.Validator.isFailResponse(response))
-            System.out.println(response.getResponseData());
-        return false;
+            return "";
+        } else if (ConnectionData.Validator.isFailResponse(response))
+            return response.getResponseData();
+        return null;
     }
 
-    public void logout(String username) throws IOException {
+    public String logout(String username) throws IOException {
         ConnectionData request = ConnectionData.Factory.newLogoutRequest(username);
-        tcpConnection.sendData(request);
-        ConnectionData response = tcpConnection.receiveData();
+        ConnectionData response = sendTCPRequest(request);
         if (ConnectionData.Validator.isSuccessResponse(response))
-            System.out.println(Messages.LOGOUT_SUCCESS);
+            return "";
         else if (ConnectionData.Validator.isFailResponse(response))
-            System.out.println(response.getResponseData());
+            return response.getResponseData();
+        return null;
     }
 
-    public void addFriend(String username, String friendUsername) throws IOException {
+    public String addFriend(String username, String friendUsername) throws IOException {
         ConnectionData request = ConnectionData.Factory.newAddFriendRequest(username, friendUsername);
-        tcpConnection.sendData(request);
-        ConnectionData response = tcpConnection.receiveData();
+        ConnectionData response = sendTCPRequest(request);
         if (ConnectionData.Validator.isSuccessResponse(response))
-            System.out.println("Tu e "+friendUsername+" siete ora amici!");
+            return "Tu e "+friendUsername+" siete ora amici!";
         else if (ConnectionData.Validator.isFailResponse(response))
-            System.out.println(response.getResponseData());
+            return response.getResponseData();
+        return null;
     }
 
-    public void friendList(String username) throws IOException {
+    public JSONArray friendList(String username) throws IOException {
         ConnectionData request = ConnectionData.Factory.newFriendListRequest(username);
-        tcpConnection.sendData(request);
-        ConnectionData response = tcpConnection.receiveData();
+        ConnectionData response = sendTCPRequest(request);
         String jsonString = response.getResponseData();
         try {
             JSONParser parser = new JSONParser();
             JSONArray jsonArray = (JSONArray) parser.parse(jsonString);
-            if (jsonArray.isEmpty()) {
-                System.out.println("Non hai nessun amico");
-            } else {
-                System.out.print("I tuoi amici sono: ");
-                String friendList = Utils.stringify(jsonArray, ", ");
-                System.out.println(friendList);
-            }
+            return jsonArray;
         } catch (ParseException e) {
-            System.out.println("C'è stato un problema, riprova più tardi");
+            //System.out.println("C'è stato un problema, riprova più tardi");
         }
+        return null;
     }
 
-    public void challenge(String username, String friendUsername) throws IOException {
+    public String challengeRequest(String username, String friendUsername) throws IOException {
         ConnectionData request = ConnectionData.Factory.newChallengeRequest(username, friendUsername);
-        tcpConnection.sendData(request);
-        ConnectionData response = tcpConnection.receiveData();
+        ConnectionData response = sendTCPRequest(request);
         if (ConnectionData.Validator.isSuccessResponse(response)) {   //The challenge has been forwarded
-            System.out.println("Sfida inviata a "+friendUsername+". In attesa di risposta...");
-
-            response = tcpConnection.receiveData();
-            if (ConnectionData.Validator.isSuccessResponse(response))
-                System.out.println(friendUsername+" ha accettato la sfida!");
-            else if (ConnectionData.Validator.isFailResponse(response))
-                System.out.println(response.getResponseData());
-
+            return "";
         } else if (ConnectionData.Validator.isFailResponse(response)) { //The challenge cannot be forwarded
-            System.out.println(response.getResponseData());
+            return response.getResponseData();
         }
-
+        return null;
     }
 
-    public void showScore(String username) throws IOException {
+    public boolean challengeResponse() throws IOException {
+        ConnectionData response = tcpConnection.receiveData();
+        if (ConnectionData.Validator.isSuccessResponse(response))
+            return true;
+        else if (ConnectionData.Validator.isFailResponse(response))
+            return false;
+        return false;
+    }
+
+    public String showScore(String username) throws IOException {
         ConnectionData request = ConnectionData.Factory.newScoreRequest(username);
-        tcpConnection.sendData(request);
-        ConnectionData response = tcpConnection.receiveData();
-        System.out.println("Il tuo punteggio è: "+response.getResponseData());
+        ConnectionData response = sendTCPRequest(request);
+        return response.getResponseData();
     }
 
-    public void showLeaderboard(String username) throws IOException {
+    public String showLeaderboard(String username) throws IOException {
         ConnectionData request = ConnectionData.Factory.newLeaderboardRequest(username);
-        tcpConnection.sendData(request);
-        ConnectionData response = tcpConnection.receiveData();
-        System.out.println(response.getResponseData());
+        ConnectionData response = sendTCPRequest(request);
+        return response.getResponseData();
     }
 
     public void exit() throws IOException {

@@ -7,24 +7,21 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.channels.DatagramChannel;
-
+//TODO fare questa documentazione
 public class UDPClient implements Runnable {
 
     private DatagramChannel channel;
     private UDPConnection udpConnection;
-    private String loggedUsername;
-    private OnChallengeArrivedListener onChallengeArrivedListener;
+    private WQClient wqClient;
+    private OnChallengeArrivedListener onChallengeArrivedListener;  //listener da invocare quando arriva una nuova sfida
 
-    public UDPClient(OnChallengeArrivedListener listener) throws IOException {
-        channel = DatagramChannel.open();
-        channel.socket().bind(new InetSocketAddress(0));
+    public UDPClient(WQClient wqClient, OnChallengeArrivedListener listener) throws IOException {
+        this.channel = DatagramChannel.open();
+        this.channel.socket().bind(new InetSocketAddress(0));
         SocketAddress serverAddress = new InetSocketAddress(UDPConnection.HOST_NAME, UDPConnection.PORT);
-        udpConnection = new UDPConnection(channel, serverAddress);
+        this.udpConnection = new UDPConnection(channel, serverAddress);
         this.onChallengeArrivedListener = listener;
-    }
-
-    public void setLoggedUsername(String loggedUsername) {
-        this.loggedUsername = loggedUsername;
+        this.wqClient = wqClient;
     }
 
     public void exit() throws IOException {
@@ -45,7 +42,7 @@ public class UDPClient implements Runnable {
                     if (accepted)
                         udpConnection.sendData(ConnectionData.Factory.newSuccessResponse());
                     else
-                        udpConnection.sendData(ConnectionData.Factory.newFailResponse(loggedUsername+" ha rifiutato la sfida"));
+                        udpConnection.sendData(ConnectionData.Factory.newFailResponse(""));
                 }
             }
         } catch (IOException e) {

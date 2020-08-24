@@ -229,7 +229,12 @@ public class ConnectionData {
             return new ConnectionData(CMD.SUCCESS_RESPONSE, new String[]{});
         }
 
-        // TODO: 26/06/2020 this doc
+        /**
+         * Builds a ConnectionData object that represents a success response with data attached.
+         *
+         * @param data data to attach
+         * @return a ConnectionData object that represents a success response
+         */
         public static ConnectionData newSuccessResponse(String data) {
             ConnectionData connectionData = new ConnectionData(CMD.SUCCESS_RESPONSE, new String[]{data});
             connectionData.responseData = data;

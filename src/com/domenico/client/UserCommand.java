@@ -2,7 +2,7 @@ package com.domenico.client;
 
 import java.util.Arrays;
 
-/** This class represent a command with its cmd and its parameters */
+/** This class represents a command with its cmd and its parameters */
 public class UserCommand {
 
     public static final String REGISTER_USER = "registra_utente";

@@ -1,7 +1,7 @@
 package com.domenico.server;
 
 import java.util.*;
-
+//TODO write documentation for this class
 public class UsersManagement {
 
     private static UsersManagement instance;
@@ -69,9 +69,8 @@ public class UsersManagement {
     public List<String> getFriendList(String username) throws UsersManagementException {
         User found = findByUsername(username);
         if (found == null) {
-            throw new UsersManagementException("Invalid username");
+            throw new UsersManagementException("Username non valida");
         }
-        // TODO: 26/06/2020 return a JSON object
         return users.get(found);
     }
 
