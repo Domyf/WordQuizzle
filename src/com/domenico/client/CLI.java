@@ -234,14 +234,14 @@ public class CLI implements OnChallengeArrivedListener {
             int left_space = String.valueOf(leaderboard.size()).length();   //how much space should be left
             if (!leaderboard.isEmpty()) {   //print header
                 System.out.printf(" %" + left_space + "s%10s%7s%s\n", "", "Utente", "", "Punteggio");
-            }
-            int pos = 1;
-            for (Object key:leaderboard.keySet()) {
-                String points = leaderboard.get(key).toString();
-                System.out.printf("#%-"+left_space+"d", pos);   //print position
-                System.out.print(Utils.getCenteredString((String) key, 15));    //print username
-                System.out.println(Utils.getCenteredString(points, 14));    //print points and new line
-                pos++;
+                int pos = 1;
+                for (Object key : leaderboard.keySet()) {
+                    String points = leaderboard.get(key).toString();
+                    System.out.printf("#%-" + left_space + "d", pos);   //print position
+                    System.out.print(Utils.getCenteredString((String) key, 15));    //print username
+                    System.out.println(Utils.getCenteredString(points, 14));    //print points and then new line
+                    pos++;
+                }
             }
         }
     }

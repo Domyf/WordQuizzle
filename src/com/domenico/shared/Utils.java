@@ -47,6 +47,13 @@ public class Utils {
         return builder.toString();
     }
 
+    /**
+     * Returns a new string in which the given string is centered and the length is as much as the parameter width.
+     *
+     * @param s the string to be centered
+     * @param width the resulting length
+     * @return the centered string
+     */
     public static String getCenteredString(String s, int width) {
         int right = s.length() + (width - s.length()) / 2;    //How much space to leave on the right side
         return String.format("%-" + width  + "s", String.format("%" + right + "s", s));

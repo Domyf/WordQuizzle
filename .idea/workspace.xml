@@ -10,9 +10,9 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="JUnit5 Test Class" />
         <option value="Interface" />
         <option value="Class" />
+        <option value="JUnit5 Test Class" />
       </list>
     </option>
   </component>
@@ -70,7 +70,7 @@
       <recent name="com.domenico.communication" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.Run Server">
+  <component name="RunManager" selected="JUnit.UserDataTest">
     <configuration name="Run Client (1)" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="com.domenico.client.MainClassWQClient" />
       <module name="WordQuizzle" />
@@ -111,6 +111,37 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="UserDataTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="WordQuizzle" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.domenico.server.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.domenico.server" />
+      <option name="MAIN_CLASS_NAME" value="com.domenico.server.UserDataTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="UserDataTest.testJSON" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="WordQuizzle" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.domenico.server.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="com.domenico.server" />
+      <option name="MAIN_CLASS_NAME" value="com.domenico.server.UserDataTest" />
+      <option name="METHOD_NAME" value="testJSON" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="UserTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="WordQuizzle" />
       <extension name="coverage">
@@ -131,9 +162,13 @@
       <item itemvalue="Application.Run Client (2)" />
       <item itemvalue="Application.Run Server" />
       <item itemvalue="JUnit.UserTest" />
+      <item itemvalue="JUnit.UserDataTest.testJSON" />
+      <item itemvalue="JUnit.UserDataTest" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.UserDataTest" />
+        <item itemvalue="JUnit.UserDataTest.testJSON" />
         <item itemvalue="Application.Run Server" />
         <item itemvalue="JUnit.UserTest" />
       </list>
@@ -159,7 +194,7 @@
       <workItem from="1598192173513" duration="505000" />
       <workItem from="1598192869638" duration="9416000" />
       <workItem from="1598281637947" duration="18653000" />
-      <workItem from="1598346174837" duration="33280000" />
+      <workItem from="1598346174837" duration="35618000" />
     </task>
     <servers />
   </component>
@@ -175,10 +210,10 @@
       <screen x="0" y="0" width="1536" height="864" />
     </state>
     <state x="225" y="88" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1536.864@0.0.1536.864" timestamp="1593376272166" />
-    <state x="575" y="149" key="#com.intellij.ide.util.MemberChooser" timestamp="1598453664677">
+    <state x="575" y="149" key="#com.intellij.ide.util.MemberChooser" timestamp="1598477400755">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state x="575" y="149" key="#com.intellij.ide.util.MemberChooser/0.0.1536.864@0.0.1536.864" timestamp="1598453664677" />
+    <state x="575" y="149" key="#com.intellij.ide.util.MemberChooser/0.0.1536.864@0.0.1536.864" timestamp="1598477400755" />
     <state x="500" y="224" key="#com.intellij.ide.util.TreeClassChooserDialog" timestamp="1593203725516">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
@@ -223,22 +258,22 @@
       <screen x="0" y="0" width="1536" height="864" />
     </state>
     <state x="475" y="175" key="FileChooserDialogImpl/0.0.1536.864@0.0.1536.864" timestamp="1598305388107" />
-    <state width="1493" height="304" key="GridCell.Tab.0.bottom" timestamp="1598475322241">
+    <state width="1493" height="304" key="GridCell.Tab.0.bottom" timestamp="1598477714601">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state width="1493" height="304" key="GridCell.Tab.0.bottom/0.0.1536.864@0.0.1536.864" timestamp="1598475322241" />
-    <state width="1493" height="304" key="GridCell.Tab.0.center" timestamp="1598475322241">
+    <state width="1493" height="304" key="GridCell.Tab.0.bottom/0.0.1536.864@0.0.1536.864" timestamp="1598477714601" />
+    <state width="1493" height="304" key="GridCell.Tab.0.center" timestamp="1598477714601">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state width="1493" height="304" key="GridCell.Tab.0.center/0.0.1536.864@0.0.1536.864" timestamp="1598475322241" />
-    <state width="1493" height="304" key="GridCell.Tab.0.left" timestamp="1598475322241">
+    <state width="1493" height="304" key="GridCell.Tab.0.center/0.0.1536.864@0.0.1536.864" timestamp="1598477714601" />
+    <state width="1493" height="304" key="GridCell.Tab.0.left" timestamp="1598477714601">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state width="1493" height="304" key="GridCell.Tab.0.left/0.0.1536.864@0.0.1536.864" timestamp="1598475322241" />
-    <state width="1493" height="304" key="GridCell.Tab.0.right" timestamp="1598475322241">
+    <state width="1493" height="304" key="GridCell.Tab.0.left/0.0.1536.864@0.0.1536.864" timestamp="1598477714601" />
+    <state width="1493" height="304" key="GridCell.Tab.0.right" timestamp="1598477714601">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state width="1493" height="304" key="GridCell.Tab.0.right/0.0.1536.864@0.0.1536.864" timestamp="1598475322241" />
+    <state width="1493" height="304" key="GridCell.Tab.0.right/0.0.1536.864@0.0.1536.864" timestamp="1598477714601" />
     <state x="250" y="8" key="SettingsEditor" timestamp="1593288766924">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
@@ -247,10 +282,10 @@
       <screen x="0" y="0" width="1536" height="864" />
     </state>
     <state x="498" y="325" key="com.intellij.jarRepository.RepositoryAttachDialog-DOWNLOAD/0.0.1536.864@0.0.1536.864" timestamp="1593157436693" />
-    <state x="541" y="240" key="com.intellij.testIntegration.createTest.CreateTestDialog" timestamp="1593427899044">
+    <state x="541" y="240" key="com.intellij.testIntegration.createTest.CreateTestDialog" timestamp="1598476949715">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state x="541" y="240" key="com.intellij.testIntegration.createTest.CreateTestDialog/0.0.1536.864@0.0.1536.864" timestamp="1593427899044" />
+    <state x="541" y="240" key="com.intellij.testIntegration.createTest.CreateTestDialog/0.0.1536.864@0.0.1536.864" timestamp="1598476949715" />
     <state x="500" y="184" key="extract.method.dialog" timestamp="1592491977058">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
