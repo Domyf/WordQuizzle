@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Persistence {
+
     private final static String pathname = "serverdata.json";
     private final static File dataFile = new File(pathname);
 

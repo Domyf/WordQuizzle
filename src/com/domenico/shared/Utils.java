@@ -46,4 +46,9 @@ public class Utils {
             builder.append(objects[i]);
         return builder.toString();
     }
+
+    public static String getCenteredString(String s, int width) {
+        int right = s.length() + (width - s.length()) / 2;    //How much space to leave on the right side
+        return String.format("%-" + width  + "s", String.format("%" + right + "s", s));
+    }
 }

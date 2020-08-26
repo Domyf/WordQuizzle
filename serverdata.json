@@ -1,1 +1,1 @@
-{"Eleonora":{"score":0,"password":"passele","friends":["Domenico"]},"Domenico":{"score":0,"password":"passdom","friends":["Eleonora"]}}
+{"u":{"score":0,"password":"unoooo","friends":["Tre"]},"Tre":{"score":0,"password":"tre","friends":["Domenico","u","Ele"]},"Domenico":{"score":0,"password":"passdom","friends":["Ele","Tre"]},"Ele":{"score":0,"password":"passele","friends":["Domenico","Tre"]}}

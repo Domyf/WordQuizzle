@@ -3,6 +3,8 @@ package com.domenico.client;
 import com.domenico.communication.ConnectionData;
 import com.domenico.communication.TCPConnection;
 import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
@@ -96,10 +98,10 @@ public class TCPClient {
         return response.getResponseData();
     }
 
-    public String showLeaderboard(String username) throws IOException {
+    public JSONObject showLeaderboard(String username) throws IOException {
         ConnectionData request = ConnectionData.Factory.newLeaderboardRequest(username);
         ConnectionData response = sendTCPRequest(request);
-        return response.getResponseData();
+        return (JSONObject) JSONValue.parse(response.getResponseData());
     }
 
     public void exit() throws IOException {

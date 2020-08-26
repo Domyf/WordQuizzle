@@ -7,6 +7,8 @@ import org.json.simple.JSONStreamAware;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 public class UserData implements JSONStreamAware {
@@ -69,7 +71,7 @@ public class UserData implements JSONStreamAware {
         return friends.contains(friendUsername);
     }
 
-    public String getFriendList() {
+    public String getFriendsJSON() {
         return JSONArray.toJSONString(friends);
     }
 
@@ -87,5 +89,9 @@ public class UserData implements JSONStreamAware {
 
     public void setOnline(boolean online) {
         this.online = online;
+    }
+
+    public List<String> getFriends() {
+        return friends;
     }
 }

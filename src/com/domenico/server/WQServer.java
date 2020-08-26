@@ -2,6 +2,7 @@ package com.domenico.server;
 
 import com.domenico.communication.*;
 import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 import java.io.IOException;
 import java.net.*;
@@ -168,16 +169,14 @@ public class WQServer extends Multiplexer {
 
     private ConnectionData handleScoreRequest(ConnectionData received) throws UsersManagementException {
         int score = usersManagement.getScore(received.getUsername());
-        // TODO: 26/06/2020 get the real score
 
         return ConnectionData.Factory.newSuccessResponse(""+score);
     }
 
-    private ConnectionData handleLeaderboardRequest(ConnectionData received) {
+    private ConnectionData handleLeaderboardRequest(ConnectionData received) throws UsersManagementException {
         String username = received.getUsername();
-        // TODO: 26/06/2020 get the leaderboard
-
-        return ConnectionData.Factory.newSuccessResponse("Leaderboard as not been implemented yet");
+        JSONObject leaderboard = usersManagement.getLeaderboard(username);
+        return ConnectionData.Factory.newSuccessResponse(leaderboard.toJSONString());
     }
 
     /**

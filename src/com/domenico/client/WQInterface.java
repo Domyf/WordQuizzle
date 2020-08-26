@@ -1,6 +1,7 @@
 package com.domenico.client;
 
 import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 public interface WQInterface {
 
@@ -20,7 +21,7 @@ public interface WQInterface {
 
     String onShowScore() throws Exception;
 
-    JSONArray onShowLeaderboard() throws Exception;
+    JSONObject onShowLeaderboard() throws Exception;
 
     /**
      * @return true if the client's user is logged in

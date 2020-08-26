@@ -1,9 +1,15 @@
 package com.domenico.client;
 
 import com.domenico.shared.Utils;
+import jdk.jshell.execution.Util;
 import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
+import java.util.Collections;
+import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class CLI implements OnChallengeArrivedListener {
 
@@ -221,12 +227,23 @@ public class CLI implements OnChallengeArrivedListener {
 
     /** Method invoked when the user types mostra_classifica */
     private void handleShowLeaderboard() throws Exception {
-        JSONArray leaderboard = wqInterface.onShowLeaderboard();
-        //TODO print the leaderboard
-        if (leaderboard == null)
+        JSONObject leaderboard = wqInterface.onShowLeaderboard();
+        if (leaderboard == null) {
             System.out.println(Messages.SOMETHING_WENT_WRONG);
-        else
-            System.out.println("Stamperò la leaderboard un giorno");
+        } else {    //print the leaderboard
+            int left_space = String.valueOf(leaderboard.size()).length();   //how much space should be left
+            if (!leaderboard.isEmpty()) {   //print header
+                System.out.printf(" %" + left_space + "s%10s%7s%s\n", "", "Utente", "", "Punteggio");
+            }
+            int pos = 1;
+            for (Object key:leaderboard.keySet()) {
+                String points = leaderboard.get(key).toString();
+                System.out.printf("#%-"+left_space+"d", pos);   //print position
+                System.out.print(Utils.getCenteredString((String) key, 15));    //print username
+                System.out.println(Utils.getCenteredString(points, 14));    //print points and new line
+                pos++;
+            }
+        }
     }
 
     /**

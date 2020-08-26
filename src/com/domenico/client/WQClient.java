@@ -1,6 +1,7 @@
 package com.domenico.client;
 
 import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 import java.io.IOException;
 import java.rmi.NotBoundException;
@@ -102,9 +103,9 @@ public class WQClient implements WQInterface {
     }
 
     @Override
-    public JSONArray onShowLeaderboard() throws Exception {
+    public JSONObject onShowLeaderboard() throws Exception {
         if (isLoggedIn()) {
-            return tcpClient.friendList(loggedUserName);
+            return tcpClient.showLeaderboard(loggedUserName);
         } else {
             return null;
         }

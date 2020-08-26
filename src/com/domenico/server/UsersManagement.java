@@ -1,5 +1,8 @@
 package com.domenico.server;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
 import java.io.*;
 import java.util.*;
 
@@ -97,6 +100,19 @@ public class UsersManagement {
         UserData userData = serverData.get(username);
         if (userData == null)
             throw new UsersManagementException("Username non valida");
-        return userData.getFriendList();
+        return userData.getFriendsJSON();
+    }
+
+    public JSONObject getLeaderboard(String username) throws UsersManagementException {
+        UserData userData = serverData.get(username);
+        if (userData == null)
+            throw new UsersManagementException("Username non valida");
+        List<String> friends = userData.getFriends();
+        JSONObject obj = new JSONObject();
+        obj.put(username, userData.getScore());
+        for (String friend:friends) {
+            obj.put(friend, serverData.get(friend).getScore());
+        }
+        return obj;
     }
 }
