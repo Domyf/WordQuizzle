@@ -40,13 +40,20 @@
     <property name="node.js.path.for.package.tslint" value="project" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
+    <property name="nodejs_package_manager_path" value="npm" />
     <property name="project.structure.last.edited" value="Libraries" />
     <property name="project.structure.proportion" value="0.0" />
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
   </component>
   <component name="RecentsManager">
+    <key name="CreateTestDialog.Recents.Supers">
+      <recent name="" />
+    </key>
     <key name="CreateTestDialog.RecentsKey">
+      <recent name="com.domenico.server" />
+    </key>
+    <key name="MoveInnerDialog.RECENTS_KEY">
       <recent name="com.domenico.server" />
     </key>
     <key name="MoveMembersDialog.RECENTS_KEY">
@@ -58,9 +65,6 @@
     </key>
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
       <recent name="com.domenico.server" />
-    </key>
-    <key name="CreateTestDialog.Recents.Supers">
-      <recent name="" />
     </key>
     <key name="CreateClassDialog.RecentsKey">
       <recent name="com.domenico.communication" />
@@ -155,7 +159,7 @@
       <workItem from="1598192173513" duration="505000" />
       <workItem from="1598192869638" duration="9416000" />
       <workItem from="1598281637947" duration="18653000" />
-      <workItem from="1598346174837" duration="24018000" />
+      <workItem from="1598346174837" duration="25451000" />
     </task>
     <servers />
   </component>
@@ -171,10 +175,10 @@
       <screen x="0" y="0" width="1536" height="864" />
     </state>
     <state x="225" y="88" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1536.864@0.0.1536.864" timestamp="1593376272166" />
-    <state x="575" y="149" key="#com.intellij.ide.util.MemberChooser" timestamp="1598450569912">
+    <state x="575" y="149" key="#com.intellij.ide.util.MemberChooser" timestamp="1598453664677">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state x="575" y="149" key="#com.intellij.ide.util.MemberChooser/0.0.1536.864@0.0.1536.864" timestamp="1598450569912" />
+    <state x="575" y="149" key="#com.intellij.ide.util.MemberChooser/0.0.1536.864@0.0.1536.864" timestamp="1598453664677" />
     <state x="500" y="224" key="#com.intellij.ide.util.TreeClassChooserDialog" timestamp="1593203725516">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
@@ -183,18 +187,26 @@
       <screen x="0" y="0" width="1536" height="864" />
     </state>
     <state x="450" y="169" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog/0.0.1536.864@0.0.1536.864" timestamp="1598281024131" />
+    <state x="606" y="358" key="#com.intellij.refactoring.move.MoveHandler.SelectRefactoringDialog" timestamp="1598453562601">
+      <screen x="0" y="0" width="1536" height="864" />
+    </state>
+    <state x="606" y="358" key="#com.intellij.refactoring.move.MoveHandler.SelectRefactoringDialog/0.0.1536.864@0.0.1536.864" timestamp="1598453562601" />
     <state x="553" y="328" width="430" height="266" key="#com.intellij.refactoring.move.moveClassesOrPackages.MoveClassesOrPackagesDialog.classes" timestamp="1592478931341">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
     <state x="553" y="328" width="430" height="266" key="#com.intellij.refactoring.move.moveClassesOrPackages.MoveClassesOrPackagesDialog.classes/0.0.1536.864@0.0.1536.864" timestamp="1592478931341" />
+    <state x="553" y="278" key="#com.intellij.refactoring.move.moveInner.MoveInnerDialog" timestamp="1598453572852">
+      <screen x="0" y="0" width="1536" height="864" />
+    </state>
+    <state x="553" y="278" key="#com.intellij.refactoring.move.moveInner.MoveInnerDialog/0.0.1536.864@0.0.1536.864" timestamp="1598453572852" />
     <state x="487" y="241" key="#com.intellij.refactoring.move.moveMembers.MoveMembersDialog" timestamp="1593203727951">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
     <state x="487" y="241" key="#com.intellij.refactoring.move.moveMembers.MoveMembersDialog/0.0.1536.864@0.0.1536.864" timestamp="1593203727951" />
-    <state x="399" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1598447215488">
+    <state x="399" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1598454430437">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state x="399" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.0.1536.864@0.0.1536.864" timestamp="1598447215488" />
+    <state x="399" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.0.1536.864@0.0.1536.864" timestamp="1598454430437" />
     <state x="500" y="180" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1598432228701">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
@@ -207,22 +219,22 @@
       <screen x="0" y="0" width="1536" height="864" />
     </state>
     <state x="475" y="175" key="FileChooserDialogImpl/0.0.1536.864@0.0.1536.864" timestamp="1598305388107" />
-    <state width="1493" height="304" key="GridCell.Tab.0.bottom" timestamp="1598453022867">
+    <state width="1493" height="304" key="GridCell.Tab.0.bottom" timestamp="1598453481392">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state width="1493" height="304" key="GridCell.Tab.0.bottom/0.0.1536.864@0.0.1536.864" timestamp="1598453022867" />
-    <state width="1493" height="304" key="GridCell.Tab.0.center" timestamp="1598453022866">
+    <state width="1493" height="304" key="GridCell.Tab.0.bottom/0.0.1536.864@0.0.1536.864" timestamp="1598453481392" />
+    <state width="1493" height="304" key="GridCell.Tab.0.center" timestamp="1598453481392">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state width="1493" height="304" key="GridCell.Tab.0.center/0.0.1536.864@0.0.1536.864" timestamp="1598453022866" />
-    <state width="1493" height="304" key="GridCell.Tab.0.left" timestamp="1598453022866">
+    <state width="1493" height="304" key="GridCell.Tab.0.center/0.0.1536.864@0.0.1536.864" timestamp="1598453481392" />
+    <state width="1493" height="304" key="GridCell.Tab.0.left" timestamp="1598453481392">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state width="1493" height="304" key="GridCell.Tab.0.left/0.0.1536.864@0.0.1536.864" timestamp="1598453022866" />
-    <state width="1493" height="304" key="GridCell.Tab.0.right" timestamp="1598453022866">
+    <state width="1493" height="304" key="GridCell.Tab.0.left/0.0.1536.864@0.0.1536.864" timestamp="1598453481392" />
+    <state width="1493" height="304" key="GridCell.Tab.0.right" timestamp="1598453481392">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state width="1493" height="304" key="GridCell.Tab.0.right/0.0.1536.864@0.0.1536.864" timestamp="1598453022866" />
+    <state width="1493" height="304" key="GridCell.Tab.0.right/0.0.1536.864@0.0.1536.864" timestamp="1598453481392" />
     <state x="250" y="8" key="SettingsEditor" timestamp="1593288766924">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
@@ -243,14 +255,14 @@
       <screen x="0" y="0" width="1536" height="864" />
     </state>
     <state x="477" y="191" key="refactoring.ChangeSignatureDialog/0.0.1536.864@0.0.1536.864" timestamp="1593526057324" />
-    <state x="426" y="197" key="run.anything.popup" timestamp="1598366623206">
+    <state x="426" y="197" key="run.anything.popup" timestamp="1598454151966">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state x="426" y="197" key="run.anything.popup/0.0.1536.864@0.0.1536.864" timestamp="1598366623206" />
-    <state x="431" y="182" width="672" height="678" key="search.everywhere.popup" timestamp="1598362612609">
+    <state x="426" y="197" key="run.anything.popup/0.0.1536.864@0.0.1536.864" timestamp="1598454151966" />
+    <state x="431" y="182" width="672" height="678" key="search.everywhere.popup" timestamp="1598453159200">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state x="431" y="182" width="672" height="678" key="search.everywhere.popup/0.0.1536.864@0.0.1536.864" timestamp="1598362612609" />
+    <state x="431" y="182" width="672" height="678" key="search.everywhere.popup/0.0.1536.864@0.0.1536.864" timestamp="1598453159200" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

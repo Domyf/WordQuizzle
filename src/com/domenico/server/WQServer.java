@@ -135,10 +135,9 @@ public class WQServer extends Multiplexer {
     }
 
     private ConnectionData handleFriendListRequest(ConnectionData received) throws UsersManagementException {
-        List<String> friendList = usersManagement.getFriendList(received.getUsername());
-        String jsonString = JSONArray.toJSONString(friendList);
+        String jsonFriendList = usersManagement.getJSONFriendList(received.getUsername());
 
-        return ConnectionData.Factory.newSuccessResponse(jsonString);
+        return ConnectionData.Factory.newSuccessResponse(jsonFriendList);
     }
 
     private ConnectionData handleChallengeRequest(ConnectionData received, UserRecord fromUserRecord) throws IOException, UsersManagementException {

@@ -1,53 +1,12 @@
 package com.domenico.server;
 
 import org.json.simple.*;
-import org.json.simple.parser.ContentHandler;
-import org.json.simple.parser.JSONParser;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 
 //TODO write documentation for this class
 public class UsersManagement {
-    private static class UserData implements JSONStreamAware {
-        String password;
-        List<String> friends;
-        int score;
-        boolean loggedIn;
-
-        public UserData(String password) {
-            this.password = password;
-            this.friends = new ArrayList<>();
-            this.score = 0;
-            this.loggedIn = false;
-        }
-
-        /**
-         * Instantiates a UserData object from a JSONObject. It does the opposite of writeJSONString(writer) method
-         *
-         * @param obj the object to be parsed relative to a UserData object
-         * @return a new UserData object
-         */
-        public static UserData newFromJSON(JSONObject obj) {
-            UserData userData = new UserData((String) obj.get("password"));
-            userData.loggedIn = false;
-            userData.score = ((Long) obj.get("score")).intValue();
-            userData.friends = (JSONArray) obj.get("friends");
-            return userData;
-        }
-
-        @Override
-        public void writeJSONString(Writer writer) throws IOException {
-            JSONObject obj = new JSONObject();
-            obj.put("password", password);
-            obj.put("score", score);
-            obj.put("friends", friends);
-            obj.writeJSONString(writer);
-        }
-    }
 
     private static UsersManagement instance;
     private final static File dataFile = new File("serverdata.json");
@@ -73,22 +32,22 @@ public class UsersManagement {
 
     public void login(String username, String password) throws UsersManagementException {
         UserData userData = serverData.get(username);
-        if (userData == null || !userData.password.equals(password))
+        if (userData == null || !userData.hasPassword(password))
             throw new UsersManagementException("Username o password non valida");
-        if (userData.loggedIn)
+        if (userData.isOnline())
             throw new UsersManagementException("Hai già eseguito il login");
 
-        userData.loggedIn = true;
+        userData.setOnline(true);
     }
 
     public void logout(String username) throws UsersManagementException {
         UserData userData = serverData.get(username);
         if (userData == null)
             throw new UsersManagementException("Username non valida");
-        if (!userData.loggedIn)
+        if (!userData.isOnline())
             throw new UsersManagementException("Hai già eseguito il logout");
 
-        userData.loggedIn = false;
+        userData.setOnline(false);
     }
 
     public void addFriend(String username, String friendUsername) throws UsersManagementException {
@@ -101,11 +60,11 @@ public class UsersManagement {
         if (second == null)
             throw new UsersManagementException("Non esiste un altro utente con questa username");
 
-        if (areFriends(first, second)) {
+        if (areFriends(username, friendUsername)) {
             throw new UsersManagementException("L'amicizia non è stata creata perchè siete già amici");
         } else {
-            first.friends.add(friendUsername);
-            second.friends.add(username);
+            first.addFriend(friendUsername);
+            second.addFriend(username);
             saveOnDisk();
         }
     }
@@ -114,31 +73,28 @@ public class UsersManagement {
         UserData userData = serverData.get(username);
         if (userData == null)
             throw new UsersManagementException("Username non valida");
-        return userData.score;
+        return userData.getScore();
     }
 
     public boolean isOnline(String username) {
         UserData userData = serverData.get(username);
-        return userData != null && userData.loggedIn;
+        return userData != null && userData.isOnline();
     }
 
-    private boolean areFriends(UserData first, UserData second) {
-        return first.friends.contains(second.friends);
-    }
-
-    public boolean areFriends(String first, String second) {
-        UserData firstData = serverData.get(first);
-        UserData secondData = serverData.get(second);
-        if (firstData != null && secondData != null)
-            return areFriends(firstData, secondData);
+    public boolean areFriends(String firstUsername, String secondUsername) {
+        UserData firstData = serverData.get(firstUsername);
+        if (firstData != null)
+            return firstData.hasFriend(secondUsername);
         return false;
     }
-    public List<String> getFriendList(String username) throws UsersManagementException {
+
+    public String getJSONFriendList(String username) throws UsersManagementException {
         UserData userData = serverData.get(username);
         if (userData == null)
             throw new UsersManagementException("Username non valida");
-        return userData.friends;
+        return userData.getFriendList();
     }
+
     /**
      * Rende i dati sul disco persistenti. La scrittura reale è bufferizzata quindi verrà svolta quando il buffer è pieno
      * altrimenti in fase di chiusura del programma.
