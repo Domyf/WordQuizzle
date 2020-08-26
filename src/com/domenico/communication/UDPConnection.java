@@ -48,7 +48,7 @@ public class UDPConnection extends Connection {
 
     @Override
     public void endConnection() throws IOException {
-        System.out.println("UDP end conn");
-        channel.close();
+        if (channel.isOpen())
+            channel.close();
     }
 }

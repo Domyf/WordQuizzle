@@ -4,7 +4,7 @@ import org.json.simple.JSONArray;
 
 public interface WQInterface {
 
-    boolean onRegisterUser(String username, String password) throws Exception;
+    String onRegisterUser(String username, String password) throws Exception;
 
     String onLogin(String username, String password) throws Exception;
 
@@ -22,5 +22,11 @@ public interface WQInterface {
 
     JSONArray onShowLeaderboard() throws Exception;
 
+    /**
+     * @return true if the client's user is logged in
+     */
+    boolean isLoggedIn();
+
     void onExit() throws Exception;
+
 }

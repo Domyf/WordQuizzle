@@ -22,12 +22,10 @@ public class MainClassWQServer {
         }
 
         try {
-            UsersManagement usersManagement = UsersManagement.getInstance();
-            UserRegistrationService.newRegistrationService(usersManagement);
-            Thread tcpWorker = new Thread(new NetWorker());
-            tcpWorker.start();
-            tcpWorker.join();
-        } catch (IOException | InterruptedException e) {
+            UserRegistrationService.newRegistrationService();
+            WQServer server = new WQServer();
+            server.startProcessing();
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

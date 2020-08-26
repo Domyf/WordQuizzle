@@ -33,7 +33,7 @@
     <property name="aspect.path.notification.shown" value="true" />
     <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary" value="JUnit5" />
     <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit5" value="" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/json-simple-1.1.1.jar!/" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../University/Reti di Calcolatori/EserciziLab" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -66,7 +66,7 @@
       <recent name="com.domenico.communication" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.Run Client (2)">
+  <component name="RunManager" selected="Application.Run Server">
     <configuration name="Run Client (1)" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="com.domenico.client.MainClassWQClient" />
       <module name="WordQuizzle" />
@@ -94,13 +94,15 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration default="true" type="ArquillianJUnit" factoryName="" nameIsGenerated="true">
+    <configuration default="true" type="ArquillianTestNG" factoryName="" nameIsGenerated="true">
       <option name="arquillianRunConfiguration">
         <value>
           <option name="containerStateName" value="" />
         </value>
       </option>
-      <option name="TEST_OBJECT" value="class" />
+      <option name="TEST_OBJECT" value="CLASS" />
+      <properties />
+      <listeners />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -152,7 +154,8 @@
       <workItem from="1593796643890" duration="597000" />
       <workItem from="1598192173513" duration="505000" />
       <workItem from="1598192869638" duration="9416000" />
-      <workItem from="1598281637947" duration="10571000" />
+      <workItem from="1598281637947" duration="18653000" />
+      <workItem from="1598346174837" duration="24018000" />
     </task>
     <servers />
   </component>
@@ -168,10 +171,10 @@
       <screen x="0" y="0" width="1536" height="864" />
     </state>
     <state x="225" y="88" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1536.864@0.0.1536.864" timestamp="1593376272166" />
-    <state x="575" y="149" key="#com.intellij.ide.util.MemberChooser" timestamp="1598291380351">
+    <state x="575" y="149" key="#com.intellij.ide.util.MemberChooser" timestamp="1598450569912">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state x="575" y="149" key="#com.intellij.ide.util.MemberChooser/0.0.1536.864@0.0.1536.864" timestamp="1598291380351" />
+    <state x="575" y="149" key="#com.intellij.ide.util.MemberChooser/0.0.1536.864@0.0.1536.864" timestamp="1598450569912" />
     <state x="500" y="224" key="#com.intellij.ide.util.TreeClassChooserDialog" timestamp="1593203725516">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
@@ -188,38 +191,38 @@
       <screen x="0" y="0" width="1536" height="864" />
     </state>
     <state x="487" y="241" key="#com.intellij.refactoring.move.moveMembers.MoveMembersDialog/0.0.1536.864@0.0.1536.864" timestamp="1593203727951" />
-    <state x="399" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1593203778223">
+    <state x="399" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1598447215488">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state x="399" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.0.1536.864@0.0.1536.864" timestamp="1593203778223" />
-    <state x="500" y="180" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1598278509573">
+    <state x="399" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.0.1536.864@0.0.1536.864" timestamp="1598447215488" />
+    <state x="500" y="180" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1598432228701">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state x="500" y="180" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1536.864@0.0.1536.864" timestamp="1598278509573" />
+    <state x="500" y="180" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1536.864@0.0.1536.864" timestamp="1598432228701" />
     <state x="522" y="329" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1" timestamp="1593157449629">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
     <state x="522" y="329" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1/0.0.1536.864@0.0.1536.864" timestamp="1593157449629" />
-    <state x="475" y="175" key="FileChooserDialogImpl" timestamp="1593288762282">
+    <state x="475" y="175" key="FileChooserDialogImpl" timestamp="1598305388107">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state x="475" y="175" key="FileChooserDialogImpl/0.0.1536.864@0.0.1536.864" timestamp="1593288762282" />
-    <state width="1493" height="311" key="GridCell.Tab.0.bottom" timestamp="1598293639211">
+    <state x="475" y="175" key="FileChooserDialogImpl/0.0.1536.864@0.0.1536.864" timestamp="1598305388107" />
+    <state width="1493" height="304" key="GridCell.Tab.0.bottom" timestamp="1598453022867">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state width="1493" height="311" key="GridCell.Tab.0.bottom/0.0.1536.864@0.0.1536.864" timestamp="1598293639211" />
-    <state width="1493" height="311" key="GridCell.Tab.0.center" timestamp="1598293639211">
+    <state width="1493" height="304" key="GridCell.Tab.0.bottom/0.0.1536.864@0.0.1536.864" timestamp="1598453022867" />
+    <state width="1493" height="304" key="GridCell.Tab.0.center" timestamp="1598453022866">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state width="1493" height="311" key="GridCell.Tab.0.center/0.0.1536.864@0.0.1536.864" timestamp="1598293639211" />
-    <state width="1493" height="311" key="GridCell.Tab.0.left" timestamp="1598293639210">
+    <state width="1493" height="304" key="GridCell.Tab.0.center/0.0.1536.864@0.0.1536.864" timestamp="1598453022866" />
+    <state width="1493" height="304" key="GridCell.Tab.0.left" timestamp="1598453022866">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state width="1493" height="311" key="GridCell.Tab.0.left/0.0.1536.864@0.0.1536.864" timestamp="1598293639210" />
-    <state width="1493" height="311" key="GridCell.Tab.0.right" timestamp="1598293639211">
+    <state width="1493" height="304" key="GridCell.Tab.0.left/0.0.1536.864@0.0.1536.864" timestamp="1598453022866" />
+    <state width="1493" height="304" key="GridCell.Tab.0.right" timestamp="1598453022866">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state width="1493" height="311" key="GridCell.Tab.0.right/0.0.1536.864@0.0.1536.864" timestamp="1598293639211" />
+    <state width="1493" height="304" key="GridCell.Tab.0.right/0.0.1536.864@0.0.1536.864" timestamp="1598453022866" />
     <state x="250" y="8" key="SettingsEditor" timestamp="1593288766924">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
@@ -240,13 +243,23 @@
       <screen x="0" y="0" width="1536" height="864" />
     </state>
     <state x="477" y="191" key="refactoring.ChangeSignatureDialog/0.0.1536.864@0.0.1536.864" timestamp="1593526057324" />
-    <state x="426" y="197" key="run.anything.popup" timestamp="1593425768809">
+    <state x="426" y="197" key="run.anything.popup" timestamp="1598366623206">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state x="426" y="197" key="run.anything.popup/0.0.1536.864@0.0.1536.864" timestamp="1593425768809" />
-    <state x="431" y="182" width="672" height="678" key="search.everywhere.popup" timestamp="1598282478608">
+    <state x="426" y="197" key="run.anything.popup/0.0.1536.864@0.0.1536.864" timestamp="1598366623206" />
+    <state x="431" y="182" width="672" height="678" key="search.everywhere.popup" timestamp="1598362612609">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state x="431" y="182" width="672" height="678" key="search.everywhere.popup/0.0.1536.864@0.0.1536.864" timestamp="1598282478608" />
+    <state x="431" y="182" width="672" height="678" key="search.everywhere.popup/0.0.1536.864@0.0.1536.864" timestamp="1598362612609" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>jar://$PROJECT_DIR$/json-simple-1.1.1.jar!/org/json/simple/JSONValue.class</url>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

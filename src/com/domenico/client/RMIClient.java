@@ -18,14 +18,7 @@ public class RMIClient {
         this.rmiConnection = (RMIConnection) remoteObj;
     }
 
-    public boolean register(String username, String password) throws RemoteException {
-        String result = rmiConnection.register(username, password);
-        if (result == null) {
-            System.out.println("Registrazione avvenuta con successo!");
-            return true;
-        } else {
-            System.out.println(result);
-            return false;
-        }
+    public String register(String username, String password) throws RemoteException {
+        return rmiConnection.register(username, password);
     }
 }

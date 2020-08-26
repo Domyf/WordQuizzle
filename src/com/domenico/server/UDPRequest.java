@@ -46,6 +46,7 @@ public class UDPRequest extends Multiplexer implements Callable<ConnectionData> 
     @Override
     void onReadable(SelectionKey key) throws IOException {
         response = udpConnection.receiveData();
+        print(response.getResponseData());
         super.stopProcessing();
     }
 

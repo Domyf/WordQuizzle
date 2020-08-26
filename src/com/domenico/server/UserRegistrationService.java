@@ -2,6 +2,7 @@ package com.domenico.server;
 
 import com.domenico.communication.RMIConnection;
 
+import java.io.IOException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -13,22 +14,22 @@ public class UserRegistrationService extends RemoteServer implements RMIConnecti
 
     private UsersManagement usersManagement;
 
-    public UserRegistrationService(UsersManagement usersManagement) {
-        this.usersManagement = usersManagement;
+    public UserRegistrationService() throws IOException {
+        this.usersManagement = UsersManagement.getInstance();
     }
 
     @Override
     public String register(String username, String password) throws RemoteException {
         try {
-            usersManagement.register(new User(username, password));
+            usersManagement.register(username, password);
         } catch (UsersManagementException e) {
             return e.getMessage();
         }
-        return null;
+        return "";
     }
 
-    public static UserRegistrationService newRegistrationService(UsersManagement usersManagement) throws RemoteException {
-        UserRegistrationService userRegistrationService = new UserRegistrationService(usersManagement);
+    public static UserRegistrationService newRegistrationService() throws IOException {
+        UserRegistrationService userRegistrationService = new UserRegistrationService();
         RMIConnection stub = (RMIConnection) UnicastRemoteObject.exportObject(userRegistrationService, 0);
 
         LocateRegistry.createRegistry(RMIConnection.REGISTRY_PORT);

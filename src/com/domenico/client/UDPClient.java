@@ -24,10 +24,6 @@ public class UDPClient implements Runnable {
         this.wqClient = wqClient;
     }
 
-    public void exit() throws IOException {
-        udpConnection.endConnection();
-    }
-
     public int getUDPPort() {
         return channel.socket().getLocalPort();
     }
@@ -35,7 +31,7 @@ public class UDPClient implements Runnable {
     @Override
     public void run() {
         try {
-            while (true) {
+            while (!Thread.currentThread().isInterrupted()) {
                 ConnectionData receiveData = udpConnection.receiveData();
                 if (ConnectionData.Validator.isChallengeRequest(receiveData)) {
                     boolean accepted = onChallengeArrivedListener.onChallengeArrived(receiveData.getUsername());
@@ -46,7 +42,6 @@ public class UDPClient implements Runnable {
                 }
             }
         } catch (IOException e) {
-
         }
     }
 }

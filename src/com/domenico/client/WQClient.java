@@ -10,6 +10,7 @@ public class WQClient implements WQInterface {
     private final RMIClient rmiClient;
     private final TCPClient tcpClient;
     private final UDPClient udpClient;
+    private final Thread udpClientTh;
     private String loggedUserName;
 
     public WQClient(OnChallengeArrivedListener listener) throws IOException, NotBoundException {
@@ -17,12 +18,17 @@ public class WQClient implements WQInterface {
         this.rmiClient = new RMIClient();
         this.tcpClient = new TCPClient();
         this.udpClient = new UDPClient(this, listener);
-        new Thread(udpClient).start();
+        this.udpClientTh = new Thread(this.udpClient);
+        udpClientTh.start();
     }
 
     @Override
-    public boolean onRegisterUser(String username, String password) throws Exception {
-        return rmiClient.register(username, password);
+    public String onRegisterUser(String username, String password) throws Exception {
+        if (!isLoggedIn()) {
+            return rmiClient.register(username, password);
+        } else {
+            return Messages.LOGOUT_NEEDED;
+        }
     }
 
     @Override
@@ -106,13 +112,11 @@ public class WQClient implements WQInterface {
 
     @Override
     public void onExit() throws Exception {
-        udpClient.exit();
+        udpClientTh.interrupt();
     }
 
-    /**
-     * @return true if the client's user is logged in
-     */
-    private boolean isLoggedIn() {
+    @Override
+    public boolean isLoggedIn() {
         return loggedUserName != null;
     }
 

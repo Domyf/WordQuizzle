@@ -6,6 +6,7 @@ public class Messages {
     //Success
     public static final String LOGIN_SUCCESS = "Login eseguito con successo";
     public static final String LOGOUT_SUCCESS = "Logout eseguito con successo";
+    public static final String REGISTRATION_SUCCESS = "Registrazione avvenuta con successo";
 
     //Warnings or errors
     public static final String LOGIN_NEEDED = "Per eseguire questa operazione hai bisogno di fare il login";

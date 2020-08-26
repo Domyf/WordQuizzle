@@ -20,13 +20,13 @@ import java.util.concurrent.FutureTask;
  * This is a worker class that manages all the TCP communications. It implements channel multiplexing to efficiently
  * manage all the clients by extending the Multiplexer class.
  */
-public class NetWorker extends Multiplexer implements Runnable {
+public class WQServer extends Multiplexer {
 
     private UsersManagement usersManagement;
     private DatagramChannel datagramChannel;
     private Map<String, SelectionKey> mapToKey;
 
-    private class UserRecord {
+    private static class UserRecord {
         TCPConnection tcpConnection;
         ConnectionData response;
         int udpPort;
@@ -35,7 +35,7 @@ public class NetWorker extends Multiplexer implements Runnable {
         String username;
     }
 
-    public NetWorker() throws IOException {
+    public WQServer() throws IOException {
         super(ServerSocketChannel.open(), SelectionKey.OP_ACCEPT);
         ServerSocket serverSocket = ((ServerSocketChannel) channel).socket();
         serverSocket.bind(new InetSocketAddress(TCPConnection.SERVER_PORT));
@@ -46,14 +46,6 @@ public class NetWorker extends Multiplexer implements Runnable {
         this.mapToKey = new HashMap<>();
         datagramChannel.socket().bind(new InetSocketAddress(UDPConnection.PORT));
     }
-
-    @Override
-    public void run() {
-        super.startProcessing();
-    }
-
-    @Override
-    protected void onTimeout() {}
 
     /** Called when the method accept() will not block the thread */
     @Override
@@ -117,7 +109,7 @@ public class NetWorker extends Multiplexer implements Runnable {
     private ConnectionData handleLoginRequest(ConnectionData connectionData, UserRecord userRecord, SelectionKey key) throws UsersManagementException {
         String username = connectionData.getUsername();
         String password = connectionData.getPassword();
-        usersManagement.login(new User(username, password));
+        usersManagement.login(username, password);
         userRecord.udpPort = Integer.parseUnsignedInt(connectionData.getResponseData());
         userRecord.username = username;
         mapToKey.put(username, key);
@@ -175,7 +167,7 @@ public class NetWorker extends Multiplexer implements Runnable {
         return ConnectionData.Factory.newSuccessResponse();
     }
 
-    private ConnectionData handleScoreRequest(ConnectionData received) {
+    private ConnectionData handleScoreRequest(ConnectionData received) throws UsersManagementException {
         int score = usersManagement.getScore(received.getUsername());
         // TODO: 26/06/2020 get the real score
 
@@ -241,5 +233,8 @@ public class NetWorker extends Multiplexer implements Runnable {
     private void print(String string) {
         System.out.println("[TCP]: "+string);
     }
+
+    @Override
+    protected void onTimeout() {}
 
 }

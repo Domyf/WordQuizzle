@@ -10,28 +10,63 @@ public class CLI implements OnChallengeArrivedListener {
     private static final String COMMAND_LINE_START = "> ";
     private Scanner scanner;
     private WQInterface wqInterface;
+    private String lastInput = null;
+    private final Object mutex = new Object();
+    private Boolean challengeArrived = false;
 
     public CLI() throws Exception {
         this.scanner = new Scanner(System.in);
         this.wqInterface = new WQClient(this);
     }
 
-    public synchronized UserCommand askForCommand() {
-        System.out.print(COMMAND_LINE_START);
-        String line = scanner.nextLine().trim();
-        if (line.isBlank())
-            return null;
-
-        return new UserCommand(line);
+    public synchronized String getNextLine() {
+        if (lastInput == null) {
+            System.out.print(COMMAND_LINE_START);
+            lastInput = scanner.nextLine().trim();
+        }
+        return lastInput;
     }
 
-    public synchronized boolean askChoice(String message) {
-        System.out.println(message);
+    public UserCommand askForCommand() throws InterruptedException {
+        UserCommand uc = null;
+        synchronized (mutex) {  //Se sto gestendo l'arrivo della sfida allora attendo
+            while (challengeArrived) {
+                mutex.wait();
+            }
+        }
+        String line = getNextLine();
+        synchronized (mutex) {
+            //Ritorno il comando solo se la sfida non è arrivata
+            if (!challengeArrived && !line.isBlank()) {
+                uc = new UserCommand(line);
+                lastInput = null;
+            } else if (line.isBlank()) {
+                lastInput = null;
+            }
+        }
+        return uc;
+    }
+
+    public boolean askChoice(String message) {
+        System.out.println(message+" (SI/NO oppure S/N)");
+        String answer = getNextLine().toLowerCase();
+        lastInput = null;
+        return answer.equals("si") || answer.equals("s");
+    }
+
+    @Override
+    public boolean onChallengeArrived(String from) {
+        System.out.println("\rArrivata una sfida da "+from+". Vuoi accettare la sfida?");
         System.out.print(COMMAND_LINE_START);
-        String answer = scanner.nextLine();
-
-        answer = answer.trim().toLowerCase();
-
+        synchronized (mutex) {
+            challengeArrived = true;
+        }
+        String answer = getNextLine().trim().toLowerCase();
+        synchronized (mutex) {
+            challengeArrived = false;
+            lastInput = null;
+            mutex.notify();
+        }
         return answer.equals("si") || answer.equals("s");
     }
 
@@ -39,6 +74,7 @@ public class CLI implements OnChallengeArrivedListener {
         boolean run = true;
         while(run) {
             UserCommand userCommand = askForCommand();
+            if (userCommand == null) continue;
             switch (userCommand.getCmd().toLowerCase()) {
                 case UserCommand.REGISTER_USER:
                     if (userCommand.hasParams(2)) {
@@ -82,7 +118,8 @@ public class CLI implements OnChallengeArrivedListener {
                     break;
                 case UserCommand.EXIT:
                     run = false;
-                    wqInterface.onLogout();
+                    if (wqInterface.isLoggedIn())
+                        handleLogout();
                     break;
                 default:
                     System.out.println(Messages.INVALID_COMMAND);
@@ -92,6 +129,7 @@ public class CLI implements OnChallengeArrivedListener {
         wqInterface.onExit();
     }
 
+    /** Method invoked when the user types a command with bad syntax */
     private void onBadCommandSintax(String commandUsage) {
         System.out.println(Messages.BAD_COMMAND_SINTAX);
         System.out.println(commandUsage);
@@ -99,10 +137,17 @@ public class CLI implements OnChallengeArrivedListener {
 
     /** Method invoked when the user types registra_utente <nickUtente> <password> */
     private void handleRegister(String username, String password) throws Exception {
-        boolean done = wqInterface.onRegisterUser(username, password);
-        if (done) {
-            if (askChoice(Messages.ASK_LOGIN+" (SI/NO oppure S/N)"))
+        String response = wqInterface.onRegisterUser(username, password);
+        if (response == null) {
+            System.out.println(Messages.SOMETHING_WENT_WRONG);
+        } else {
+            if (response.isEmpty())
+                System.out.println(Messages.REGISTRATION_SUCCESS);
+            else
+                System.out.println(response);
+            if (response.isEmpty() && askChoice(Messages.ASK_LOGIN)) {
                 handleLogin(username, password);
+            }
         }
     }
 
@@ -198,10 +243,5 @@ public class CLI implements OnChallengeArrivedListener {
                 "   "+UserCommand.getCommandUsage(UserCommand.SHOW_SCORE)+"\n" +
                 "   "+UserCommand.getCommandUsage(UserCommand.SHOW_LEADERBOARD)+"\n" +
                 "   "+UserCommand.getCommandUsage(UserCommand.EXIT));
-    }
-
-    @Override
-    public boolean onChallengeArrived(String from) {
-        return true;
     }
 }
