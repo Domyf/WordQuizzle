@@ -7,21 +7,20 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.channels.DatagramChannel;
+
 //TODO fare questa documentazione
 public class UDPClient implements Runnable {
 
     private DatagramChannel channel;
     private UDPConnection udpConnection;
-    private WQClient wqClient;
     private OnChallengeArrivedListener onChallengeArrivedListener;  //listener da invocare quando arriva una nuova sfida
 
-    public UDPClient(WQClient wqClient, OnChallengeArrivedListener listener) throws IOException {
+    public UDPClient(OnChallengeArrivedListener listener) throws IOException {
         this.channel = DatagramChannel.open();
         this.channel.socket().bind(new InetSocketAddress(0));
         SocketAddress serverAddress = new InetSocketAddress(UDPConnection.HOST_NAME, UDPConnection.PORT);
         this.udpConnection = new UDPConnection(channel, serverAddress);
         this.onChallengeArrivedListener = listener;
-        this.wqClient = wqClient;
     }
 
     public int getUDPPort() {
@@ -38,7 +37,7 @@ public class UDPClient implements Runnable {
                     if (accepted)
                         udpConnection.sendData(ConnectionData.Factory.newSuccessResponse());
                     else
-                        udpConnection.sendData(ConnectionData.Factory.newFailResponse(""));
+                        udpConnection.sendData(ConnectionData.Factory.newFailResponse());
                 }
             }
         } catch (IOException e) {

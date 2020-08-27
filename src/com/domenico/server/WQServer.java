@@ -9,7 +9,9 @@ import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
 
@@ -17,11 +19,13 @@ import java.util.concurrent.*;
  * This is a worker class that manages all the TCP communications. It implements channel multiplexing to efficiently
  * manage all the clients by extending the Multiplexer class.
  */
-public class WQServer extends Multiplexer {
+public class WQServer extends Multiplexer implements TimeIsUpListener {
 
     private final UsersManagement usersManagement;
     private final DatagramChannel datagramChannel;    //channel on which the UDP communication is done
     private final Map<String, SelectionKey> mapToKey; //maps username -> client's key
+    private final Object timeoutmutex = new Object();
+    private final List<String> timedoutusers;
 
     private static class UserRecord {
         TCPConnection tcpConnection;
@@ -41,6 +45,7 @@ public class WQServer extends Multiplexer {
         this.usersManagement = UsersManagement.getInstance();
         this.datagramChannel = DatagramChannel.open();
         this.mapToKey = new HashMap<>();
+        this.timedoutusers = new ArrayList<>();
         datagramChannel.socket().bind(new InetSocketAddress(UDPConnection.PORT));
     }
 
@@ -111,12 +116,13 @@ public class WQServer extends Multiplexer {
         userRecord.username = username;
         mapToKey.put(username, key);
         //TODO rimuovere questo codice di test
-        String[] words = {"Cane", "Gatto", "Canzone"};
+        /*String[] words = {"Cane", "Gatto", "Canzone"};
         String[] translations = Translations.translate(words);
         for (String translation : translations) {
             System.out.print(translation);
         }
-        System.out.println();
+        System.out.println();*/
+        TimeIsUp.schedule(this, 6000, username, "Secondo");
         return ConnectionData.Factory.newSuccessResponse();
     }
 
@@ -230,6 +236,31 @@ public class WQServer extends Multiplexer {
         } catch (UsersManagementException ignored) { }
 
         print("Ended connection with "+client.getRemoteAddress());
+    }
+
+    @Override
+    public void timeIsUp(Object... params) {
+        synchronized (timeoutmutex) {
+            for (Object param : params) {
+                timedoutusers.add((String) param);
+            }
+        }
+        super.wakeUp();
+    }
+
+    @Override
+    protected void onWakeUp() {
+        print("On wake up");
+        synchronized (timeoutmutex) {
+            for (String user : timedoutusers) {
+                SelectionKey key = mapToKey.get(user);
+                if (key == null) continue;  //se l'utente si è disconnesso
+                //UserRecord attachment = (UserRecord) key.attachment();
+                //TODO inviare attachment.response = ConnectionData.Factory.newEndGameResponse();
+                key.interestOps(SelectionKey.OP_WRITE);
+            }
+            timedoutusers.clear();
+        }
     }
 
     private void print(String string) {

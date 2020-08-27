@@ -18,9 +18,9 @@ public class WQClient implements WQInterface {
         this.loggedUserName = null;
         this.rmiClient = new RMIClient();
         this.tcpClient = new TCPClient();
-        this.udpClient = new UDPClient(this, listener);
+        this.udpClient = new UDPClient(listener);
         this.udpClientTh = new Thread(this.udpClient);
-        udpClientTh.start();
+        this.udpClientTh.start();
     }
 
     @Override

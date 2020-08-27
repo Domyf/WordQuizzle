@@ -28,12 +28,9 @@ public class UDPConnection extends Connection {
         this.address = address;
     }
 
-    /**
-     * Builds an UDPConnection object without specifying the endpoint address
-     * @param channel the channel on which the UDP communication is done
-     */
-    public UDPConnection(DatagramChannel channel) {
-        this.channel = channel;
+    public void sendData(ConnectionData data, SocketAddress address) throws IOException {
+        this.address = address;
+        sendData(data);
     }
 
     @Override

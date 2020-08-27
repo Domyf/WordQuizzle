@@ -12,9 +12,9 @@ import java.util.concurrent.Callable;
 public class UDPRequest extends Multiplexer implements Callable<ConnectionData> {
 
     private static final int MAX_WAITING_TIME = 5000;
-    private String from;
-    private String to;
-    private UDPConnection udpConnection;
+    private final String from;
+    private final String to;
+    private final UDPConnection udpConnection;
     private ConnectionData response;
 
     public UDPRequest(DatagramChannel channel, SocketAddress remoteAddress, String from, String to) throws IOException {
@@ -28,7 +28,8 @@ public class UDPRequest extends Multiplexer implements Callable<ConnectionData> 
     public ConnectionData call() throws Exception {
         response = null;
         print("Forwarding challenge request from "+from+" to "+to);
-        super.startProcessing();  //loops until time is out or connection is closed
+        //loops until time is out or connection is closed
+        super.startProcessing();
         if (response == null)
             response = ConnectionData.Factory.newFailResponse("Tempo scaduto");
 
@@ -49,13 +50,18 @@ public class UDPRequest extends Multiplexer implements Callable<ConnectionData> 
     @Override
     void onReadable(SelectionKey key) throws IOException {
         response = udpConnection.receiveData();
-        print(response.getResponseData());
+        print(response.toString());
         super.stopProcessing();
     }
 
     @Override
     void onEndConnection(SelectionKey key) throws IOException {
         super.stopProcessing();
+    }
+
+    @Override
+    protected void onWakeUp() {
+
     }
 
     public void print(String str) {

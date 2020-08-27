@@ -127,10 +127,8 @@ public class ConnectionData {
                         return newSuccessResponse(paramsRow);
                     }
                 case FAIL_RESPONSE:
-                    if (params.length > 0) {
-                        String paramsRow = Utils.stringify(params, " ");
-                        return newFailResponse(paramsRow);
-                    }
+                    String paramsRow = Utils.stringify(params, " ");
+                    return newFailResponse(paramsRow);
             }
 
             return newFailResponse("Invalid command");
@@ -251,6 +249,15 @@ public class ConnectionData {
             connectionData.responseData = failmessage;
             return connectionData;
         }
+
+        /**
+         * Builds a ConnectionData object that represents a fail response
+         *
+         * @return a ConnectionData object that represents a fail response
+         */
+        public static ConnectionData newFailResponse() {
+            return new ConnectionData(CMD.FAIL_RESPONSE, new String[]{});
+        }
     }
 
     public static class Validator {
@@ -357,14 +364,14 @@ public class ConnectionData {
         }
 
         /**
-         * Checks if the given response represents a valid fail response, which means it has the right CMD and not null
-         * message.
+         * Checks if the given response represents a valid fail response, which means it has the right CMD.
          * The return value is true if the given response is a valid fail response, false otherwise.
+         *
          * @param response the response that should be evaluated
-         * @return true if the response has the fail response's cmd and not null message, false otherwise.
+         * @return true if the response has the fail response's cmd, false otherwise.
          */
         public static boolean isFailResponse(ConnectionData response) {
-            return hasSameCMD(CMD.FAIL_RESPONSE, response.cmd) && notNull(response.responseData);
+            return hasSameCMD(CMD.FAIL_RESPONSE, response.cmd);
         }
     }
 }

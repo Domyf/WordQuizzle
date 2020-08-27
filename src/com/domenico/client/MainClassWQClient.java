@@ -19,7 +19,7 @@ public class MainClassWQClient {
             CLI cli = new CLI();
             cli.loop();
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Disconnesso dal server, termino.");
         }
     }
 }

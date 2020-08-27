@@ -6,6 +6,7 @@ import java.nio.channels.Selector;
 import java.nio.channels.spi.AbstractSelectableChannel;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Abstract class that implements the multiplexing logic of a channel and it extends the Thread class.
@@ -18,7 +19,7 @@ public abstract class Multiplexer {
 
     protected AbstractSelectableChannel channel;
     protected Selector selector;
-
+    private final AtomicBoolean wokeup;
     private boolean running;
     private int timeout;
 
@@ -35,6 +36,7 @@ public abstract class Multiplexer {
         this.selector = Selector.open();
         this.channel.configureBlocking(false);
         this.channel.register(selector, firstOp);
+        this.wokeup = new AtomicBoolean(false);
     }
 
     /**
@@ -53,7 +55,8 @@ public abstract class Multiplexer {
         running = true;
         try {
             while (running) {
-                if (selector.select(timeout) == 0) {
+                int sel = selector.select(timeout);
+                if (sel == 0 && !wokeup.get()) {
                     onTimeout();
                     continue;
                 }
@@ -78,12 +81,26 @@ public abstract class Multiplexer {
                             onEndConnection(key);   //The connection with the endpoint should be ended
                     }
                 }
+                if (wokeup.compareAndSet(true, false)) {
+                    onWakeUp();
+                }
             }
         } catch (IOException e) {
             stopProcessing();
         }
     }
 
+    /**
+     * Wakes up the multiplexer if it is waiting into the select() call
+     */
+    protected void wakeUp() {
+        wokeup.set(true);
+        selector.wakeup();
+    }
+
+    /**
+     * Stops the multiplexer thread
+     */
     protected void stopProcessing() {
         running = false;
     }
@@ -117,4 +134,6 @@ public abstract class Multiplexer {
      * @throws IOException if an I/O error occurs
      */
     abstract void onEndConnection(SelectionKey key) throws IOException;
+
+    protected abstract void onWakeUp();
 }
