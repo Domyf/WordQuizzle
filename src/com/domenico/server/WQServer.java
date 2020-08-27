@@ -1,7 +1,6 @@
 package com.domenico.server;
 
 import com.domenico.communication.*;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.io.IOException;
@@ -10,12 +9,11 @@ import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.FutureTask;
+import java.util.concurrent.*;
 
 /**
  * This is a worker class that manages all the TCP communications. It implements channel multiplexing to efficiently
@@ -24,8 +22,8 @@ import java.util.concurrent.FutureTask;
 public class WQServer extends Multiplexer {
 
     private UsersManagement usersManagement;
-    private DatagramChannel datagramChannel;
-    private Map<String, SelectionKey> mapToKey;
+    private DatagramChannel datagramChannel;    //channel on which the UDP communication is done
+    private Map<String, SelectionKey> mapToKey; //maps username -> client's key
 
     private static class UserRecord {
         TCPConnection tcpConnection;
@@ -114,15 +112,22 @@ public class WQServer extends Multiplexer {
         userRecord.udpPort = Integer.parseUnsignedInt(connectionData.getResponseData());
         userRecord.username = username;
         mapToKey.put(username, key);
-
+        //TODO rimuovere questo codice di test
+        String[] words = {"Cane", "Gatto", "Canzone"};
+        String[] translations = Translations.translate(words);
+        for (int i = 0; i < translations.length; i++) {
+            System.out.print(translations[i]);
+        }
+        System.out.println();
         return ConnectionData.Factory.newSuccessResponse();
     }
 
     private ConnectionData handleLogoutRequest(ConnectionData received, UserRecord attachment) throws UsersManagementException {
         usersManagement.logout(received.getUsername());
         mapToKey.remove(received.getUsername());
-        if (attachment.challengePending != null)
+        if (attachment.challengePending != null) {
             attachment.challengePending.cancel(true);
+        }
 
         return ConnectionData.Factory.newSuccessResponse();
     }
@@ -142,7 +147,6 @@ public class WQServer extends Multiplexer {
     }
 
     private ConnectionData handleChallengeRequest(ConnectionData received, UserRecord fromUserRecord) throws IOException, UsersManagementException {
-        // TODO: 29/06/2020 avoid multiple challenges
         //Throws an exception if the request is not valid and the error is sent back to who requested the challenge
         String from = received.getUsername();
         String to = received.getFriendUsername();
@@ -157,8 +161,12 @@ public class WQServer extends Multiplexer {
 
         SelectionKey toKey = mapToKey.get(to);
         UserRecord toRecord = (UserRecord) toKey.attachment();
+        //Il the user has already sent a challenge which is not timedout yet or it has not been accepted yet
+        if (toRecord.challengePending != null && !toRecord.challengePending.isDone())
+            throw new UsersManagementException(from+" ha già una richiesta di sfida in questo momento");
+
         SocketAddress toUDPAddress = new InetSocketAddress(toRecord.address, toRecord.udpPort);
-        //the challenge request is handled
+        //Handling the challenge request
         Callable<ConnectionData> callable = new UDPRequest(datagramChannel, toUDPAddress, from, to);
         FutureTask<ConnectionData> futureTask = new FutureTask<>(callable);
         new Thread(futureTask).start();
@@ -188,7 +196,7 @@ public class WQServer extends Multiplexer {
         UserRecord attachment = (UserRecord) key.attachment();
         TCPConnection tcpConnection = attachment.tcpConnection;
 
-        if (attachment.response != null) {
+        if (attachment.response != null) {  //Send the response because it is ready
             print(attachment.response.toString());
             tcpConnection.sendData(attachment.response);
             if (attachment.challengePending != null) {
@@ -221,9 +229,7 @@ public class WQServer extends Multiplexer {
 
         try {
             usersManagement.logout(attachment.username);
-        } catch (UsersManagementException e) {
-
-        }
+        } catch (UsersManagementException e) { }
 
         print("Ended connection with "+client.getRemoteAddress());
     }
