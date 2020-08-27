@@ -41,19 +41,16 @@ public class UDPRequest extends Multiplexer implements Callable<ConnectionData> 
     }
 
     @Override
-    void onAcceptable(SelectionKey key) throws IOException {}
+    void onWritable(SelectionKey key) throws IOException {
+        udpConnection.sendData(ConnectionData.Factory.newChallengeRequest(from, to));
+        key.channel().register(selector, SelectionKey.OP_READ);
+    }
 
     @Override
     void onReadable(SelectionKey key) throws IOException {
         response = udpConnection.receiveData();
         print(response.getResponseData());
         super.stopProcessing();
-    }
-
-    @Override
-    void onWritable(SelectionKey key) throws IOException {
-        udpConnection.sendData(ConnectionData.Factory.newChallengeRequest(from, to));
-        key.channel().register(selector, SelectionKey.OP_READ);
     }
 
     @Override
@@ -64,4 +61,8 @@ public class UDPRequest extends Multiplexer implements Callable<ConnectionData> 
     public void print(String str) {
         System.out.println("[UDP]: "+str);
     }
+
+    @Override
+    void onAcceptable(SelectionKey key) throws IOException {}
+
 }

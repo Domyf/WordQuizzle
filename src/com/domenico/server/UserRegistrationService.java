@@ -19,7 +19,7 @@ public class UserRegistrationService extends RemoteServer implements RMIConnecti
     }
 
     @Override
-    public String register(String username, String password) throws RemoteException {
+    synchronized public String register(String username, String password) throws RemoteException {
         try {
             usersManagement.register(username, password);
         } catch (UsersManagementException e) {

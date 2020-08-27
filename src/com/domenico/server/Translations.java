@@ -10,7 +10,6 @@ public class Translations {
     private final static int BUF_LEN = 16;
     private final static String WORD_DIVIDER = ";";
 
-
     public static String[] translate(String[] itWords) {
         if (itWords != null && itWords.length == 0)
             return new String[0];

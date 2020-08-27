@@ -9,8 +9,6 @@ import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.*;
@@ -21,9 +19,9 @@ import java.util.concurrent.*;
  */
 public class WQServer extends Multiplexer {
 
-    private UsersManagement usersManagement;
-    private DatagramChannel datagramChannel;    //channel on which the UDP communication is done
-    private Map<String, SelectionKey> mapToKey; //maps username -> client's key
+    private final UsersManagement usersManagement;
+    private final DatagramChannel datagramChannel;    //channel on which the UDP communication is done
+    private final Map<String, SelectionKey> mapToKey; //maps username -> client's key
 
     private static class UserRecord {
         TCPConnection tcpConnection;
@@ -115,8 +113,8 @@ public class WQServer extends Multiplexer {
         //TODO rimuovere questo codice di test
         String[] words = {"Cane", "Gatto", "Canzone"};
         String[] translations = Translations.translate(words);
-        for (int i = 0; i < translations.length; i++) {
-            System.out.print(translations[i]);
+        for (String translation : translations) {
+            System.out.print(translation);
         }
         System.out.println();
         return ConnectionData.Factory.newSuccessResponse();
@@ -220,7 +218,7 @@ public class WQServer extends Multiplexer {
     }
 
     /**
-     * Called when it is needed to close the connection with the endpoint
+     * Called when the connection with a client is closed
      */
     @Override
     void onEndConnection(SelectionKey key) throws IOException {
@@ -229,7 +227,7 @@ public class WQServer extends Multiplexer {
 
         try {
             usersManagement.logout(attachment.username);
-        } catch (UsersManagementException e) { }
+        } catch (UsersManagementException ignored) { }
 
         print("Ended connection with "+client.getRemoteAddress());
     }

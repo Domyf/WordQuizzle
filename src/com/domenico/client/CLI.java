@@ -1,21 +1,16 @@
 package com.domenico.client;
 
 import com.domenico.shared.Utils;
-import jdk.jshell.execution.Util;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-import java.util.Collections;
-import java.util.Map;
 import java.util.Scanner;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class CLI implements OnChallengeArrivedListener {
 
     private static final String COMMAND_LINE_START = "> ";
-    private Scanner scanner;
-    private WQInterface wqInterface;
+    private final Scanner scanner;
+    private final WQInterface wqInterface;
     private String lastInput = null;
     private final Object mutex = new Object();
     private Boolean challengeArrived = false;
