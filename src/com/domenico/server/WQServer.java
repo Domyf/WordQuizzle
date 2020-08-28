@@ -14,7 +14,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * This is a worker class that manages all the TCP communications. It implements channel multiplexing to efficiently
@@ -23,10 +24,11 @@ import java.util.concurrent.*;
 public class WQServer extends Multiplexer implements TimeIsUpListener {
 
     private final UsersManagement usersManagement;
-    private final DatagramChannel datagramChannel;      //channel on which the UDP communication is done
+    private final UDPServer udpServer;
     private final Map<String, SelectionKey> mapToKey;   //maps username -> client's key
     private final Object timeoutmutex = new Object();   //mutex to handle concurrently the timedout challanges
     private final List<String> timedoutusers;           //users which are in a timedout challenge
+    private final ExecutorService executors;            //executors that will run the ChallengeRequest
 
     private static class UserRecord {
         String username;
@@ -34,8 +36,7 @@ public class WQServer extends Multiplexer implements TimeIsUpListener {
         ConnectionData response;
         int udpPort;
         InetAddress address;
-        ChallengeRequest challengeRequest;
-        FutureTask<ConnectionData> challengePending = null;
+        Challenge challenge;
     }
 
     public WQServer() throws IOException {
@@ -45,10 +46,11 @@ public class WQServer extends Multiplexer implements TimeIsUpListener {
         print("Listening on port " + TCPConnection.SERVER_PORT);
 
         this.usersManagement = UsersManagement.getInstance();
-        this.datagramChannel = DatagramChannel.open();
+        this.udpServer = new UDPServer(DatagramChannel.open());
+        Executors.newSingleThreadExecutor().execute(this.udpServer);    //TODO change how I do this
+        this.executors = Executors.newCachedThreadPool();
         this.mapToKey = new HashMap<>();
         this.timedoutusers = new ArrayList<>();
-        datagramChannel.socket().bind(new InetSocketAddress(UDPConnection.PORT));
     }
 
     /** Called when the method accept() will not block the thread */
@@ -63,7 +65,7 @@ public class WQServer extends Multiplexer implements TimeIsUpListener {
         attachment.tcpConnection = new TCPConnection(client);
         attachment.address = client.socket().getInetAddress();
         attachment.response = null;
-        attachment.challengePending = null;
+        attachment.challenge = null;
 
         client.register(selector, SelectionKey.OP_READ, attachment);
     }
@@ -123,8 +125,9 @@ public class WQServer extends Multiplexer implements TimeIsUpListener {
     private ConnectionData handleLogoutRequest(ConnectionData received, UserRecord attachment) throws UsersManagementException {
         usersManagement.logout(received.getUsername());
         mapToKey.remove(received.getUsername());
-        if (attachment.challengePending != null) {
-            attachment.challengePending.cancel(true);
+        //TODO is logging out while has a challenge
+        if (attachment.challenge != null) {
+            attachment.challenge.setAccepted(false);
         }
 
         return ConnectionData.Factory.newSuccessResponse();
@@ -160,22 +163,26 @@ public class WQServer extends Multiplexer implements TimeIsUpListener {
         SelectionKey toKey = mapToKey.get(to);
         UserRecord toRecord = (UserRecord) toKey.attachment();
         //Il the user has already sent a challenge which is not timedout yet or it has not been accepted yet
-        if (toRecord.challengeRequest != null && !toRecord.challengeRequest.isDone())
-            throw new UsersManagementException(to+" ha già una richiesta di sfida in questo momento");
-        if (fromUserRecord.challengeRequest != null && !fromUserRecord.challengeRequest.isDone())
+        if (toRecord.challenge != null)
+            throw new UsersManagementException(to+" ha una sfida in questo momento");
+        if (fromUserRecord.challenge != null)
             throw new UsersManagementException("Non puoi avviare più sfide contemporaneamente");
 
-        SocketAddress toUDPAddress = new InetSocketAddress(toRecord.address, toRecord.udpPort);
-        ChallengeRequest challengeRequest = new ChallengeRequest(from, to);
-        fromUserRecord.challengeRequest = challengeRequest;
-        toRecord.challengeRequest = challengeRequest;
-        //Handling the challenge request with a callable
-        Callable<ConnectionData> callable = new UDPRequest(datagramChannel, toUDPAddress, challengeRequest);
-        FutureTask<ConnectionData> futureTask = new FutureTask<>(callable);
-        new Thread(futureTask).start();
-        fromUserRecord.challengePending = futureTask;
+        InetSocketAddress toUDPAddress = new InetSocketAddress(toRecord.address, toRecord.udpPort);
+        Challenge challenge = new Challenge(from, to);
+        fromUserRecord.challenge = challenge;
+        toRecord.challenge = challenge;
+        //Handling the challenge request via udp
+        executors.execute(new ChallengeRequest(udpServer, toUDPAddress, challenge));
 
         return ConnectionData.Factory.newSuccessResponse();
+    }
+
+    private ConnectionData handleChallengeResponse(Challenge challenge) {
+        if (challenge.isAccepted())
+            return ConnectionData.Factory.newSuccessResponse();
+
+        return ConnectionData.Factory.newFailResponse();
     }
 
     private ConnectionData handleScoreRequest(ConnectionData received) throws UsersManagementException {
@@ -195,32 +202,50 @@ public class WQServer extends Multiplexer implements TimeIsUpListener {
      */
     @Override
     protected void onWritable(SelectionKey key) throws IOException {
-        SocketChannel client = (SocketChannel) key.channel();
         UserRecord attachment = (UserRecord) key.attachment();
         TCPConnection tcpConnection = attachment.tcpConnection;
-        if (attachment.response != null) {  //Send the response because it is ready
+        Challenge challenge = attachment.challenge;
+
+        //Send the response if it is ready
+        if (attachment.response != null) {
             print(attachment.response.toString());
             tcpConnection.sendData(attachment.response);
-            if (attachment.challengePending != null) {
-                attachment.response = null;
-                return;
+            attachment.response = null;
+            if (challenge == null || challenge.playing) {    //if the user has not a challenge request or the game is started
+                key.interestOps(SelectionKey.OP_READ);
             }
-        } else if (attachment.challengeRequest != null && attachment.challengeRequest.isDone()) {
-            try {
-                ChallengeRequest challengeRequest = attachment.challengeRequest;
-                ConnectionData challengeResponse = attachment.challengePending.get();
-                print(challengeResponse.toString());
-                if (attachment.username.equals(challengeRequest.from))
-                    tcpConnection.sendData(challengeResponse);  //Sends the challenge response to who started the challenge request
-                //TimeIsUp.schedule(this, 6000, username, "Secondo");
-            } catch (InterruptedException | ExecutionException e) {
-                tcpConnection.sendData(ConnectionData.Factory.newFailResponse("C'è stato un problema, riprova più tardi"));
+        } else if (challenge != null && challenge.isRequestDone()) {
+            ConnectionData response = null;
+            //Sends the challenge response to who started the challenge request
+            if (!challenge.responseSent && challenge.isFromUser(attachment.username)) {
+                response = handleChallengeResponse(challenge);
+                challenge.responseSent = true;
+                //Remove the challenge if it has not been accepted
+                if (!challenge.isAccepted()) {
+                    attachment.challenge = null;
+                    key.interestOps(SelectionKey.OP_READ);
+                    SelectionKey otherKey = mapToKey.get(challenge.getTo());
+                    if (otherKey != null) {
+                        ((UserRecord) otherKey.attachment()).challenge = null;
+                    }
+                }
+            } else if (challenge.hasWords()) {
+                System.out.println("has words"+attachment.username);
+                attachment.challenge = null;    //TODO iniziare la partita
+                key.interestOps(SelectionKey.OP_READ);
+                if (challenge.isFromUser(attachment.username)) {
+                    SelectionKey otherKey = mapToKey.get(challenge.getTo());
+                    if (otherKey != null) {
+                        otherKey.interestOps(SelectionKey.OP_WRITE);
+                    }
+                }
+                //TimeIsUp.schedule(this, 6000, challengeRequest.from, challengeRequest.to);
             }
-        } else {
-            return;
+            if (response != null) {
+                print(response.toString());
+                tcpConnection.sendData(response);
+            }
         }
-
-        client.register(selector, SelectionKey.OP_READ, attachment);
     }
 
     /**

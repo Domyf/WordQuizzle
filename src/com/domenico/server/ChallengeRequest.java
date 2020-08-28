@@ -1,51 +1,64 @@
 package com.domenico.server;
 
-public class ChallengeRequest {
+import com.domenico.communication.ConnectionData;
+import com.domenico.communication.UDPConnection;
+import com.domenico.shared.Multiplexer;
 
-    String from;
-    String to;
-    private boolean accepted;
-    private boolean hasReplied;
-    private boolean done;
-    private final Object mutex = new Object();
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+import java.nio.channels.DatagramChannel;
+import java.nio.channels.SelectionKey;
 
-    public ChallengeRequest(String from, String to) {
-        this.from = from;
-        this.to = to;
-        this.init();
+//TODO this doc
+public class ChallengeRequest implements Runnable {
+
+    private static final int MAX_WAITING_TIME = 5000;
+    private final Challenge challenge;
+    private final InetSocketAddress toAddress;
+    private final UDPServer udpServer;
+
+    public ChallengeRequest(UDPServer udpServer, InetSocketAddress remoteAddress, Challenge challenge) throws IOException {
+        this.udpServer = udpServer;
+        this.challenge = challenge;
+        this.toAddress = remoteAddress;
     }
 
-    private void init() {
-        this.accepted = false;
-        this.hasReplied = false;
-        this.done = false;
-    }
-
-    public void reset() {
-        synchronized (mutex) {
-            init();
+    @Override
+    public void run() {
+        print("Forwarding challenge request from "+ challenge.getFrom()+" to "+ challenge.getTo());
+        udpServer.forwardChallenge(challenge, toAddress);
+        try {
+            Thread.sleep(MAX_WAITING_TIME);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        //If response is null then the user never replied and the time is up
+        if (challenge.getResponse() == null) {
+            System.out.println("tempo scaduto");    //TODO fare il caso timedout e rimuovere la println
+            /*challenge.setResponse(ConnectionData.Factory.newFailResponse("Tempo scaduto"));
+            try {
+                //channel.configureBlocking(false);
+                udpConnection.sendData(response);   //Send time is up to who received the challenge
+            } catch (IOException e) {
+                e.printStackTrace();
+            }*/
+            challenge.setAccepted(false);
+        } else if (ConnectionData.Validator.isSuccessResponse(challenge.getResponse())) {
+            challenge.setAccepted(true);
+            //TODO rimuovere questo codice di test
+            String[] itWords = {"Cane", "Gatto", "Canzone"};
+            String[] enWords = Translations.translate(itWords);
+            for (String translation : enWords) {
+                System.out.print(translation);
+            }
+            System.out.println();
+            challenge.setWords(itWords, enWords);
+        } else if (ConnectionData.Validator.isFailResponse(challenge.getResponse())) {
+            challenge.setAccepted(false);
         }
     }
 
-    public void setAccepted(boolean accepted) {
-        synchronized (mutex) {
-            if (hasReplied)
-                return;
-            this.accepted = accepted;
-            this.hasReplied = true;
-            this.done = true;
-        }
-    }
+    public void print(String str) { System.out.println("[UDP]: "+str); }
 
-    public boolean isAccepted() {
-        synchronized (mutex) {
-            return accepted;
-        }
-    }
-
-    public boolean isDone() {
-        synchronized (mutex) {
-            return done;
-        }
-    }
 }

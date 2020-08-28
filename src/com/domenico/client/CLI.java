@@ -5,8 +5,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.util.Scanner;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
 public class CLI implements OnChallengeArrivedListener {
@@ -49,7 +47,7 @@ public class CLI implements OnChallengeArrivedListener {
         synchronized (mutex) {
             challengeArrived = false;
             this.onChallengeResponse = null;
-            System.out.println("\rTempo scaduto");
+            System.out.println("\rIl tempo è scaduto");
             System.out.print(COMMAND_LINE_START);
         }
     }

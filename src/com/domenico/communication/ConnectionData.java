@@ -91,6 +91,7 @@ public class ConnectionData {
             String cmd = splittedLine[0];
             if (splittedLine.length > 1)
                 params = Arrays.copyOfRange(splittedLine, 1, splittedLine.length);
+            //System.out.println("line:"+line+"cmd:"+cmd);    //TODO rimuovere
             try {
                 switch (CMD.valueOf(cmd)) {
                     case LOGIN_REQUEST:
