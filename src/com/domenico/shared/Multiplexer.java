@@ -1,4 +1,4 @@
-package com.domenico.server;
+package com.domenico.shared;
 
 import java.io.IOException;
 import java.nio.channels.SelectionKey;
@@ -112,28 +112,28 @@ public abstract class Multiplexer {
      * @param key the selection key relative to that channel on which the accept() method will not block the thread
      * @throws IOException if an I/O error occurs
      */
-    abstract void onAcceptable(SelectionKey key) throws IOException;
+    abstract protected void onAcceptable(SelectionKey key) throws IOException;
 
     /**
      * Called when the method read() will not block the thread
      * @param key the selection key relative to that channel on which the read() method will not block the thread
      * @throws IOException if an I/O error occurs
      */
-    abstract void onReadable(SelectionKey key) throws IOException;
+    abstract protected void onReadable(SelectionKey key) throws IOException;
 
     /**
      * Called when the method write() will not block the thread
      * @param key the selection key relative to that channel on which the write() method will not block the thread
      * @throws IOException if an I/O error occurs
      */
-    abstract void onWritable(SelectionKey key) throws IOException;
+    abstract protected void onWritable(SelectionKey key) throws IOException;
 
     /**
      * Called when it is needed to close the connection with the endpoint
      * @param key the selection key relative to that channel that should be closed
      * @throws IOException if an I/O error occurs
      */
-    abstract void onEndConnection(SelectionKey key) throws IOException;
+    abstract protected void onEndConnection(SelectionKey key) throws IOException;
 
-    protected abstract void onWakeUp();
+    abstract protected void onWakeUp();
 }

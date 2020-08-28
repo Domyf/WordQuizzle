@@ -1,18 +1,23 @@
 package com.domenico.server;
 
-import com.domenico.communication.Connection;
 import com.domenico.communication.ConnectionData;
 import com.domenico.communication.UDPConnection;
+import com.domenico.shared.Multiplexer;
 
 import java.io.IOException;
 import java.net.SocketAddress;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public class UDPServer extends Multiplexer {
 
     private final UDPConnection udpConnection;
+    private final Object mutex = new Object();
+    private final List<Attachment> newRequests;
 
     private static class Attachment {
         ChallengeRequest challengeRequest;
@@ -22,25 +27,25 @@ public class UDPServer extends Multiplexer {
     public UDPServer(DatagramChannel channel) throws IOException {
         super(channel, SelectionKey.OP_READ);
         this.udpConnection = new UDPConnection(channel, null);
+        this.newRequests = new LinkedList<>();
     }
 
     public ChallengeRequest forwardChallenge(String from, String to, SocketAddress toAddress) throws ClosedChannelException {
+        CompletableFuture<ChallengeRequest> future = new CompletableFuture<>();
+
         ChallengeRequest challengeRequest = new ChallengeRequest(from, to);
         Attachment attachment = new Attachment();
         attachment.challengeRequest = challengeRequest;
         attachment.toAddress = toAddress;
-
-        channel.register(selector, SelectionKey.OP_WRITE, attachment);
+        synchronized (mutex) {
+            newRequests.add(attachment);
+        }
+        wakeUp();
         return challengeRequest;
     }
 
     @Override
-    protected void onTimeout() throws IOException {
-
-    }
-
-    @Override
-    void onWritable(SelectionKey key) throws IOException {
+    protected void onWritable(SelectionKey key) throws IOException {
         Attachment att = (Attachment) key.attachment();
         ConnectionData data = ConnectionData.Factory.newChallengeRequest(att.challengeRequest.from, att.challengeRequest.to);
         udpConnection.sendData(data, att.toAddress);
@@ -48,7 +53,7 @@ public class UDPServer extends Multiplexer {
     }
 
     @Override
-    void onReadable(SelectionKey key) throws IOException {
+    protected void onReadable(SelectionKey key) throws IOException {
         ConnectionData response = udpConnection.receiveData();
         print(response.toString());
         key.cancel();
@@ -59,13 +64,14 @@ public class UDPServer extends Multiplexer {
     }
 
     @Override
-    void onEndConnection(SelectionKey key) throws IOException {}
+    protected void onEndConnection(SelectionKey key) throws IOException {}
 
     @Override
-    protected void onWakeUp() {
-
-    }
+    protected void onWakeUp() {}
 
     @Override
-    void onAcceptable(SelectionKey key) throws IOException {}
+    protected void onAcceptable(SelectionKey key) throws IOException {}
+
+    @Override
+    protected void onTimeout() throws IOException {}
 }

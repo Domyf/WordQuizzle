@@ -91,46 +91,47 @@ public class ConnectionData {
             String cmd = splittedLine[0];
             if (splittedLine.length > 1)
                 params = Arrays.copyOfRange(splittedLine, 1, splittedLine.length);
-            switch (CMD.valueOf(cmd)) {
-                case LOGIN_REQUEST:
-                    if (params.length == 3)
-                        return newLoginRequest(params[0], params[1], Integer.parseUnsignedInt(params[2]));
-                    break;
-                case LOGOUT_REQUEST:
-                    if (params.length == 1)
-                        return newLogoutRequest(params[0]);
-                    break;
-                case ADD_FRIEND_REQUEST:
-                    if (params.length == 2)
-                        return newAddFriendRequest(params[0], params[1]);
-                    break;
-                case FRIEND_LIST_REQUEST:
-                    if (params.length == 1)
-                        return newFriendListRequest(params[0]);
-                    break;
-                case CHALLENGE_REQUEST:
-                    if (params.length == 2)
-                        return newChallengeRequest(params[0], params[1]);
-                    break;
-                case SCORE_REQUEST:
-                    if (params.length == 1)
-                        return newScoreRequest(params[0]);
-                    break;
-                case LEADERBOARD_REQUEST:
-                    if (params.length == 1)
-                        return newLeaderboardRequest(params[0]);
-                case SUCCESS_RESPONSE:
-                    if (params.length == 0) {
-                        return newSuccessResponse();
-                    } else {
+            try {
+                switch (CMD.valueOf(cmd)) {
+                    case LOGIN_REQUEST:
+                        if (params.length == 3)
+                            return newLoginRequest(params[0], params[1], Integer.parseUnsignedInt(params[2]));
+                        break;
+                    case LOGOUT_REQUEST:
+                        if (params.length == 1)
+                            return newLogoutRequest(params[0]);
+                        break;
+                    case ADD_FRIEND_REQUEST:
+                        if (params.length == 2)
+                            return newAddFriendRequest(params[0], params[1]);
+                        break;
+                    case FRIEND_LIST_REQUEST:
+                        if (params.length == 1)
+                            return newFriendListRequest(params[0]);
+                        break;
+                    case CHALLENGE_REQUEST:
+                        if (params.length == 2)
+                            return newChallengeRequest(params[0], params[1]);
+                        break;
+                    case SCORE_REQUEST:
+                        if (params.length == 1)
+                            return newScoreRequest(params[0]);
+                        break;
+                    case LEADERBOARD_REQUEST:
+                        if (params.length == 1)
+                            return newLeaderboardRequest(params[0]);
+                    case SUCCESS_RESPONSE:
+                        if (params.length == 0) {
+                            return newSuccessResponse();
+                        } else {
+                            String paramsRow = Utils.stringify(params, " ");
+                            return newSuccessResponse(paramsRow);
+                        }
+                    case FAIL_RESPONSE:
                         String paramsRow = Utils.stringify(params, " ");
-                        return newSuccessResponse(paramsRow);
-                    }
-                case FAIL_RESPONSE:
-                    String paramsRow = Utils.stringify(params, " ");
-                    return newFailResponse(paramsRow);
-            }
-
+                        return newFailResponse(paramsRow);
+                }
+            } catch (IllegalArgumentException ignored) {}   //ignored because it will return Invalid Command
             return newFailResponse("Invalid command");
         }
 

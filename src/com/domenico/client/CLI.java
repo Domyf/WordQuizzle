@@ -5,77 +5,68 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.util.Scanner;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.function.Consumer;
 
 public class CLI implements OnChallengeArrivedListener {
 
     private static final String COMMAND_LINE_START = "> ";
     private final Scanner scanner;
     private final WQInterface wqInterface;
-    private String lastInput = null;
     private final Object mutex = new Object();
-    private Boolean challengeArrived = false;
+    private boolean challengeArrived = false;
+    private Consumer<Boolean> onChallengeResponse;
 
     public CLI() throws Exception {
         this.scanner = new Scanner(System.in);
         this.wqInterface = new WQClient(this);
     }
 
-    public synchronized String getNextLine() {
-        if (lastInput == null) {
-            System.out.print(COMMAND_LINE_START);
-            lastInput = scanner.nextLine().trim();
-        }
-        return lastInput;
-    }
-
-    public UserCommand askForCommand() throws InterruptedException {
-        UserCommand uc = null;
-        synchronized (mutex) {  //Se sto gestendo l'arrivo della sfida allora attendo
-            while (challengeArrived) {
-                mutex.wait();
-            }
-        }
-        String line = getNextLine();
-        synchronized (mutex) {
-            //Ritorno il comando solo se la sfida non è arrivata
-            if (!challengeArrived && !line.isBlank()) {
-                uc = new UserCommand(line);
-                lastInput = null;
-            } else if (line.isBlank()) {
-                lastInput = null;
-            }
-        }
-        return uc;
+    public String getNextLine() {
+        System.out.print(COMMAND_LINE_START);
+        return scanner.nextLine().trim();
     }
 
     public boolean askChoice(String message) {
         System.out.println(message+" (SI/NO oppure S/N)");
         String answer = getNextLine().toLowerCase();
-        lastInput = null;
         return answer.equals("si") || answer.equals("s");
     }
 
     @Override
-    public boolean onChallengeArrived(String from) {
-        System.out.println("\rArrivata una sfida da "+from+". Vuoi accettare la sfida?");
-        System.out.print(COMMAND_LINE_START);
+    public void onChallengeArrived(String from, Consumer<Boolean> onResponse) {
         synchronized (mutex) {
-            challengeArrived = true;
+            System.out.println("\rArrivata una sfida da "+from+". Vuoi accettare la sfida?");
+            System.out.print(COMMAND_LINE_START);
+            this.challengeArrived = true;
+            this.onChallengeResponse = onResponse;
         }
-        String answer = getNextLine().trim().toLowerCase();
+    }
+
+    @Override
+    public void onChallengeArrivedTimeout() {
         synchronized (mutex) {
             challengeArrived = false;
-            lastInput = null;
-            mutex.notify();
+            this.onChallengeResponse = null;
+            System.out.println("\rTempo scaduto");
+            System.out.print(COMMAND_LINE_START);
         }
-        return answer.equals("si") || answer.equals("s");
     }
 
     public void loop() throws Exception {
         boolean run = true;
         while(run) {
-            UserCommand userCommand = askForCommand();
-            if (userCommand == null) continue;
+            String line = getNextLine();
+            if (line.isBlank()) continue;
+            synchronized (mutex) {
+                if (challengeArrived) {
+                    challengeArrived = false;
+                    onChallengeResponse.accept(line.equals("si") || line.equals("s"));
+                    continue;
+                }
+            }
+            UserCommand userCommand = new UserCommand(line);
             switch (userCommand.getCmd().toLowerCase()) {
                 case UserCommand.REGISTER_USER:
                     if (userCommand.hasParams(2)) {

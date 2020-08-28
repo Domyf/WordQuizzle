@@ -123,7 +123,7 @@
       <module name="WordQuizzle" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.domenico.server.*" />
+          <option name="PATTERN" value="com.domenico.shared.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -138,7 +138,7 @@
       <module name="WordQuizzle" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.domenico.server.*" />
+          <option name="PATTERN" value="com.domenico.shared.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -154,7 +154,7 @@
       <module name="WordQuizzle" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="com.domenico.server.*" />
+          <option name="PATTERN" value="com.domenico.shared.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -203,7 +203,7 @@
       <workItem from="1598192173513" duration="505000" />
       <workItem from="1598192869638" duration="9416000" />
       <workItem from="1598281637947" duration="18653000" />
-      <workItem from="1598346174837" duration="67814000" />
+      <workItem from="1598346174837" duration="82110000" />
     </task>
     <servers />
   </component>
@@ -219,10 +219,10 @@
       <screen x="0" y="0" width="1536" height="864" />
     </state>
     <state x="225" y="88" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1536.864@0.0.1536.864" timestamp="1598478095652" />
-    <state x="575" y="149" key="#com.intellij.ide.util.MemberChooser" timestamp="1598570076935">
+    <state x="575" y="149" key="#com.intellij.ide.util.MemberChooser" timestamp="1598613011239">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state x="575" y="149" key="#com.intellij.ide.util.MemberChooser/0.0.1536.864@0.0.1536.864" timestamp="1598570076935" />
+    <state x="575" y="149" key="#com.intellij.ide.util.MemberChooser/0.0.1536.864@0.0.1536.864" timestamp="1598613011239" />
     <state x="500" y="224" key="#com.intellij.ide.util.TreeClassChooserDialog" timestamp="1593203725516">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
@@ -267,22 +267,22 @@
       <screen x="0" y="0" width="1536" height="864" />
     </state>
     <state x="475" y="175" key="FileChooserDialogImpl/0.0.1536.864@0.0.1536.864" timestamp="1598305388107" />
-    <state width="1493" height="303" key="GridCell.Tab.0.bottom" timestamp="1598570710241">
+    <state width="1493" height="303" key="GridCell.Tab.0.bottom" timestamp="1598621664015">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state width="1493" height="303" key="GridCell.Tab.0.bottom/0.0.1536.864@0.0.1536.864" timestamp="1598570710241" />
-    <state width="1493" height="303" key="GridCell.Tab.0.center" timestamp="1598570710241">
+    <state width="1493" height="303" key="GridCell.Tab.0.bottom/0.0.1536.864@0.0.1536.864" timestamp="1598621664015" />
+    <state width="1493" height="303" key="GridCell.Tab.0.center" timestamp="1598621664015">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state width="1493" height="303" key="GridCell.Tab.0.center/0.0.1536.864@0.0.1536.864" timestamp="1598570710241" />
-    <state width="1493" height="303" key="GridCell.Tab.0.left" timestamp="1598570710241">
+    <state width="1493" height="303" key="GridCell.Tab.0.center/0.0.1536.864@0.0.1536.864" timestamp="1598621664015" />
+    <state width="1493" height="303" key="GridCell.Tab.0.left" timestamp="1598621664015">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state width="1493" height="303" key="GridCell.Tab.0.left/0.0.1536.864@0.0.1536.864" timestamp="1598570710241" />
-    <state width="1493" height="303" key="GridCell.Tab.0.right" timestamp="1598570710241">
+    <state width="1493" height="303" key="GridCell.Tab.0.left/0.0.1536.864@0.0.1536.864" timestamp="1598621664015" />
+    <state width="1493" height="303" key="GridCell.Tab.0.right" timestamp="1598621664015">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state width="1493" height="303" key="GridCell.Tab.0.right/0.0.1536.864@0.0.1536.864" timestamp="1598570710241" />
+    <state width="1493" height="303" key="GridCell.Tab.0.right/0.0.1536.864@0.0.1536.864" timestamp="1598621664015" />
     <state x="250" y="8" key="SettingsEditor" timestamp="1593288766924">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
@@ -303,10 +303,10 @@
       <screen x="0" y="0" width="1536" height="864" />
     </state>
     <state x="477" y="191" key="refactoring.ChangeSignatureDialog/0.0.1536.864@0.0.1536.864" timestamp="1593526057324" />
-    <state x="426" y="197" key="run.anything.popup" timestamp="1598549595012">
+    <state x="426" y="197" key="run.anything.popup" timestamp="1598622143764">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state x="426" y="197" key="run.anything.popup/0.0.1536.864@0.0.1536.864" timestamp="1598549595012" />
+    <state x="426" y="197" key="run.anything.popup/0.0.1536.864@0.0.1536.864" timestamp="1598622143764" />
     <state x="431" y="182" width="672" height="678" key="search.everywhere.popup" timestamp="1598453159200">
       <screen x="0" y="0" width="1536" height="864" />
     </state>

@@ -14,12 +14,11 @@ import java.nio.channels.SocketChannel;
 
 public class TCPClient {
 
-    private SocketChannel channel;
-    private TCPConnection tcpConnection;
+    private final TCPConnection tcpConnection;
 
     public TCPClient() throws IOException {
         InetSocketAddress socketAddress = new InetSocketAddress(TCPConnection.SERVER_HOST, TCPConnection.SERVER_PORT);
-        channel = SocketChannel.open(socketAddress);
+        SocketChannel channel = SocketChannel.open(socketAddress);
         tcpConnection = new TCPConnection(channel);
     }
 
