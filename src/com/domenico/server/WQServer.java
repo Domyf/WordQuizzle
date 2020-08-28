@@ -179,7 +179,9 @@ public class WQServer extends Multiplexer implements TimeIsUpListener {
     }
 
     private ConnectionData handleChallengeResponse(Challenge challenge) {
-        if (challenge.isAccepted())
+        if (challenge.isTimedout())
+            return ConnectionData.Factory.newFailResponse("Tempo scaduto");
+        else if (challenge.isAccepted())
             return ConnectionData.Factory.newSuccessResponse();
 
         return ConnectionData.Factory.newFailResponse();
@@ -214,13 +216,14 @@ public class WQServer extends Multiplexer implements TimeIsUpListener {
             if (challenge == null || challenge.playing) {    //if the user has not a challenge request or the game is started
                 key.interestOps(SelectionKey.OP_READ);
             }
-        } else if (challenge != null && challenge.isRequestDone()) {
+        } else if (challenge != null && challenge.hasResponseOrTimeout()) {
             ConnectionData response = null;
             //Sends the challenge response to who started the challenge request
-            if (!challenge.responseSent && challenge.isFromUser(attachment.username)) {
+            if (!challenge.isResponseSentBack() && challenge.isFromUser(attachment.username)) {
+                challenge.setResponseSentBack(true);
                 response = handleChallengeResponse(challenge);
-                challenge.responseSent = true;
-                //Remove the challenge if it has not been accepted
+                print("sent back");
+                //Remove the challenge if it has not been accepted or it has timedout
                 if (!challenge.isAccepted()) {
                     attachment.challenge = null;
                     key.interestOps(SelectionKey.OP_READ);
@@ -230,8 +233,7 @@ public class WQServer extends Multiplexer implements TimeIsUpListener {
                     }
                 }
             } else if (challenge.hasWords()) {
-                System.out.println("has words"+attachment.username);
-                attachment.challenge = null;    //TODO iniziare la partita
+                attachment.challenge = null;    //TODO iniziare la partita anzichè finirla
                 key.interestOps(SelectionKey.OP_READ);
                 if (challenge.isFromUser(attachment.username)) {
                     SelectionKey otherKey = mapToKey.get(challenge.getTo());

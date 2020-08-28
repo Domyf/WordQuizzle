@@ -5,9 +5,7 @@ import com.domenico.communication.UDPConnection;
 import com.domenico.shared.Multiplexer;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
@@ -18,14 +16,15 @@ public class UDPServer extends Multiplexer implements Runnable {
     private final UDPConnection udpConnection;
     private final Object mutex = new Object();
     private final Map<InetSocketAddress, Challenge> mapAddress;
+    private final LinkedList<Forward> forwards;
 
     private static class Forward {
+        InetSocketAddress toAddress;
         Challenge challenge;
-        SocketAddress toAddress;
 
-        public Forward(Challenge challenge, InetSocketAddress toAddress) {
-            this.challenge = challenge;
+        public Forward(InetSocketAddress toAddress, Challenge challenge) {
             this.toAddress = toAddress;
+            this.challenge = challenge;
         }
     }
 
@@ -34,48 +33,54 @@ public class UDPServer extends Multiplexer implements Runnable {
         channel.socket().bind(new InetSocketAddress(UDPConnection.PORT));
         this.udpConnection = new UDPConnection(channel, null);
         this.mapAddress = new HashMap<>();
+        this.forwards = new LinkedList<>();
     }
 
     public void forwardChallenge(Challenge challenge, InetSocketAddress toAddress) {
-        synchronized (mutex) {
-            mapAddress.put(toAddress, challenge);
-            wakeUp();
-        }
+        handleChallenge(challenge, toAddress);
     }
 
-    public void challengeTimedout(InetSocketAddress toAddress) {
+    public void challengeTimedout(Challenge challenge, InetSocketAddress toAddress) {
+        handleChallenge(challenge, toAddress);
+    }
+
+    private void handleChallenge(Challenge challenge, InetSocketAddress toAddress) {
         synchronized (mutex) {
-            Challenge challenge = mapAddress.get(toAddress);
-            //TODO fare la situazione del timedout
+            forwards.push(new Forward(toAddress, challenge));
+            wakeUp();
         }
     }
 
     @Override
     protected void onWritable(SelectionKey key) throws IOException {
-        Challenge challenge = null;
-        SocketAddress toAddress = null;
-        boolean hasNext;
+        boolean isEmpty;
+        Forward forward = null;
+        //Pop the next forward
         synchronized (mutex) {
-            Iterator<Map.Entry<InetSocketAddress, Challenge>> iterator = mapAddress.entrySet().iterator();
-            if (iterator.hasNext()) {   //Sends the next challenge request
-                Map.Entry<InetSocketAddress, Challenge> next = iterator.next();
-                challenge = next.getValue();
-                toAddress = next.getKey();
-                //Removes this challenge from the once that should be sent
-                iterator.remove();
+            if (!forwards.isEmpty()) {
+                forward = forwards.pop();
             }
-            hasNext = iterator.hasNext();
+            isEmpty = forwards.isEmpty();
         }
-        //Sends a new challenge request
-        if (challenge != null && toAddress != null) {
-            ConnectionData data = ConnectionData.Factory.newChallengeRequest(challenge.getFrom(), challenge.getTo());
-            udpConnection.sendData(data, toAddress);
+
+        //Sends a new challenge request or sends that the challenge timedout
+        if (forward != null) { //TODO check is challenge timedout
+            Challenge challenge = forward.challenge;
+            ConnectionData data;
+            if (challenge.isTimedout()) {
+                mapAddress.remove(forward.toAddress, forward.challenge);
+                data = ConnectionData.Factory.newFailResponse("Tempo scaduto");
+            } else {
+                mapAddress.put(forward.toAddress, forward.challenge);
+                data = ConnectionData.Factory.newChallengeRequest(challenge.getFrom(), challenge.getTo());
+            }
+
+            udpConnection.sendData(data, forward.toAddress);
         }
-        print("writable");
+
         //If there are no more challenges to forward then go read from the socket
-        if (!hasNext) {
+        if (isEmpty) {
             channel.register(selector, SelectionKey.OP_READ);
-            print("go read");
         }
     }
 
@@ -83,23 +88,15 @@ public class UDPServer extends Multiplexer implements Runnable {
     protected void onReadable(SelectionKey key) throws IOException {
         ConnectionData response = udpConnection.receiveData();
         InetSocketAddress address = (InetSocketAddress) udpConnection.getAddress();
-        Challenge challenge;
-
-        synchronized (mutex) {
-            challenge = mapAddress.remove(address);
-        }
-        if (challenge != null) {    //if the challenge has not timedout
-            print("readable");
-            challenge.setResponse(response);
-            print(response.toString());
-        }
+        Challenge challenge = mapAddress.remove(address);
+        challenge.setAccepted(ConnectionData.Validator.isSuccessResponse(response));
     }
 
     @Override
     protected void onWakeUp() {
         synchronized (mutex) {
             //If there is at least a request to forward, then go write into the socket
-            if (!mapAddress.isEmpty()) {
+            if (!forwards.isEmpty()) {
                 try {
                     channel.register(selector, SelectionKey.OP_WRITE);
                 } catch (ClosedChannelException ignored) { }

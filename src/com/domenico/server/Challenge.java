@@ -1,7 +1,5 @@
 package com.domenico.server;
 
-import com.domenico.communication.ConnectionData;
-
 //TODO this doc
 public class Challenge {
 
@@ -12,10 +10,10 @@ public class Challenge {
 
     //Related to the request phase
     private final Object mutex = new Object();
+    private boolean responseArrived;
+    private boolean responseSentBack;
     private boolean accepted;
-    private boolean requestDone;
-    boolean responseSent;
-    private ConnectionData response;
+    private boolean timedout;
 
     //Related to the words picking phase
     private String[] itWords;
@@ -24,41 +22,62 @@ public class Challenge {
     public Challenge(String from, String to) {
         this.from = from;
         this.to = to;
-        this.init();
-    }
-
-    private void init() {
+        this.responseArrived = false;
+        this.responseSentBack = false;
         this.accepted = false;
-        this.requestDone = false;
-        this.responseSent = false;
+        this.timedout = false;
         this.playing = false;
         this.itWords = null;
         this.enWords = null;
-        this.response = null;
+    }
+
+    /**
+     * Returns if the other player has replied to the challenge request or the request has timedout.
+     *
+     * @return true if the challenge request has been replied by the user or if the request timedout
+     */
+    public boolean hasResponseOrTimeout() {
+        synchronized (mutex) {
+            return responseArrived || timedout;
+        }
+    }
+
+    public void waitResponseOrTimeout(long millis) throws InterruptedException {
+        synchronized (mutex) {
+            long now = System.currentTimeMillis();
+            long end = now + millis;
+            while (!responseArrived && now < end) {
+                mutex.wait(end - now);
+                now = System.currentTimeMillis();
+            }
+
+            if (!responseArrived) { //timeout
+                timedout = true;
+                accepted = false;
+            }
+        }
     }
 
     public void setAccepted(boolean accepted) {
         synchronized (mutex) {
-            if (requestDone) return;
-            this.accepted = accepted;
-            this.requestDone = true;
-        }
-    }
+            if (this.responseArrived || this.timedout)
+                return;
 
-    /**
-     * Returns if the challenge request has been sent and if the player replied or the request timedout.
-     *
-     * @return true if the challenge request has been replied by the user or if the request timedout
-     */
-    public boolean isRequestDone() {
-        synchronized (mutex) {
-            return requestDone;
+            this.accepted = accepted;
+            this.responseArrived = true;
+            mutex.notify();
         }
     }
 
     public boolean isAccepted() {
         synchronized (mutex) {
             return accepted;
+        }
+    }
+
+    public boolean isTimedout() {
+        synchronized (mutex) {
+            return timedout;
         }
     }
 
@@ -89,8 +108,9 @@ public class Challenge {
 
     public String getTo() { return to; }
 
-    public void setResponse(ConnectionData response) { this.response = response; }
+    public boolean isResponseSentBack() { return responseSentBack; }
 
-    public ConnectionData getResponse() { return response; }
+    public void setResponseSentBack(boolean responseSentBack) { this.responseSentBack = responseSentBack; }
+
 
 }
