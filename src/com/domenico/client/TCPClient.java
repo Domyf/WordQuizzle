@@ -61,14 +61,8 @@ public class TCPClient {
         ConnectionData request = ConnectionData.Factory.newFriendListRequest(username);
         ConnectionData response = sendTCPRequest(request);
         String jsonString = response.getResponseData();
-        try {
-            JSONParser parser = new JSONParser();
-            JSONArray jsonArray = (JSONArray) parser.parse(jsonString);
-            return jsonArray;
-        } catch (ParseException e) {
-            //System.out.println("C'è stato un problema, riprova più tardi");
-        }
-        return null;
+
+        return (JSONArray) JSONValue.parse(jsonString);
     }
 
     public String challengeRequest(String username, String friendUsername) throws IOException {
@@ -79,16 +73,14 @@ public class TCPClient {
         } else if (ConnectionData.Validator.isFailResponse(response)) { //The challenge cannot be forwarded
             return response.getResponseData();
         }
-        return null;
+        return null;    //error occurred
     }
 
-    public boolean challengeResponse() throws IOException {
-        ConnectionData response = tcpConnection.receiveData();
-        if (ConnectionData.Validator.isSuccessResponse(response))
-            return true;
-        else if (ConnectionData.Validator.isFailResponse(response))
-            return false;
-        return false;
+    public boolean challengeResponse(StringBuffer response) throws IOException {
+        ConnectionData data = tcpConnection.receiveData();
+        response.append(data.getResponseData());
+
+        return ConnectionData.Validator.isSuccessResponse(data);
     }
 
     public String showScore(String username) throws IOException {

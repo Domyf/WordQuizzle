@@ -95,7 +95,8 @@ public class CLI implements OnChallengeArrivedListener {
                     break;
                 case UserCommand.CHALLENGE:
                     if (userCommand.hasParams(1)) {
-                        handleSendChallengeRequest(userCommand.getParam(0));
+                        boolean play = handleSendChallengeRequest(userCommand.getParam(0));
+                        //TODO start the game when play == true
                     } else {
                         onBadCommandSintax(UserCommand.getCommandUsage(UserCommand.CHALLENGE));
                     }
@@ -182,22 +183,23 @@ public class CLI implements OnChallengeArrivedListener {
         }
     }
 
-    /** Method invoked when the user types sfida <nickAmico> */
-    private void handleSendChallengeRequest(String friendUsername) throws Exception {
+    /** Method invoked when the user types sfida <nickAmico>
+     * @return true if the challenge has been accepted, false otherwise
+     * */
+    private boolean handleSendChallengeRequest(String friendUsername) throws Exception {
         String result = wqInterface.onSendChallengeRequest(friendUsername);
         if (result == null) {
             System.out.println(Messages.SOMETHING_WENT_WRONG);
         } else if (result.isEmpty()) {
             System.out.println("Sfida inviata a "+friendUsername+". In attesa di risposta...");
-            boolean accepted = wqInterface.getChallengeResponse(friendUsername);
-            if (accepted) {
-                System.out.println(friendUsername + " ha accettato la sfida");
-            } else {
-                System.out.println(friendUsername + " ha rifiutato la sfida");
-            }
+            StringBuffer response = new StringBuffer();
+            boolean accepted = wqInterface.getChallengeResponse(response);
+            System.out.println(response);
+            return accepted;
         } else {
             System.out.println(result);
         }
+        return false;
     }
 
     /** Method invoked when the user types mostra_punteggio */

@@ -85,7 +85,7 @@ public class UDPClient extends Multiplexer implements Runnable {
     @Override
     protected void onReadable(SelectionKey key) throws IOException {
         ConnectionData data = udpConnection.receiveData();
-        System.out.println("data:"+data.toString());    //TODO rimuovere
+
         if (ConnectionData.Validator.isChallengeRequest(data)) {
             challengeTimeout = false;
             onChallengeArrivedListener.onChallengeArrived(data.getUsername(), this::onChallengeResponse);

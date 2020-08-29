@@ -54,7 +54,7 @@ public abstract class Multiplexer {
     public void startProcessing() {
         running = true;
         try {
-            while (running) {
+            while (running && !Thread.currentThread().isInterrupted()) {
                 int sel = selector.select(timeout);
                 if (sel == 0 && !wokeup.get()) {
                     onTimeout();

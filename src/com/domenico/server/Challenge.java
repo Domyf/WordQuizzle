@@ -1,7 +1,13 @@
 package com.domenico.server;
 
+import java.util.List;
+
 //TODO this doc
 public class Challenge {
+
+    private final static int RIGHT_TRANSLATION = 1;
+    private final static int ERROR_PENALTY = 1;
+    private final static int EXTRA_POINTS = 10;
 
     //General info
     private final String from;
@@ -16,19 +22,16 @@ public class Challenge {
     private boolean timedout;
 
     //Related to the words picking phase
-    private String[] itWords;
-    private String[] enWords;
+    private List<String> itWords = null;
+    private List<String> enWords = null;
+    private int fromIndex;
+    private int toIndex;
+    private int fromPoints;
+    private int toPoints;
 
     public Challenge(String from, String to) {
         this.from = from;
         this.to = to;
-        this.responseArrived = false;
-        this.responseSentBack = false;
-        this.accepted = false;
-        this.timedout = false;
-        this.playing = false;
-        this.itWords = null;
-        this.enWords = null;
     }
 
     /**
@@ -81,7 +84,7 @@ public class Challenge {
         }
     }
 
-    public void setWords(String[] itWords, String[] enWords) {
+    public void setWords(List<String> itWords, List<String> enWords) {
         synchronized (mutex) {
             if (this.itWords == null && this.enWords == null) {
                 this.itWords = itWords;
@@ -112,5 +115,63 @@ public class Challenge {
 
     public void setResponseSentBack(boolean responseSentBack) { this.responseSentBack = responseSentBack; }
 
+    public String getNextItWord(String username) {
+        if (username.equals(from))
+            return itWords.get(fromIndex);
+        if (username.equals(to))
+            return itWords.get(toIndex);
+        return null;
+    }
+
+    public boolean checkAndGoNext(String username, String enWord) {
+        String rightEnWord;
+        if (username.equals(from)) {
+            rightEnWord = itWords.get(fromIndex);
+            fromIndex++;
+        } else if (username.equals(to)) {
+            rightEnWord = itWords.get(toIndex);
+            toIndex++;
+        } else {
+            return false;
+        }
+
+        boolean isRight = rightEnWord.equalsIgnoreCase(enWord);
+        if (isRight)
+            addPoints(username, RIGHT_TRANSLATION);
+        else
+            subtractPoints(username, ERROR_PENALTY);
+
+        return isRight;
+    }
+
+    public boolean hasPlayerEnded(String username) {
+        if (username.equals(from)) {
+            return fromIndex == itWords.size();
+        } else if (username.equals(to)) {
+            return toIndex == itWords.size();
+        }
+        return true;
+    }
+
+    public boolean isGameEnded() {
+        //return challengeTimeout || (hasPlayerEnded(from) && hasPlayerEnded(to));
+        return (hasPlayerEnded(from) && hasPlayerEnded(to));
+    }
+
+    private void addPoints(String username, int amount) {
+        if (username.equals(from)) {
+            fromPoints = fromPoints + amount;
+        } else if (username.equals(to)) {
+            toPoints = toPoints + amount;
+        }
+    }
+
+    private void subtractPoints(String username, int amount) {
+        if (username.equals(from)) {
+            fromPoints = fromPoints - amount;
+        } else if (username.equals(to)) {
+            toPoints = toPoints - amount;
+        }
+    }
 
 }

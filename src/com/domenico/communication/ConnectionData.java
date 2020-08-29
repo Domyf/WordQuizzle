@@ -68,6 +68,8 @@ public class ConnectionData {
     @Override
     public String toString() {
         String parameters = Utils.stringify(params, " ");
+        if (parameters.isEmpty())
+            return cmd.toString();
         return cmd.toString()+" "+parameters;
     }
 

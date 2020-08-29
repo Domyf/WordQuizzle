@@ -1,6 +1,8 @@
 package com.domenico.shared;
 
-import java.util.Iterator;
+import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.IntStream;
 
 /**
  * Class that contains some useful methods for general purposes
@@ -57,5 +59,21 @@ public class Utils {
     public static String getCenteredString(String s, int width) {
         int right = s.length() + (width - s.length()) / 2;    //How much space to leave on the right side
         return String.format("%-" + width  + "s", String.format("%" + right + "s", s));
+    }
+
+    public static <T> void randomSubList(List<T> list, int howMany, List<T> dest) {
+        if (howMany > list.size())
+            throw new IllegalArgumentException("The list has less elements that the ones required");
+        ThreadLocalRandom random = ThreadLocalRandom.current();
+
+        int i = 0;
+        while( i < howMany) {
+            int index = random.nextInt(list.size());
+            T elem = list.get(index);
+            if (!dest.contains(elem)) {
+                dest.add(elem);
+                i++;
+            }
+        }
     }
 }

@@ -4,7 +4,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.io.IOException;
-import java.nio.channels.DatagramChannel;
 import java.rmi.NotBoundException;
 
 public class WQClient implements WQInterface {
@@ -90,8 +89,8 @@ public class WQClient implements WQInterface {
     }
 
     @Override
-    public boolean getChallengeResponse(String friendUsername) throws Exception {
-        return tcpClient.challengeResponse();
+    public boolean getChallengeResponse(StringBuffer response) throws Exception {
+        return tcpClient.challengeResponse(response);
     }
 
     @Override
@@ -114,7 +113,7 @@ public class WQClient implements WQInterface {
 
     @Override
     public void onExit() throws Exception {
-        udpClientTh.interrupt();
+        this.udpClientTh.interrupt();
     }
 
     @Override

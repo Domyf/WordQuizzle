@@ -10,10 +10,7 @@ import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -28,7 +25,8 @@ public class WQServer extends Multiplexer implements TimeIsUpListener {
     private final Map<String, SelectionKey> mapToKey;   //maps username -> client's key
     private final Object timeoutmutex = new Object();   //mutex to handle concurrently the timedout challanges
     private final List<String> timedoutusers;           //users which are in a timedout challenge
-    private final ExecutorService executors;            //executors that will run the ChallengeRequest
+    private final ExecutorService executors;            //executors that will run the ChallengeRequests. One of them also runs the UDP server
+    private final List<String> italianWords;
 
     private static class UserRecord {
         String username;
@@ -39,18 +37,19 @@ public class WQServer extends Multiplexer implements TimeIsUpListener {
         Challenge challenge;
     }
 
-    public WQServer() throws IOException {
+    public WQServer(List<String> italianWords) throws IOException {
         super(ServerSocketChannel.open(), SelectionKey.OP_ACCEPT);
         ServerSocket serverSocket = ((ServerSocketChannel) channel).socket();
         serverSocket.bind(new InetSocketAddress(TCPConnection.SERVER_PORT));
         print("Listening on port " + TCPConnection.SERVER_PORT);
 
         this.usersManagement = UsersManagement.getInstance();
-        this.udpServer = new UDPServer(DatagramChannel.open());
-        Executors.newSingleThreadExecutor().execute(this.udpServer);    //TODO change how I do this
         this.executors = Executors.newCachedThreadPool();
+        this.udpServer = new UDPServer(DatagramChannel.open());
+        this.executors.execute(this.udpServer);
         this.mapToKey = new HashMap<>();
         this.timedoutusers = new ArrayList<>();
+        this.italianWords = italianWords;
     }
 
     /** Called when the method accept() will not block the thread */
@@ -81,7 +80,6 @@ public class WQServer extends Multiplexer implements TimeIsUpListener {
 
         attachment.response = null;
         ConnectionData received = tcpConnection.receiveData();
-        print(received.toString());
         try {
             if (ConnectionData.Validator.isLoginRequest(received)) {
                 attachment.response = handleLoginRequest(received, attachment, key);
@@ -108,7 +106,7 @@ public class WQServer extends Multiplexer implements TimeIsUpListener {
         } catch (UsersManagementException e) {
             attachment.response = ConnectionData.Factory.newFailResponse(e.getMessage());
         }
-
+        print(received.toString(), "<-", client.getRemoteAddress(), attachment.username);
         client.register(selector, SelectionKey.OP_WRITE, attachment);
     }
 
@@ -173,7 +171,7 @@ public class WQServer extends Multiplexer implements TimeIsUpListener {
         fromUserRecord.challenge = challenge;
         toRecord.challenge = challenge;
         //Handling the challenge request via udp
-        executors.execute(new ChallengeRequest(udpServer, toUDPAddress, challenge));
+        executors.execute(new ChallengeRequest(udpServer, toUDPAddress, challenge, italianWords));
 
         return ConnectionData.Factory.newSuccessResponse();
     }
@@ -182,9 +180,9 @@ public class WQServer extends Multiplexer implements TimeIsUpListener {
         if (challenge.isTimedout())
             return ConnectionData.Factory.newFailResponse("Tempo scaduto");
         else if (challenge.isAccepted())
-            return ConnectionData.Factory.newSuccessResponse();
+            return ConnectionData.Factory.newSuccessResponse(challenge.getTo()+" ha accettato la sfida");
 
-        return ConnectionData.Factory.newFailResponse();
+        return ConnectionData.Factory.newFailResponse(challenge.getTo()+" ha rifiutato la sfida");
     }
 
     private ConnectionData handleScoreRequest(ConnectionData received) throws UsersManagementException {
@@ -204,13 +202,14 @@ public class WQServer extends Multiplexer implements TimeIsUpListener {
      */
     @Override
     protected void onWritable(SelectionKey key) throws IOException {
+        SocketChannel client = (SocketChannel) key.channel();
         UserRecord attachment = (UserRecord) key.attachment();
         TCPConnection tcpConnection = attachment.tcpConnection;
         Challenge challenge = attachment.challenge;
 
         //Send the response if it is ready
         if (attachment.response != null) {
-            print(attachment.response.toString());
+            print(attachment.response.toString(), "->", client.getRemoteAddress(), attachment.username);
             tcpConnection.sendData(attachment.response);
             attachment.response = null;
             if (challenge == null || challenge.playing) {    //if the user has not a challenge request or the game is started
@@ -222,7 +221,6 @@ public class WQServer extends Multiplexer implements TimeIsUpListener {
             if (!challenge.isResponseSentBack() && challenge.isFromUser(attachment.username)) {
                 challenge.setResponseSentBack(true);
                 response = handleChallengeResponse(challenge);
-                print("sent back");
                 //Remove the challenge if it has not been accepted or it has timedout
                 if (!challenge.isAccepted()) {
                     attachment.challenge = null;
@@ -244,7 +242,7 @@ public class WQServer extends Multiplexer implements TimeIsUpListener {
                 //TimeIsUp.schedule(this, 6000, challengeRequest.from, challengeRequest.to);
             }
             if (response != null) {
-                print(response.toString());
+                print(response.toString(), "->", client.getRemoteAddress(), attachment.username);
                 tcpConnection.sendData(response);
             }
         }
@@ -278,7 +276,6 @@ public class WQServer extends Multiplexer implements TimeIsUpListener {
 
     @Override
     protected void onWakeUp() {
-        print("On wake up");
         synchronized (timeoutmutex) {
             for (String user : timedoutusers) {
                 SelectionKey key = mapToKey.get(user);
@@ -291,11 +288,14 @@ public class WQServer extends Multiplexer implements TimeIsUpListener {
         }
     }
 
-    private void print(String string) {
-        System.out.println("[TCP]: "+string);
+    public void print(String received, String direction, SocketAddress toAddress, String username) {
+        System.out.printf("[TCP]: %s %s %s (%s)\n", received, direction, toAddress, username);
     }
 
+    public void print(String str) {
+        System.out.println("[TCP]: "+str);
+    }
     @Override
-    protected void onTimeout() {}
+    protected void onTimeout() {}   //never invoked because the select() has no timeout in this thread
 
 }

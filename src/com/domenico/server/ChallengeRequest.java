@@ -1,20 +1,28 @@
 package com.domenico.server;
 
+import com.domenico.shared.Utils;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 //TODO this doc
 public class ChallengeRequest implements Runnable {
 
     private static final int MAX_WAITING_TIME = 5000;
+    private static final int CHALLENGE_WORDS = 8;   //TODO add into a Settings class
     private final Challenge challenge;
     private final InetSocketAddress toAddress;
     private final UDPServer udpServer;
+    private final List<String> words;
 
-    public ChallengeRequest(UDPServer udpServer, InetSocketAddress remoteAddress, Challenge challenge) throws IOException {
+    public ChallengeRequest(UDPServer udpServer, InetSocketAddress remoteAddress, Challenge challenge, List<String> words) throws IOException {
         this.udpServer = udpServer;
         this.challenge = challenge;
         this.toAddress = remoteAddress;
+        this.words = words;
     }
 
     @Override
@@ -31,8 +39,9 @@ public class ChallengeRequest implements Runnable {
         } else if (challenge.isAccepted()) {
             //If the challenge is accepted, get random italian words and their english translations
             //TODO rimuovere questo codice di test
-            String[] itWords = {"Cane", "Gatto", "Canzone"};
-            String[] enWords = Translations.translate(itWords);
+            List<String> itWords = new ArrayList<>(CHALLENGE_WORDS);
+            Utils.randomSubList(words, CHALLENGE_WORDS, itWords);
+            List<String> enWords = Arrays.asList(Translations.translate(itWords));
             for (String translation : enWords) {
                 System.out.print(translation);
             }

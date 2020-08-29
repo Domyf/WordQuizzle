@@ -8,22 +8,14 @@ import java.util.List;
 
 public class MainClassWQServer {
 
-    public static final String USERS_FILENAME = "users.json";
     public static final String ITALIAN_WORDS_FILENAME = "1000_common_italian_words.txt";
-    private static List<String> italianWords;
 
     public static void main(String[] args) {
         try {
-            italianWords = loadItalianWords(ITALIAN_WORDS_FILENAME);
+            List<String> italianWords = loadItalianWords(ITALIAN_WORDS_FILENAME);
             System.out.println("Loaded "+ italianWords.size() +" italian words");
-        } catch (IOException e) {
-            e.printStackTrace();
-            return;
-        }
-
-        try {
             UserRegistrationService.newRegistrationService();
-            WQServer server = new WQServer();
+            WQServer server = new WQServer(italianWords);
             server.startProcessing();
         } catch (Exception e) {
             e.printStackTrace();

@@ -14,8 +14,8 @@ import java.util.*;
 public class UDPServer extends Multiplexer implements Runnable {
 
     private final UDPConnection udpConnection;
-    private final Object mutex = new Object();
     private final Map<InetSocketAddress, Challenge> mapAddress;
+    private final Object mutex = new Object();
     private final LinkedList<Forward> forwards;
 
     private static class Forward {
@@ -63,19 +63,19 @@ public class UDPServer extends Multiplexer implements Runnable {
             isEmpty = forwards.isEmpty();
         }
 
-        //Sends a new challenge request or sends that the challenge timedout
-        if (forward != null) { //TODO check is challenge timedout
-            Challenge challenge = forward.challenge;
+        //Sends a new challenge request or sends that the challenge timed out
+        if (forward != null) {
             ConnectionData data;
-            if (challenge.isTimedout()) {
+            if (forward.challenge.isTimedout()) {
                 mapAddress.remove(forward.toAddress, forward.challenge);
-                data = ConnectionData.Factory.newFailResponse("Tempo scaduto");
+                data = ConnectionData.Factory.newFailResponse("Tempo scaduto"); //TODO change into ChallengeTimeout
             } else {
                 mapAddress.put(forward.toAddress, forward.challenge);
-                data = ConnectionData.Factory.newChallengeRequest(challenge.getFrom(), challenge.getTo());
+                data = ConnectionData.Factory.newChallengeRequest(forward.challenge.getFrom(), forward.challenge.getTo());
             }
 
             udpConnection.sendData(data, forward.toAddress);
+            print(data.toString(), forward.toAddress, forward.challenge.getTo());
         }
 
         //If there are no more challenges to forward then go read from the socket
@@ -109,8 +109,8 @@ public class UDPServer extends Multiplexer implements Runnable {
         this.startProcessing();
     }
     
-    public void print(String str) {
-        System.out.println("[UDP]: "+str);
+    public void print(String str, InetSocketAddress toAddress, String username) {
+        System.out.printf("[UDP]: %s -> %s (%s)\n", str, toAddress, username);
     }
 
     @Override

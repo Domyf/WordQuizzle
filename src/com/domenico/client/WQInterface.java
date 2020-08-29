@@ -17,7 +17,7 @@ public interface WQInterface {
 
     String onSendChallengeRequest(String friendUsername) throws Exception;
 
-    boolean getChallengeResponse(String friendUsername) throws Exception;
+    boolean getChallengeResponse(StringBuffer response) throws Exception;
 
     String onShowScore() throws Exception;
 
