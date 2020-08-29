@@ -8,11 +8,9 @@ import java.util.List;
 
 public class MainClassWQServer {
 
-    public static final String ITALIAN_WORDS_FILENAME = "1000_common_italian_words.txt";
-
     public static void main(String[] args) {
         try {
-            List<String> italianWords = loadItalianWords(ITALIAN_WORDS_FILENAME);
+            List<String> italianWords = loadItalianWords(Settings.ITALIAN_WORDS_FILENAME);
             System.out.println("Loaded "+ italianWords.size() +" italian words");
             UserRegistrationService.newRegistrationService();
             WQServer server = new WQServer(italianWords);

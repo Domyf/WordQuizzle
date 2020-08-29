@@ -3,14 +3,13 @@ package com.domenico.server;
 import java.io.*;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
 import java.util.List;
 
 //TODO fare doc
 public class Translations {
 
     private final static int START_LEN = 34;
-    private final static int BUF_LEN = 16;
+    private final static int BUF_LEN = 32;
     private final static String WORD_DIVIDER = ".%20";
 
     public static String[] translate(List<String> itWords) {

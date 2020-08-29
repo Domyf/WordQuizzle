@@ -5,10 +5,6 @@ import java.util.List;
 //TODO this doc
 public class Challenge {
 
-    private final static int RIGHT_TRANSLATION = 1;
-    private final static int ERROR_PENALTY = 1;
-    private final static int EXTRA_POINTS = 10;
-
     //General info
     private final String from;
     private final String to;
@@ -137,9 +133,9 @@ public class Challenge {
 
         boolean isRight = rightEnWord.equalsIgnoreCase(enWord);
         if (isRight)
-            addPoints(username, RIGHT_TRANSLATION);
+            addPoints(username, Settings.POINTS_RIGHT_TRANSLATION);
         else
-            subtractPoints(username, ERROR_PENALTY);
+            subtractPoints(username, Settings.POINTS_ERROR_PENALTY);
 
         return isRight;
     }

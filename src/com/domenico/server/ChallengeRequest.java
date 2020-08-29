@@ -11,8 +11,6 @@ import java.util.List;
 //TODO this doc
 public class ChallengeRequest implements Runnable {
 
-    private static final int MAX_WAITING_TIME = 5000;
-    private static final int CHALLENGE_WORDS = 8;   //TODO add into a Settings class
     private final Challenge challenge;
     private final InetSocketAddress toAddress;
     private final UDPServer udpServer;
@@ -30,7 +28,7 @@ public class ChallengeRequest implements Runnable {
         print("Forwarding challenge request from "+ challenge.getFrom()+" to "+ challenge.getTo());
         udpServer.forwardChallenge(challenge, toAddress);
         try {
-            challenge.waitResponseOrTimeout(MAX_WAITING_TIME);
+            challenge.waitResponseOrTimeout(Settings.MAX_WAITING_TIME);
         } catch (InterruptedException e) { return; }
 
         //If the challenge request has timedout
@@ -38,9 +36,8 @@ public class ChallengeRequest implements Runnable {
             udpServer.challengeTimedout(challenge, toAddress);
         } else if (challenge.isAccepted()) {
             //If the challenge is accepted, get random italian words and their english translations
-            //TODO rimuovere questo codice di test
-            List<String> itWords = new ArrayList<>(CHALLENGE_WORDS);
-            Utils.randomSubList(words, CHALLENGE_WORDS, itWords);
+            List<String> itWords = new ArrayList<>(Settings.CHALLENGE_WORDS);
+            Utils.randomSubList(words, Settings.CHALLENGE_WORDS, itWords);
             List<String> enWords = Arrays.asList(Translations.translate(itWords));
             for (String translation : enWords) {
                 System.out.print(translation);
