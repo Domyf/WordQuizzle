@@ -17,7 +17,8 @@ public class MainClassWQClient {
 
         try {
             CLI cli = new CLI();
-            cli.loop();
+            WQClient wqClient = new WQClient(cli);
+            cli.loop(wqClient);
         } catch (Exception e) {
             System.out.println("Disconnesso dal server, termino.");
         }

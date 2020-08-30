@@ -11,12 +11,15 @@ import java.util.Arrays;
  * represents the object and which can be sent through the network.
  */
 public class ConnectionData {
+
+
     private enum CMD {
         LOGIN_REQUEST,
         LOGOUT_REQUEST,
         ADD_FRIEND_REQUEST,
         FRIEND_LIST_REQUEST,
         CHALLENGE_REQUEST,
+        CHALLENGE_START,
         CHALLENGE_END_RESPONSE,
         CHALLENGE_WORD,
         SCORE_REQUEST,
@@ -25,14 +28,14 @@ public class ConnectionData {
         FAIL_RESPONSE
     }
 
-    private final static String PARAMETERS_DIVIDER = " ";
+    private static final String PARAMETERS_DIVIDER = " ";
+    private static final String RESPONSE_DATA_DIVIDER = ";";
     private final CMD cmd;                //The command of the request/response
     private final String[] params;        //The parameters of the request/response
     private String senderUsername;  //The username of who sent the message. It is always used
     private String senderPassword;  //The password of who sent the message.
     private String friendUsername;  //The friend's username. Used for the ADD_FRIEND request
-    private String responseData;    //The data which is used as failure message by the fail response or as data by the success response
-    private String word;            //The word sent in case of a challenge word response
+    private String responseData;    //The data which is attached to a message (used as failure message by the fail response or by the success response)
 
     /**
      * Private constructor. It creates this by using the given parameters. The attributes are set as null. The only way
@@ -47,7 +50,6 @@ public class ConnectionData {
         senderPassword = null;
         friendUsername = null;
         responseData = null;
-        word = null;
     }
 
     public String getUsername() { return senderUsername; }
@@ -57,6 +59,10 @@ public class ConnectionData {
     public String getFriendUsername() { return friendUsername; }
 
     public String getResponseData() { return responseData; }
+
+    public String[] splitResponseData() {
+        return responseData.split(RESPONSE_DATA_DIVIDER);
+    }
 
     /**
      * Transforms this into a string. The returned string has the following pattern: <command> <parameter1> <parameter2> ...
@@ -113,6 +119,9 @@ public class ConnectionData {
                         if (params.length == 2)
                             return newChallengeRequest(params[0], params[1]);
                         break;
+                    case CHALLENGE_START:
+                        if (params.length == 1)
+                            return newChallengeStartFromData(params[0]);
                     case CHALLENGE_END_RESPONSE:
                         return newChallengeEndResponse();
                     case CHALLENGE_WORD:
@@ -139,6 +148,10 @@ public class ConnectionData {
                 }
             } catch (IllegalArgumentException ignored) {}   //ignored because it will return Invalid Command
             return newFailResponse("Invalid command");
+        }
+
+        private static ConnectionData newChallengeStart(String param) {
+            return null;
         }
 
         /**
@@ -224,7 +237,7 @@ public class ConnectionData {
          */
         public static ConnectionData newChallengeWord(String word) {
             ConnectionData connectionData = new ConnectionData(CMD.CHALLENGE_WORD, new String[]{word});
-            connectionData.word = word;
+            connectionData.responseData = word;
             return connectionData;
         }
 
@@ -289,6 +302,18 @@ public class ConnectionData {
          */
         public static ConnectionData newFailResponse() {
             return new ConnectionData(CMD.FAIL_RESPONSE, new String[]{});
+        }
+
+        //TODO this doc
+        public static ConnectionData newChallengeStart(long maxChallengeLength, int challengeWords, String nextItWord) {
+            String data = maxChallengeLength+RESPONSE_DATA_DIVIDER+challengeWords+RESPONSE_DATA_DIVIDER+nextItWord;
+            return newChallengeStartFromData(data);
+        }
+
+        private static ConnectionData newChallengeStartFromData(String data) {
+            ConnectionData connectionData = new ConnectionData(CMD.CHALLENGE_START, new String[]{data});
+            connectionData.responseData = data;
+            return connectionData;
         }
     }
 
@@ -378,14 +403,20 @@ public class ConnectionData {
 
         /**
          * Checks if the given data represents a valid challenge word data, which means it has the right CMD and
-         * a word as parameter.
+         * a word as response data.
          * The return value is true if the given data is a valid challenge word data, false otherwise.
          *
          * @param data the data that should be evaluated
-         * @return true if the data has the challenge data's cmd, false otherwise.
+         * @return true if the data has the challenge data's cmd and a word as response data, false otherwise.
          */
         public static boolean isChallengeWord(ConnectionData data) {
-            return hasSameCMD(CMD.CHALLENGE_WORD, data.cmd) && notNull(data.word);
+            return hasSameCMD(CMD.CHALLENGE_WORD, data.cmd) && notNull(data.responseData);
+        }
+
+        //TODO this doc
+        public static boolean isChallengeStart(ConnectionData data) {
+            return hasSameCMD(CMD.CHALLENGE_START, data.cmd) && notNull(data.responseData)
+                    && data.responseData.indexOf(RESPONSE_DATA_DIVIDER) != data.responseData.lastIndexOf(RESPONSE_DATA_DIVIDER);
         }
 
         /**

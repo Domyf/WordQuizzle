@@ -18,4 +18,6 @@ public interface OnChallengeArrivedListener {
      * Invoked when the challenge request has expired.
      */
     void onChallengeArrivedTimeout();
+
+    void onChallengeEnd();
 }

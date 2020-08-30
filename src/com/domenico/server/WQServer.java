@@ -14,7 +14,7 @@ import java.util.concurrent.Executors;
  * This is a worker class that manages all the TCP communications. It implements channel multiplexing to efficiently
  * manage all the clients by extending the Multiplexer class.
  */
-public class WQServer implements WQHandler, TimeIsUpListener {
+public class WQServer implements WQHandler {
 
     private final UsersManagement usersManagement = UsersManagement.getInstance();
     private final List<String> italianWords;            //list of italian words
@@ -22,15 +22,12 @@ public class WQServer implements WQHandler, TimeIsUpListener {
     private final TCPServer tcpServer;                  //thread that handles all the tcp communications
     private final UDPServer udpServer;                  //thread that handles all the udp communications
     private final Map<String, SelectionKey> mapToKey;   //maps username -> client's tcp key
-    private final Object timeoutMutex = new Object();   //mutex to handle concurrently the timed out challenges
-    private final List<String> timedoutUsers;           //users which are in a timed out challenge
 
     public WQServer(List<String> italianWords) throws IOException {
         this.executors = Executors.newCachedThreadPool();
         this.udpServer = new UDPServer();
         this.tcpServer = new TCPServer(this);
         this.mapToKey = new HashMap<>();
-        this.timedoutUsers = new ArrayList<>();
         this.italianWords = italianWords;
     }
 
@@ -142,6 +139,24 @@ public class WQServer implements WQHandler, TimeIsUpListener {
     }
 
     @Override
+    public void handleChallengeWordsReady(Challenge challenge, SelectionKey fromKey, SelectionKey toKey) {
+        //TODO handle the readiness of the challenge's words and send the first word to both
+        TCPServer.Attachment fromUser = (TCPServer.Attachment) fromKey.attachment();
+        TCPServer.Attachment toUser = (TCPServer.Attachment) toKey.attachment();
+        String nextItWordFrom = challenge.getNextItWord(fromUser.username);
+        String nextItWordTo = challenge.getNextItWord(toUser.username);
+        //Sends the first word via tcp to both
+        if (nextItWordFrom != null && nextItWordTo != null) {
+            tcpServer.sendToClient(ConnectionData.Factory.newChallengeStart(Settings.MAX_CHALLENGE_LENGTH, Settings.CHALLENGE_WORDS, nextItWordFrom), fromKey);
+            tcpServer.sendToClient(ConnectionData.Factory.newChallengeStart(Settings.MAX_CHALLENGE_LENGTH, Settings.CHALLENGE_WORDS, nextItWordTo), toKey);
+            TimeIsUp.schedule(this::onChallengeTimeout, Settings.MAX_CHALLENGE_LENGTH, fromKey, toKey);
+        } else {
+            toUser.challenge = null;
+            fromUser.challenge = null;
+        }
+    }
+
+    @Override
     public ConnectionData handleScoreRequest(ConnectionData received) throws UsersManagementException {
         int score = usersManagement.getScore(received.getUsername());
 
@@ -164,13 +179,14 @@ public class WQServer implements WQHandler, TimeIsUpListener {
         } catch (UsersManagementException ignored) { }
     }
 
-    @Override
-    public void timeIsUp(Object... params) {
-        synchronized (timeoutMutex) {
-            for (Object param : params) {
-                timedoutUsers.add((String) param);
-            }
-        }
+    private void onChallengeTimeout(SelectionKey ...users) {
+        TCPServer.Attachment fromUser = (TCPServer.Attachment) users[0].attachment();
+        TCPServer.Attachment toUser = (TCPServer.Attachment) users[1].attachment();
+        System.out.printf("Challenge timeout (%s vs %s)\n", fromUser.username, toUser.username);
+        Challenge challenge = fromUser.challenge;
+        //if (!challenge.hasPlayerEnded(fromUser.username))
+        toUser.challenge = null;
+        fromUser.challenge = null;
     }
 }
 

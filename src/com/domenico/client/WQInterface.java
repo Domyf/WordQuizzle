@@ -3,6 +3,8 @@ package com.domenico.client;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import java.io.IOException;
+
 public interface WQInterface {
 
     String onRegisterUser(String username, String password) throws Exception;
@@ -19,6 +21,12 @@ public interface WQInterface {
 
     boolean getChallengeResponse(StringBuffer response) throws Exception;
 
+    String onChallengeStart() throws IOException;
+
+    String getNextWord() throws IOException;
+
+    boolean sendTranslation(String enWord);
+
     String onShowScore() throws Exception;
 
     JSONObject onShowLeaderboard() throws Exception;
@@ -30,4 +38,7 @@ public interface WQInterface {
 
     void onExit() throws Exception;
 
+    int getChallengeLength();
+
+    int getChallengeWords();
 }

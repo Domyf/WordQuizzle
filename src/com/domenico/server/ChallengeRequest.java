@@ -44,7 +44,7 @@ public class ChallengeRequest implements Runnable {
             }
             System.out.println();
             challenge.setWords(itWords, enWords);
-            //TODO send the words to both
+            handler.handleChallengeWordsReady(challenge, fromKey, toKey);
         }
     }
 

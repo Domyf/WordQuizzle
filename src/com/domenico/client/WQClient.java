@@ -13,6 +13,9 @@ public class WQClient implements WQInterface {
     private final UDPClient udpClient;
     private final Thread udpClientTh;
     private String loggedUserName;
+    private boolean playing;
+    private int challengeLengthSec;
+    private int challengeWords;
 
     public WQClient(OnChallengeArrivedListener listener) throws IOException, NotBoundException {
         this.loggedUserName = null;
@@ -94,6 +97,26 @@ public class WQClient implements WQInterface {
     }
 
     @Override
+    public String onChallengeStart() throws IOException {
+        String[] challengeSettings = new String[2];
+        String nextItWord = tcpClient.onChallengeStart(challengeSettings);
+        if (nextItWord.isEmpty()) return "";
+        challengeLengthSec = Integer.parseUnsignedInt(challengeSettings[0]) / 1000;
+        challengeWords = Integer.parseUnsignedInt(challengeSettings[1]);
+        return nextItWord;
+    }
+
+    @Override
+    public String getNextWord() throws IOException {
+        return tcpClient.getNextWord();
+    }
+
+    @Override
+    public boolean sendTranslation(String enWord) {
+        return false;
+    }
+
+    @Override
     public String onShowScore() throws Exception {
         if (isLoggedIn()) {
             return tcpClient.showScore(loggedUserName);
@@ -114,6 +137,16 @@ public class WQClient implements WQInterface {
     @Override
     public void onExit() throws Exception {
         this.udpClientTh.interrupt();
+    }
+
+    @Override
+    public int getChallengeLength() {
+        return challengeLengthSec;
+    }
+
+    @Override
+    public int getChallengeWords() {
+        return challengeWords;
     }
 
     @Override

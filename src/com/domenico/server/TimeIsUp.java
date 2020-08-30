@@ -2,25 +2,27 @@ package com.domenico.server;
 
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 //TODO this doc
-public class TimeIsUp extends TimerTask {
+public class TimeIsUp<T> extends TimerTask {
 
-    private final TimeIsUpListener listener;
-    private final Object[] params;
+    private final Consumer<T[]> function;
+    private final T[] args;
 
-    private TimeIsUp(TimeIsUpListener listener, Object[] params) {
-        this.listener = listener;
-        this.params = params;
+    public TimeIsUp(Consumer<T[]> function, T ...args) {
+        this.function = function;
+        this.args = args;
     }
 
-    public static void schedule(TimeIsUpListener listener, long delay, Object... params) {
+    public static <T> void schedule(Consumer<T[]> function, long delay, T ...args) {
         Timer timer = new Timer();
-        timer.schedule(new TimeIsUp(listener, params), delay);
+        timer.schedule(new TimeIsUp<T>(function, args), delay);
     }
 
     @Override
     public void run() {
-        listener.timeIsUp(params);
+        function.accept(args);
     }
 }

@@ -19,6 +19,8 @@ public interface WQHandler {
 
     void handleChallengeResponse(Challenge challenge, SelectionKey fromKey, SelectionKey toKey);
 
+    void handleChallengeWordsReady(Challenge challenge, SelectionKey fromKey, SelectionKey toKey);
+
     ConnectionData handleScoreRequest(ConnectionData received) throws UsersManagementException;
 
     ConnectionData handleLeaderboardRequest(ConnectionData received) throws UsersManagementException;

@@ -5,8 +5,6 @@ import com.domenico.communication.TCPConnection;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -73,6 +71,7 @@ public class TCPClient {
         } else if (ConnectionData.Validator.isFailResponse(response)) { //The challenge cannot be forwarded
             return response.getResponseData();
         }
+        System.out.println("error");
         return null;    //error occurred
     }
 
@@ -81,6 +80,13 @@ public class TCPClient {
         response.append(data.getResponseData());
 
         return ConnectionData.Validator.isSuccessResponse(data);
+    }
+
+    public String getNextWord() throws IOException {
+        ConnectionData received = tcpConnection.receiveData();
+        if (ConnectionData.Validator.isChallengeWord(received))
+            return received.getResponseData();
+        return null;
     }
 
     public String showScore(String username) throws IOException {
@@ -97,5 +103,18 @@ public class TCPClient {
 
     public void exit() throws IOException {
         tcpConnection.endConnection();
+    }
+
+    public String onChallengeStart(String[] challengeSettings) throws IOException {
+        if (challengeSettings.length != 2)
+            return "";
+        ConnectionData received = tcpConnection.receiveData();
+        if (ConnectionData.Validator.isChallengeStart(received)) {
+            String[] splitted = received.splitResponseData();
+            challengeSettings[0] = splitted[0];
+            challengeSettings[1] = splitted[1];
+            return splitted[2];
+        }
+        return "";
     }
 }

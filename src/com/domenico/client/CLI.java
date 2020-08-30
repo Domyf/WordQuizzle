@@ -4,6 +4,7 @@ import com.domenico.shared.Utils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import java.io.IOException;
 import java.util.Scanner;
 import java.util.function.Consumer;
 
@@ -11,14 +12,13 @@ public class CLI implements OnChallengeArrivedListener {
 
     private static final String COMMAND_LINE_START = "> ";
     private final Scanner scanner;
-    private final WQInterface wqInterface;
+    private WQInterface wqInterface;
     private final Object mutex = new Object();
     private boolean challengeArrived = false;
     private Consumer<Boolean> onChallengeResponse;
 
     public CLI() throws Exception {
         this.scanner = new Scanner(System.in);
-        this.wqInterface = new WQClient(this);
     }
 
     public String getNextLine() {
@@ -52,18 +52,32 @@ public class CLI implements OnChallengeArrivedListener {
         }
     }
 
-    public void loop() throws Exception {
+    @Override
+    public void onChallengeEnd() {
+
+    }
+
+    public void loop(WQInterface wqInterface) throws Exception {
+        if (wqInterface == null) return;
+        this.wqInterface = wqInterface;
         boolean run = true;
         while(run) {
+            boolean accepted = false;
             String line = getNextLine();
             if (line.isBlank()) continue;
             synchronized (mutex) {
                 if (challengeArrived) {
                     challengeArrived = false;
-                    onChallengeResponse.accept(line.equals("si") || line.equals("s"));
-                    continue;
+                    accepted = line.equals("si") || line.equals("s");
+                    onChallengeResponse.accept(accepted);
+                    if (!accepted) continue;
                 }
             }
+            if (accepted) {
+                playChallenge();
+                continue;
+            }
+
             UserCommand userCommand = new UserCommand(line);
             switch (userCommand.getCmd().toLowerCase()) {
                 case UserCommand.REGISTER_USER:
@@ -95,7 +109,10 @@ public class CLI implements OnChallengeArrivedListener {
                     break;
                 case UserCommand.CHALLENGE:
                     if (userCommand.hasParams(1)) {
-                        boolean play = handleSendChallengeRequest(userCommand.getParam(0));
+                        accepted = handleSendChallengeRequest(userCommand.getParam(0));
+                        if (accepted) {
+                            playChallenge();
+                        }
                         //TODO start the game when play == true
                     } else {
                         onBadCommandSintax(UserCommand.getCommandUsage(UserCommand.CHALLENGE));
@@ -118,6 +135,20 @@ public class CLI implements OnChallengeArrivedListener {
             }
         }
         wqInterface.onExit();
+    }
+
+    /** Method invoked when the challenge starts */
+    private void playChallenge() throws IOException {
+        String nextItWord = wqInterface.onChallengeStart();
+        System.out.println("Via alla sfida di traduzione!");
+        if (nextItWord.isEmpty()) {
+            System.out.println(Messages.SOMETHING_WENT_WRONG);
+            return;
+        }
+        System.out.printf("Avete %d secondi per tradurre correttamente %d parole.\n",
+                wqInterface.getChallengeLength(), wqInterface.getChallengeWords());
+        int wordCounter = 1;
+        System.out.printf("Challenge %d/%d: %s\n", wordCounter, wqInterface.getChallengeWords(), nextItWord);
     }
 
     /** Method invoked when the user types a command with bad syntax */
