@@ -28,10 +28,11 @@ public class UDPServer extends Multiplexer implements Runnable {
         }
     }
 
-    public UDPServer(DatagramChannel channel) throws IOException {
-        super(channel, SelectionKey.OP_READ);
-        channel.socket().bind(new InetSocketAddress(UDPConnection.PORT));
-        this.udpConnection = new UDPConnection(channel, null);
+    public UDPServer() throws IOException {
+        super(DatagramChannel.open(), SelectionKey.OP_READ);
+        DatagramChannel datagramChannel = (DatagramChannel) channel;
+        datagramChannel.socket().bind(new InetSocketAddress(UDPConnection.PORT));
+        this.udpConnection = new UDPConnection(datagramChannel, null);
         this.mapAddress = new HashMap<>();
         this.forwards = new LinkedList<>();
     }
@@ -66,7 +67,7 @@ public class UDPServer extends Multiplexer implements Runnable {
         //Sends a new challenge request or sends that the challenge timed out
         if (forward != null) {
             ConnectionData data;
-            if (forward.challenge.isTimedout()) {
+            if (forward.challenge.isTimedOut()) {
                 mapAddress.remove(forward.toAddress, forward.challenge);
                 data = ConnectionData.Factory.newFailResponse("Tempo scaduto"); //TODO change into ChallengeTimeout
             } else {
@@ -106,6 +107,7 @@ public class UDPServer extends Multiplexer implements Runnable {
 
     @Override
     public void run() {
+        System.out.println("[UDP]: Server is running");
         this.startProcessing();
     }
     

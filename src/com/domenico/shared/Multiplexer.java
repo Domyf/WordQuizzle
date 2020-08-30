@@ -101,7 +101,7 @@ public abstract class Multiplexer {
     /**
      * Stops the multiplexer thread
      */
-    protected void stopProcessing() {
+    public void stopProcessing() {
         running = false;
     }
 

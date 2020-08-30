@@ -24,7 +24,7 @@ public interface WQInterface {
     JSONObject onShowLeaderboard() throws Exception;
 
     /**
-     * @return true if the client's user is logged in
+     * @return true if the client's user is logged in, false otherwise
      */
     boolean isLoggedIn();
 

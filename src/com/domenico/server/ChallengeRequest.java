@@ -2,8 +2,7 @@ package com.domenico.server;
 
 import com.domenico.shared.Utils;
 
-import java.io.IOException;
-import java.net.InetSocketAddress;
+import java.nio.channels.SelectionKey;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -11,30 +10,31 @@ import java.util.List;
 //TODO this doc
 public class ChallengeRequest implements Runnable {
 
-    private final Challenge challenge;
-    private final InetSocketAddress toAddress;
     private final UDPServer udpServer;
     private final List<String> words;
+    private final SelectionKey fromKey;
+    private final SelectionKey toKey;
+    private final WQHandler handler;
 
-    public ChallengeRequest(UDPServer udpServer, InetSocketAddress remoteAddress, Challenge challenge, List<String> words) throws IOException {
+    public ChallengeRequest(WQHandler handler, UDPServer udpServer, SelectionKey fromKey, SelectionKey toKey, List<String> words) {
         this.udpServer = udpServer;
-        this.challenge = challenge;
-        this.toAddress = remoteAddress;
+        this.fromKey = fromKey;
+        this.toKey = toKey;
         this.words = words;
+        this.handler = handler;
     }
 
     @Override
     public void run() {
-        print("Forwarding challenge request from "+ challenge.getFrom()+" to "+ challenge.getTo());
-        udpServer.forwardChallenge(challenge, toAddress);
+        TCPServer.Attachment toUserAttachment = (TCPServer.Attachment) toKey.attachment();
+        Challenge challenge = toUserAttachment.challenge;
+        print("Forwarding challenge request from " + challenge.getFrom() + " to " + challenge.getTo());
+        udpServer.forwardChallenge(challenge, toUserAttachment.address);
         try {
             challenge.waitResponseOrTimeout(Settings.MAX_WAITING_TIME);
         } catch (InterruptedException e) { return; }
-
-        //If the challenge request has timedout
-        if (challenge.isTimedout()) {
-            udpServer.challengeTimedout(challenge, toAddress);
-        } else if (challenge.isAccepted()) {
+        handler.handleChallengeResponse(challenge, fromKey, toKey);
+        if (challenge.isAccepted()) {
             //If the challenge is accepted, get random italian words and their english translations
             List<String> itWords = new ArrayList<>(Settings.CHALLENGE_WORDS);
             Utils.randomSubList(words, Settings.CHALLENGE_WORDS, itWords);
@@ -44,6 +44,7 @@ public class ChallengeRequest implements Runnable {
             }
             System.out.println();
             challenge.setWords(itWords, enWords);
+            //TODO send the words to both
         }
     }
 

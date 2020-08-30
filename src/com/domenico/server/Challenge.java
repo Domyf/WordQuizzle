@@ -8,14 +8,14 @@ public class Challenge {
     //General info
     private final String from;
     private final String to;
-    boolean playing;
 
     //Related to the request phase
     private final Object mutex = new Object();
     private boolean responseArrived;
     private boolean responseSentBack;
     private boolean accepted;
-    private boolean timedout;
+    private boolean timedOut;
+    private boolean ended;
 
     //Related to the words picking phase
     private List<String> itWords = null;
@@ -37,7 +37,7 @@ public class Challenge {
      */
     public boolean hasResponseOrTimeout() {
         synchronized (mutex) {
-            return responseArrived || timedout;
+            return responseArrived || timedOut;
         }
     }
 
@@ -51,7 +51,7 @@ public class Challenge {
             }
 
             if (!responseArrived) { //timeout
-                timedout = true;
+                timedOut = true;
                 accepted = false;
             }
         }
@@ -59,7 +59,7 @@ public class Challenge {
 
     public void setAccepted(boolean accepted) {
         synchronized (mutex) {
-            if (this.responseArrived || this.timedout)
+            if (this.responseArrived || this.timedOut)
                 return;
 
             this.accepted = accepted;
@@ -74,9 +74,9 @@ public class Challenge {
         }
     }
 
-    public boolean isTimedout() {
+    public boolean isTimedOut() {
         synchronized (mutex) {
-            return timedout;
+            return timedOut;
         }
     }
 
@@ -170,4 +170,9 @@ public class Challenge {
         }
     }
 
+    public void onChallengeEnded() {
+        //TODO select who won and give him the extra points
+        if (this.ended) return;
+        this.ended = true;
+    }
 }

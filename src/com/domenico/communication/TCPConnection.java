@@ -13,7 +13,7 @@ public class TCPConnection extends Connection {
     public static final int SERVER_PORT = 5555;
     public static final String SERVER_HOST = "localhost";
 
-    private SocketChannel channel;  //The channel on which the TCP communication is done
+    private final SocketChannel channel;  //The channel on which the TCP communication is done
 
     /**
      * Instantiates a TCPConnection object that communicates with the other endpoint via the given channel

@@ -17,18 +17,22 @@ public class ConnectionData {
         ADD_FRIEND_REQUEST,
         FRIEND_LIST_REQUEST,
         CHALLENGE_REQUEST,
+        CHALLENGE_END_RESPONSE,
+        CHALLENGE_WORD,
         SCORE_REQUEST,
         LEADERBOARD_REQUEST,
         SUCCESS_RESPONSE,
         FAIL_RESPONSE
     }
 
-    private CMD cmd;                //The command of the request/response
-    private String[] params;        //The parameters of the request/response
+    private final static String PARAMETERS_DIVIDER = " ";
+    private final CMD cmd;                //The command of the request/response
+    private final String[] params;        //The parameters of the request/response
     private String senderUsername;  //The username of who sent the message. It is always used
     private String senderPassword;  //The password of who sent the message.
     private String friendUsername;  //The friend's username. Used for the ADD_FRIEND request
     private String responseData;    //The data which is used as failure message by the fail response or as data by the success response
+    private String word;            //The word sent in case of a challenge word response
 
     /**
      * Private constructor. It creates this by using the given parameters. The attributes are set as null. The only way
@@ -43,23 +47,16 @@ public class ConnectionData {
         senderPassword = null;
         friendUsername = null;
         responseData = null;
+        word = null;
     }
 
-    public String getUsername() {
-        return senderUsername;
-    }
+    public String getUsername() { return senderUsername; }
 
-    public String getPassword() {
-        return senderPassword;
-    }
+    public String getPassword() { return senderPassword; }
 
-    public String getFriendUsername() {
-        return friendUsername;
-    }
+    public String getFriendUsername() { return friendUsername; }
 
-    public String getResponseData() {
-        return responseData;
-    }
+    public String getResponseData() { return responseData; }
 
     /**
      * Transforms this into a string. The returned string has the following pattern: <command> <parameter1> <parameter2> ...
@@ -67,10 +64,10 @@ public class ConnectionData {
      */
     @Override
     public String toString() {
-        String parameters = Utils.stringify(params, " ");
+        String parameters = Utils.stringify(params, PARAMETERS_DIVIDER);
         if (parameters.isEmpty())
             return cmd.toString();
-        return cmd.toString()+" "+parameters;
+        return cmd.toString()+PARAMETERS_DIVIDER+parameters;
     }
 
     /**
@@ -88,12 +85,12 @@ public class ConnectionData {
          * valid ConnectionData object.
          */
         public static ConnectionData parseLine(String line) {
-            String[] splittedLine = line.split(" ");
+            String[] splittedLine = line.split(PARAMETERS_DIVIDER);
             String[] params = new String[0];
             String cmd = splittedLine[0];
             if (splittedLine.length > 1)
                 params = Arrays.copyOfRange(splittedLine, 1, splittedLine.length);
-            //System.out.println("line:"+line+"cmd:"+cmd);    //TODO rimuovere
+
             try {
                 switch (CMD.valueOf(cmd)) {
                     case LOGIN_REQUEST:
@@ -115,6 +112,12 @@ public class ConnectionData {
                     case CHALLENGE_REQUEST:
                         if (params.length == 2)
                             return newChallengeRequest(params[0], params[1]);
+                        break;
+                    case CHALLENGE_END_RESPONSE:
+                        return newChallengeEndResponse();
+                    case CHALLENGE_WORD:
+                        if (params.length == 1)
+                            return newChallengeWord(params[0]);
                         break;
                     case SCORE_REQUEST:
                         if (params.length == 1)
@@ -142,7 +145,7 @@ public class ConnectionData {
          * Builds a ConnectionData object that represents a login request
          * @param username the username of who is sending the request
          * @param password the password of who is sending the request
-         * @param udpPort
+         * @param udpPort the udpPort on which the user can receive data via UDP protocol
          * @return a ConnectionData object that represents a login request
          */
         public static ConnectionData newLoginRequest(String username, String password, int udpPort) {
@@ -190,6 +193,7 @@ public class ConnectionData {
 
         /**
          * Builds a ConnectionData object that represents an challenge request
+         *
          * @param username the username of who is sending the request
          * @param friendUsername the friend's username
          * @return a ConnectionData object that represents a challenge request
@@ -202,7 +206,31 @@ public class ConnectionData {
         }
 
         /**
+         * Builds a ConnectionData object that represents an challenge end response
+         *
+         * @return a ConnectionData object that represents a challenge end response
+         */
+        public static ConnectionData newChallengeEndResponse() {
+            return new ConnectionData(CMD.CHALLENGE_END_RESPONSE, new String[]{});
+        }
+
+        /**
+         * Build a ConnectionData object that represents the next word that the user should translate or the translated
+         * word. The first case occurs when the server sends this as request to the user while the second case occurs
+         * when the user sends this type of ConnectionData object to the server.
+         *
+         * @param word the word that the user should translate
+         * @return a ConnectionData object that represents the next word that the user should translate
+         */
+        public static ConnectionData newChallengeWord(String word) {
+            ConnectionData connectionData = new ConnectionData(CMD.CHALLENGE_WORD, new String[]{word});
+            connectionData.word = word;
+            return connectionData;
+        }
+
+        /**
          * Builds a ConnectionData object that represents a score request
+         *
          * @param username the username of who is sending the request
          * @return a ConnectionData object that represents a score request
          */
@@ -335,6 +363,29 @@ public class ConnectionData {
          */
         public static boolean isChallengeRequest(ConnectionData request) {
             return hasSameCMD(CMD.CHALLENGE_REQUEST, request.cmd) && notNull(request.senderUsername) && notNull(request.friendUsername);
+        }
+
+        /**
+         * Checks if the given response represents a valid challenge end response, which means it has the right CMD.
+         * The return value is true if the given response is a valid challenge response, false otherwise.
+         *
+         * @param response the response that should be evaluated
+         * @return true if the response has the challenge response's cmd, false otherwise.
+         */
+        public static boolean isChallengeEndResponse(ConnectionData response) {
+            return hasSameCMD(CMD.CHALLENGE_END_RESPONSE, response.cmd);
+        }
+
+        /**
+         * Checks if the given data represents a valid challenge word data, which means it has the right CMD and
+         * a word as parameter.
+         * The return value is true if the given data is a valid challenge word data, false otherwise.
+         *
+         * @param data the data that should be evaluated
+         * @return true if the data has the challenge data's cmd, false otherwise.
+         */
+        public static boolean isChallengeWord(ConnectionData data) {
+            return hasSameCMD(CMD.CHALLENGE_WORD, data.cmd) && notNull(data.word);
         }
 
         /**

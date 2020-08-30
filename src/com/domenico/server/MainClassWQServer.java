@@ -10,21 +10,22 @@ public class MainClassWQServer {
 
     public static void main(String[] args) {
         try {
-            List<String> italianWords = loadItalianWords(Settings.ITALIAN_WORDS_FILENAME);
+            List<String> italianWords = loadItalianWords();
             System.out.println("Loaded "+ italianWords.size() +" italian words");
             UserRegistrationService.newRegistrationService();
             WQServer server = new WQServer(italianWords);
-            server.startProcessing();
+            server.start();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private static List<String> loadItalianWords(String filename) throws IOException {
+    private static List<String> loadItalianWords() throws IOException {
         ArrayList<String> words = new ArrayList<>();
         //file downloaded from https://github.com/napolux/paroleitaliane/tree/master/paroleitaliane
-        BufferedReader reader = Files.newBufferedReader(Path.of("src/com/domenico/server/"+filename));
-        String line = null;
+        Path path = Path.of("src/com/domenico/server/" + Settings.ITALIAN_WORDS_FILENAME);  //TODO update this
+        BufferedReader reader = Files.newBufferedReader(path);
+        String line;
         while ((line = reader.readLine()) != null) {
             words.add(line);
         }
