@@ -11,7 +11,6 @@ public class WQClient implements WQInterface {
     private final RMIClient rmiClient;
     private final TCPClient tcpClient;
     private final UDPClient udpClient;
-    private final Thread udpClientTh;
     private String loggedUserName;
     private boolean playing;
     private int challengeLengthSec;
@@ -22,8 +21,7 @@ public class WQClient implements WQInterface {
         this.rmiClient = new RMIClient();
         this.tcpClient = new TCPClient();
         this.udpClient = new UDPClient(listener);
-        this.udpClientTh = new Thread(this.udpClient);
-        this.udpClientTh.start();
+        new Thread(this.udpClient).start();
     }
 
     @Override
@@ -85,7 +83,7 @@ public class WQClient implements WQInterface {
     @Override
     public String onSendChallengeRequest(String friendUsername) throws Exception {
         if (isLoggedIn()) {
-            return tcpClient.challengeRequest(loggedUserName, friendUsername);
+            return tcpClient.sendChallengeRequest(loggedUserName, friendUsername);
         } else {
             return Messages.LOGIN_NEEDED;
         }
@@ -93,11 +91,11 @@ public class WQClient implements WQInterface {
 
     @Override
     public boolean getChallengeResponse(StringBuffer response) throws Exception {
-        return tcpClient.challengeResponse(response);
+        return tcpClient.getChallengeResponse(response);
     }
 
     @Override
-    public String onChallengeStart() throws IOException {
+    public String onChallengeStart() throws Exception {
         String[] challengeSettings = new String[2];
         String nextItWord = tcpClient.onChallengeStart(challengeSettings);
         if (nextItWord.isEmpty()) return "";
@@ -106,8 +104,10 @@ public class WQClient implements WQInterface {
         return nextItWord;
     }
 
+
+
     @Override
-    public String getNextWord() throws IOException {
+    public String getNextWord() throws Exception {
         return tcpClient.getNextWord();
     }
 
@@ -135,26 +135,17 @@ public class WQClient implements WQInterface {
     }
 
     @Override
-    public void onExit() throws Exception {
-        this.udpClientTh.interrupt();
+    public void onExit() {
+        this.udpClient.stopProcessing();
+        this.tcpClient.exit();
     }
 
     @Override
-    public int getChallengeLength() {
-        return challengeLengthSec;
-    }
+    public int getChallengeLength() { return challengeLengthSec; }
 
     @Override
-    public int getChallengeWords() {
-        return challengeWords;
-    }
+    public int getChallengeWords() { return challengeWords; }
 
     @Override
-    public boolean isLoggedIn() {
-        return loggedUserName != null;
-    }
-
-    public String getLoggedUserName() {
-        return loggedUserName;
-    }
+    public boolean isLoggedIn() { return loggedUserName != null; }
 }

@@ -20,7 +20,7 @@ public class ConnectionData {
         FRIEND_LIST_REQUEST,
         CHALLENGE_REQUEST,
         CHALLENGE_START,
-        CHALLENGE_END_RESPONSE,
+        CHALLENGE_END,
         CHALLENGE_WORD,
         SCORE_REQUEST,
         LEADERBOARD_REQUEST,
@@ -121,9 +121,10 @@ public class ConnectionData {
                         break;
                     case CHALLENGE_START:
                         if (params.length == 1)
-                            return newChallengeStartFromData(params[0]);
-                    case CHALLENGE_END_RESPONSE:
-                        return newChallengeEndResponse();
+                            return newCustomFromData(CMD.CHALLENGE_START, params[0]);
+                        break;
+                    case CHALLENGE_END:
+                        return newChallengeEnd();
                     case CHALLENGE_WORD:
                         if (params.length == 1)
                             return newChallengeWord(params[0]);
@@ -223,8 +224,8 @@ public class ConnectionData {
          *
          * @return a ConnectionData object that represents a challenge end response
          */
-        public static ConnectionData newChallengeEndResponse() {
-            return new ConnectionData(CMD.CHALLENGE_END_RESPONSE, new String[]{});
+        public static ConnectionData newChallengeEnd() {
+            return new ConnectionData(CMD.CHALLENGE_END, new String[]{});
         }
 
         /**
@@ -307,11 +308,11 @@ public class ConnectionData {
         //TODO this doc
         public static ConnectionData newChallengeStart(long maxChallengeLength, int challengeWords, String nextItWord) {
             String data = maxChallengeLength+RESPONSE_DATA_DIVIDER+challengeWords+RESPONSE_DATA_DIVIDER+nextItWord;
-            return newChallengeStartFromData(data);
+            return newCustomFromData(CMD.CHALLENGE_START, data);
         }
 
-        private static ConnectionData newChallengeStartFromData(String data) {
-            ConnectionData connectionData = new ConnectionData(CMD.CHALLENGE_START, new String[]{data});
+        private static ConnectionData newCustomFromData(CMD cmd, String data) {
+            ConnectionData connectionData = new ConnectionData(cmd, new String[]{data});
             connectionData.responseData = data;
             return connectionData;
         }
@@ -397,8 +398,8 @@ public class ConnectionData {
          * @param response the response that should be evaluated
          * @return true if the response has the challenge response's cmd, false otherwise.
          */
-        public static boolean isChallengeEndResponse(ConnectionData response) {
-            return hasSameCMD(CMD.CHALLENGE_END_RESPONSE, response.cmd);
+        public static boolean isChallengeEnd(ConnectionData response) {
+            return hasSameCMD(CMD.CHALLENGE_END, response.cmd);
         }
 
         /**

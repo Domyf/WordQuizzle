@@ -21,9 +21,9 @@ public interface WQInterface {
 
     boolean getChallengeResponse(StringBuffer response) throws Exception;
 
-    String onChallengeStart() throws IOException;
+    String onChallengeStart() throws Exception;
 
-    String getNextWord() throws IOException;
+    String getNextWord() throws Exception;
 
     boolean sendTranslation(String enWord);
 

@@ -12,7 +12,6 @@ public class Challenge {
     //Related to the request phase
     private final Object mutex = new Object();
     private boolean responseArrived;
-    private boolean responseSentBack;
     private boolean accepted;
     private boolean timedOut;
     private boolean ended;
@@ -28,17 +27,6 @@ public class Challenge {
     public Challenge(String from, String to) {
         this.from = from;
         this.to = to;
-    }
-
-    /**
-     * Returns if the other player has replied to the challenge request or the request has timedout.
-     *
-     * @return true if the challenge request has been replied by the user or if the request timedout
-     */
-    public boolean hasResponseOrTimeout() {
-        synchronized (mutex) {
-            return responseArrived || timedOut;
-        }
     }
 
     public void waitResponseOrTimeout(long millis) throws InterruptedException {
@@ -89,12 +77,6 @@ public class Challenge {
         }
     }
 
-    public boolean hasWords() {
-        synchronized (mutex) {
-            return itWords != null && enWords != null;
-        }
-    }
-
     /**
      * Returns true if the user with the given username it's who sent this challenge request, false otherwise.
      *
@@ -106,10 +88,6 @@ public class Challenge {
     public String getFrom() { return from; }
 
     public String getTo() { return to; }
-
-    public boolean isResponseSentBack() { return responseSentBack; }
-
-    public void setResponseSentBack(boolean responseSentBack) { this.responseSentBack = responseSentBack; }
 
     public String getNextItWord(String username) {
         if (username.equals(from))
@@ -136,7 +114,8 @@ public class Challenge {
             addPoints(username, Settings.POINTS_RIGHT_TRANSLATION);
         else
             subtractPoints(username, Settings.POINTS_ERROR_PENALTY);
-
+        if (hasPlayerEnded(from) && hasPlayerEnded(to))
+            onChallengeEnded();
         return isRight;
     }
 
@@ -150,8 +129,7 @@ public class Challenge {
     }
 
     public boolean isGameEnded() {
-        //return challengeTimeout || (hasPlayerEnded(from) && hasPlayerEnded(to));
-        return (hasPlayerEnded(from) && hasPlayerEnded(to));
+        return ended || (hasPlayerEnded(from) && hasPlayerEnded(to));
     }
 
     private void addPoints(String username, int amount) {
@@ -174,5 +152,9 @@ public class Challenge {
         //TODO select who won and give him the extra points
         if (this.ended) return;
         this.ended = true;
+        if (fromPoints > toPoints)
+            addPoints(from, Settings.EXTRA_POINTS);
+        else if (toPoints > fromPoints)
+            addPoints(to, Settings.EXTRA_POINTS);
     }
 }

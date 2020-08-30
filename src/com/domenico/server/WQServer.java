@@ -37,13 +37,6 @@ public class WQServer implements WQHandler {
         udpServer.stopProcessing();
     }
 
-    /*private void handleUserConnected(SelectionKey key, InetAddress address) {
-        UserRecord userRecord = new UserRecord();
-        userRecord.address = address;
-        userRecord.challenge = null;
-        userRecord.username = null;
-    }*/
-
     @Override
     public ConnectionData handleLoginRequest(ConnectionData connectionData, SelectionKey key, InetAddress inetAddress) throws UsersManagementException {
         TCPServer.Attachment attachment = (TCPServer.Attachment) key.attachment();
@@ -149,7 +142,7 @@ public class WQServer implements WQHandler {
         if (nextItWordFrom != null && nextItWordTo != null) {
             tcpServer.sendToClient(ConnectionData.Factory.newChallengeStart(Settings.MAX_CHALLENGE_LENGTH, Settings.CHALLENGE_WORDS, nextItWordFrom), fromKey);
             tcpServer.sendToClient(ConnectionData.Factory.newChallengeStart(Settings.MAX_CHALLENGE_LENGTH, Settings.CHALLENGE_WORDS, nextItWordTo), toKey);
-            TimeIsUp.schedule(this::onChallengeTimeout, Settings.MAX_CHALLENGE_LENGTH, fromKey, toKey);
+            TimeIsUp.schedule(this::handleChallengeTimeout, Settings.MAX_CHALLENGE_LENGTH, fromKey, toKey);
         } else {
             toUser.challenge = null;
             fromUser.challenge = null;
@@ -179,73 +172,17 @@ public class WQServer implements WQHandler {
         } catch (UsersManagementException ignored) { }
     }
 
-    private void onChallengeTimeout(SelectionKey ...users) {
+    private void handleChallengeTimeout(SelectionKey ...users) {
         TCPServer.Attachment fromUser = (TCPServer.Attachment) users[0].attachment();
         TCPServer.Attachment toUser = (TCPServer.Attachment) users[1].attachment();
-        System.out.printf("Challenge timeout (%s vs %s)\n", fromUser.username, toUser.username);
-        Challenge challenge = fromUser.challenge;
-        //if (!challenge.hasPlayerEnded(fromUser.username))
-        toUser.challenge = null;
-        fromUser.challenge = null;
+        System.out.printf("Challenge ended (%s vs %s)\n", fromUser.username, toUser.username);
+        if (fromUser.challenge != null) {
+            fromUser.challenge.onChallengeEnded();
+            toUser.challenge = null;
+            fromUser.challenge = null;
+            tcpServer.sendToClient(ConnectionData.Factory.newChallengeEnd(), users[0]);
+            tcpServer.sendToClient(ConnectionData.Factory.newChallengeEnd(), users[1]);
+        }
+        //TODO shouldn't it be synchronized?!
     }
 }
-
-/** TODO remove the following comment block
- * Called when the method write() will not block the thread */
-    /*@Override
-    protected void onWritable(SelectionKey key) throws IOException {
-        SocketChannel client = (SocketChannel) key.channel();
-        UserRecord attachment = (UserRecord) key.attachment();
-        TCPConnection tcpConnection = attachment.tcpConnection;
-        Challenge challenge = attachment.challenge;
-
-        if (attachment.response != null) {
-            print(attachment.response.toString(), "->", client.getRemoteAddress(), attachment.username);
-            tcpConnection.sendData(attachment.response);
-            attachment.response = null;
-            key.interestOps(SelectionKey.OP_READ);
-        }
-
-        //Send the response if it is ready
-        /*if (attachment.response != null) {
-            print(attachment.response.toString(), "->", client.getRemoteAddress(), attachment.username);
-            tcpConnection.sendData(attachment.response);
-            attachment.response = null;
-            if (challenge == null) {    //if the user has not a challenge request or the game is started
-                key.interestOps(SelectionKey.OP_READ);
-            }
-        } else if (challenge != null && challenge.hasResponseOrTimeout()) {
-            ConnectionData response = null;
-            //Sends the challenge response to who started the challenge request
-            if (!challenge.isResponseSentBack() && challenge.isFromUser(attachment.username)) {
-                challenge.setResponseSentBack(true);
-                response = handleChallengeResponse(attachment, key);
-            } else if (challenge.hasWords()) {
-                String nextItWord = challenge.getNextItWord(attachment.username);
-                response = ConnectionData.Factory.newChallengeWord(nextItWord);
-
-                attachment.challenge = null;
-                key.interestOps(SelectionKey.OP_READ);
-                if (challenge.isFromUser(attachment.username)) {
-                    SelectionKey otherKey = mapToKey.get(challenge.getTo());
-                    if (otherKey != null) {
-                        otherKey.interestOps(SelectionKey.OP_WRITE);
-                    }
-                    //TimeIsUp.schedule(this, 6000, challengeRequest.from, challengeRequest.to);
-                }
-
-                /*attachment.challenge = null;
-                key.interestOps(SelectionKey.OP_READ);
-                if (challenge.isFromUser(attachment.username)) {
-                    SelectionKey otherKey = mapToKey.get(challenge.getTo());
-                    if (otherKey != null) {
-                        otherKey.interestOps(SelectionKey.OP_WRITE);
-                    }
-                }*/
-            /*}
-            if (response != null) {
-                print(response.toString(), "->", client.getRemoteAddress(), attachment.username);
-                tcpConnection.sendData(response);
-            }
-        }
-    }*/

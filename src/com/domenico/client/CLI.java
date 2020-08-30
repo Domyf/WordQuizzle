@@ -138,7 +138,7 @@ public class CLI implements OnChallengeArrivedListener {
     }
 
     /** Method invoked when the challenge starts */
-    private void playChallenge() throws IOException {
+    private void playChallenge() throws Exception {
         String nextItWord = wqInterface.onChallengeStart();
         System.out.println("Via alla sfida di traduzione!");
         if (nextItWord.isEmpty()) {

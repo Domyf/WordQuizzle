@@ -142,20 +142,10 @@ public class TCPServer extends Multiplexer {
                 ASyncResponse aSyncResponse = aSyncResponses.pop();
                 Attachment attachment = (Attachment) aSyncResponse.key.attachment();
                 attachment.response = aSyncResponse.data;
-                aSyncResponse.key.interestOps(SelectionKey.OP_WRITE);
+                if (aSyncResponse.key.isValid())
+                    aSyncResponse.key.interestOps(SelectionKey.OP_WRITE);
             }
         }
-        /*synchronized (timeoutMutex) {
-            for (String user : timedoutUsers) {
-                SelectionKey key = mapToKey.get(user);
-                if (key == null) continue;  //se l'utente si è disconnesso
-                Attachment attachment = (Attachment) key.attachment();
-                attachment.response = ConnectionData.Factory.newChallengeEndResponse();
-                attachment.challenge.onChallengeEnded();
-                key.interestOps(SelectionKey.OP_WRITE);
-            }
-            timedoutUsers.clear();
-        }*/
     }
 
     public void sendToClient(ConnectionData data, SelectionKey key) {
