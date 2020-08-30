@@ -11,16 +11,19 @@ public class WQClient implements WQInterface {
     private final RMIClient rmiClient;
     private final TCPClient tcpClient;
     private final UDPClient udpClient;
+    private final ChallengeListener challengeListener;  //listener used to signal the events relative to the challenge request
     private String loggedUserName;
-    private boolean playing;
     private int challengeLengthSec;
     private int challengeWords;
+    private boolean playing;
+    private int wordCounter;
 
-    public WQClient(OnChallengeArrivedListener listener) throws IOException, NotBoundException {
+    public WQClient(ChallengeListener listener) throws IOException, NotBoundException {
         this.loggedUserName = null;
         this.rmiClient = new RMIClient();
-        this.tcpClient = new TCPClient();
-        this.udpClient = new UDPClient(listener);
+        this.tcpClient = new TCPClient(this);
+        this.udpClient = new UDPClient(this);
+        this.challengeListener = listener;
         new Thread(this.udpClient).start();
     }
 
@@ -81,42 +84,6 @@ public class WQClient implements WQInterface {
     }
 
     @Override
-    public String onSendChallengeRequest(String friendUsername) throws Exception {
-        if (isLoggedIn()) {
-            return tcpClient.sendChallengeRequest(loggedUserName, friendUsername);
-        } else {
-            return Messages.LOGIN_NEEDED;
-        }
-    }
-
-    @Override
-    public boolean getChallengeResponse(StringBuffer response) throws Exception {
-        return tcpClient.getChallengeResponse(response);
-    }
-
-    @Override
-    public String onChallengeStart() throws Exception {
-        String[] challengeSettings = new String[2];
-        String nextItWord = tcpClient.onChallengeStart(challengeSettings);
-        if (nextItWord.isEmpty()) return "";
-        challengeLengthSec = Integer.parseUnsignedInt(challengeSettings[0]) / 1000;
-        challengeWords = Integer.parseUnsignedInt(challengeSettings[1]);
-        return nextItWord;
-    }
-
-
-
-    @Override
-    public String getNextWord() throws Exception {
-        return tcpClient.getNextWord();
-    }
-
-    @Override
-    public boolean sendTranslation(String enWord) {
-        return false;
-    }
-
-    @Override
     public String onShowScore() throws Exception {
         if (isLoggedIn()) {
             return tcpClient.showScore(loggedUserName);
@@ -135,6 +102,45 @@ public class WQClient implements WQInterface {
     }
 
     @Override
+    public String onSendChallengeRequest(String friendUsername) throws Exception {
+        if (isLoggedIn()) {
+            return tcpClient.sendChallengeRequest(loggedUserName, friendUsername);
+        } else {
+            return Messages.LOGIN_NEEDED;
+        }
+    }
+
+    @Override
+    public boolean waitChallengeResponse(StringBuffer response) throws Exception {
+        boolean accepted = tcpClient.getChallengeResponse(response);
+        playing = accepted;
+        return accepted;
+    }
+
+    @Override
+    public String onChallengeStart() throws Exception {
+        String[] challengeSettings = new String[2];
+        String nextItWord = tcpClient.onChallengeStart(challengeSettings);
+        if (nextItWord.isEmpty()) return "";
+        challengeLengthSec = Integer.parseUnsignedInt(challengeSettings[0]) / 1000;
+        challengeWords = Integer.parseUnsignedInt(challengeSettings[1]);
+        playing = true;
+        wordCounter = 1;
+        return nextItWord;
+    }
+
+    @Override
+    public String getNextWord() throws Exception {
+        wordCounter++;
+        return tcpClient.getNextWord();
+    }
+
+    @Override
+    public boolean sendTranslation(String enWord) {
+        return false;
+    }
+
+    @Override
     public void onExit() {
         this.udpClient.stopProcessing();
         this.tcpClient.exit();
@@ -148,4 +154,30 @@ public class WQClient implements WQInterface {
 
     @Override
     public boolean isLoggedIn() { return loggedUserName != null; }
+
+    @Override
+    public boolean isPlaying() { return playing; }
+
+    @Override
+    public int getWordCounter() { return wordCounter; }
+
+    public void onChallengeTimeout() {
+        this.wordCounter = 1;
+        this.playing = false;
+        challengeListener.onChallengeTimeout();
+    }
+
+    public void onChallengeArrived(String from) {
+        challengeListener.onChallengeArrived(from, this::onChallengeResponse);
+    }
+
+    public void onChallengeResponse(Boolean accepted) {
+        udpClient.onChallengeResponse(accepted);
+        this.playing = accepted;
+    }
+
+    public void onChallengeArrivedTimeout() {
+        this.playing = false;
+        challengeListener.onChallengeArrivedTimeout();
+    }
 }

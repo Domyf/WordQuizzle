@@ -10,22 +10,23 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.SocketChannel;
 
-public class TCPClient implements TCPListener {
+public class TCPClient {
 
-    private final TCPNClient tcpnClient;
+    private final TCPMultiplexer tcpMultiplexer;
+    private final WQClient wqClient;
     private final Object mutex = new Object();
     private ConnectionData received = null;
 
-    public TCPClient() throws IOException {
+    public TCPClient(WQClient wqClient) throws IOException {
         InetSocketAddress socketAddress = new InetSocketAddress(TCPConnection.SERVER_HOST, TCPConnection.SERVER_PORT);
-        this.tcpnClient = new TCPNClient(SocketChannel.open(socketAddress), this);
-        new Thread(tcpnClient).start();
+        this.tcpMultiplexer = new TCPMultiplexer(SocketChannel.open(socketAddress), this::onTCPDataReceived);
+        new Thread(tcpMultiplexer).start();
+        this.wqClient = wqClient;
     }
 
-    @Override
     public void onTCPDataReceived(ConnectionData received) {
         if (ConnectionData.Validator.isChallengeEnd(received)) {
-            System.out.println("Sfida terminata");
+            wqClient.onChallengeTimeout();
         } else {
             synchronized (mutex) {
                 this.received = received;
@@ -48,7 +49,7 @@ public class TCPClient implements TCPListener {
 
     public String login(String username, String password, int udpPort) throws InterruptedException {
         ConnectionData request = ConnectionData.Factory.newLoginRequest(username, password, udpPort);
-        tcpnClient.sendToServer(request);
+        tcpMultiplexer.sendToServer(request);
         ConnectionData response = waitResponseFromServer();
         if (ConnectionData.Validator.isSuccessResponse(response)) {
             return "";
@@ -59,7 +60,7 @@ public class TCPClient implements TCPListener {
 
     public String logout(String username) throws IOException, InterruptedException {
         ConnectionData request = ConnectionData.Factory.newLogoutRequest(username);
-        tcpnClient.sendToServer(request);
+        tcpMultiplexer.sendToServer(request);
         ConnectionData response = waitResponseFromServer();
         if (ConnectionData.Validator.isSuccessResponse(response))
             return "";
@@ -70,7 +71,7 @@ public class TCPClient implements TCPListener {
 
     public String addFriend(String username, String friendUsername) throws IOException, InterruptedException {
         ConnectionData request = ConnectionData.Factory.newAddFriendRequest(username, friendUsername);
-        tcpnClient.sendToServer(request);
+        tcpMultiplexer.sendToServer(request);
         ConnectionData response = waitResponseFromServer();
         if (ConnectionData.Validator.isSuccessResponse(response))
             return "Tu e "+friendUsername+" siete ora amici!";
@@ -81,7 +82,7 @@ public class TCPClient implements TCPListener {
 
     public JSONArray friendList(String username) throws IOException, InterruptedException {
         ConnectionData request = ConnectionData.Factory.newFriendListRequest(username);
-        tcpnClient.sendToServer(request);
+        tcpMultiplexer.sendToServer(request);
         ConnectionData response = waitResponseFromServer();
         String jsonString = response.getResponseData();
 
@@ -90,7 +91,7 @@ public class TCPClient implements TCPListener {
 
     public String sendChallengeRequest(String username, String friendUsername) throws IOException, InterruptedException {
         ConnectionData request = ConnectionData.Factory.newChallengeRequest(username, friendUsername);
-        tcpnClient.sendToServer(request);
+        tcpMultiplexer.sendToServer(request);
         ConnectionData response = waitResponseFromServer();
         if (ConnectionData.Validator.isSuccessResponse(response)) {   //The challenge has been forwarded
             return "";
@@ -117,14 +118,14 @@ public class TCPClient implements TCPListener {
 
     public String showScore(String username) throws IOException, InterruptedException {
         ConnectionData request = ConnectionData.Factory.newScoreRequest(username);
-        tcpnClient.sendToServer(request);
+        tcpMultiplexer.sendToServer(request);
         ConnectionData response = waitResponseFromServer();
         return response.getResponseData();
     }
 
     public JSONObject showLeaderboard(String username) throws IOException, InterruptedException {
         ConnectionData request = ConnectionData.Factory.newLeaderboardRequest(username);
-        tcpnClient.sendToServer(request);
+        tcpMultiplexer.sendToServer(request);
         ConnectionData response = waitResponseFromServer();
         return (JSONObject) JSONValue.parse(response.getResponseData());
     }
@@ -143,6 +144,6 @@ public class TCPClient implements TCPListener {
     }
 
     public void exit() {
-        tcpnClient.stopProcessing();
+        tcpMultiplexer.stopProcessing();
     }
 }

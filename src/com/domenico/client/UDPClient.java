@@ -16,12 +16,12 @@ import java.nio.channels.Selector;
  * This class extends the {@link Multiplexer} class and it handles all the UDP communications from and to the
  * WordQuizzle server. Such communications are all related to challenge requests. A challenge request is sent from the
  * server to a client via UDP. The client waits that the DatagramChannel is readable, and then it reads the challenge
- * request and sends it to the challenge handler (which is a {@link OnChallengeArrivedListener}
+ * request and sends it to the challenge handler (which is a {@link ChallengeListener}
  * that is passed when this class is instantiated). While the challenger handler will do its work, this thread comes back
  * to wait that the DatagramChannel is readable.
  * The UDPClient will then wake up when {@link #onChallengeResponse(Boolean)} is called by the challenge handler or
  * when the server sends that the challenge has timed out. On that case, the challenge handler is notified via
- * {@link OnChallengeArrivedListener#onChallengeArrivedTimeout()} and this thread comes back to wait messages from the
+ * {@link ChallengeListener#onChallengeArrivedTimeout()} and this thread comes back to wait messages from the
  * server.
  * One remote but still probable case is that a client accepts or declines a challenge while the server sends that
  * the challenge is timedout. On that case, the timeout event is more importante and the user is notified that the
@@ -30,7 +30,7 @@ import java.nio.channels.Selector;
 public class UDPClient extends Multiplexer implements Runnable {
 
     private final UDPConnection udpConnection;  //used to send and receive messages via DatagramChannel
-    private final OnChallengeArrivedListener onChallengeArrivedListener;  //listener used to signal the events relative to the challenge request
+    private final WQClient wqClient;
     private final int udpPort;  //port used to receive UDP data
     private boolean challengeTimeout = false;   //true if a challenge timeout has arrived, false otherwise
     private boolean challengeAccepted = false;  //true if the user has accepted the challenge, false otherwise
@@ -38,16 +38,15 @@ public class UDPClient extends Multiplexer implements Runnable {
     /**
      * Sets up the UDPClient.
      *
-     * @param listener listener that will be called when a challenge arrives or when a challenge times out.
      * @throws IOException when I/O error occurs
      */
-    public UDPClient(OnChallengeArrivedListener listener) throws IOException {
+    public UDPClient(WQClient wqClient) throws IOException {
         super(DatagramChannel.open(), SelectionKey.OP_READ);
         DatagramChannel channel = (DatagramChannel) super.channel;
         channel.socket().bind(new InetSocketAddress(0));    //bind with ephemeral port
         SocketAddress serverAddress = new InetSocketAddress(UDPConnection.HOST_NAME, UDPConnection.PORT);
         this.udpConnection = new UDPConnection(channel, serverAddress);
-        this.onChallengeArrivedListener = listener;
+        this.wqClient = wqClient;
         this.udpPort = channel.socket().getLocalPort();
     }
 
@@ -88,10 +87,10 @@ public class UDPClient extends Multiplexer implements Runnable {
 
         if (ConnectionData.Validator.isChallengeRequest(data)) {
             challengeTimeout = false;
-            onChallengeArrivedListener.onChallengeArrived(data.getUsername(), this::onChallengeResponse);
-        } else if (ConnectionData.Validator.isFailResponse(data)) { //TODO change into ChallengeTimeout
+            wqClient.onChallengeArrived(data.getUsername());
+        } else if (ConnectionData.Validator.isFailResponse(data)) {
             challengeTimeout = true;
-            onChallengeArrivedListener.onChallengeArrivedTimeout();
+            wqClient.onChallengeArrivedTimeout();
         }
         channel.register(selector, SelectionKey.OP_READ);
     }
@@ -103,7 +102,7 @@ public class UDPClient extends Multiplexer implements Runnable {
      *
      * @param accepted true is the user has accepted, false otherwise
      */
-    private void onChallengeResponse(Boolean accepted) {
+    public void onChallengeResponse(Boolean accepted) {
         this.challengeAccepted = accepted;
         wakeUp();
     }

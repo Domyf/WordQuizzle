@@ -19,7 +19,7 @@ public interface WQInterface {
 
     String onSendChallengeRequest(String friendUsername) throws Exception;
 
-    boolean getChallengeResponse(StringBuffer response) throws Exception;
+    boolean waitChallengeResponse(StringBuffer response) throws Exception;
 
     String onChallengeStart() throws Exception;
 
@@ -41,4 +41,8 @@ public interface WQInterface {
     int getChallengeLength();
 
     int getChallengeWords();
+
+    boolean isPlaying();
+
+    int getWordCounter();
 }

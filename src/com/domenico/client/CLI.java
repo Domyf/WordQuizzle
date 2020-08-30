@@ -4,11 +4,10 @@ import com.domenico.shared.Utils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-import java.io.IOException;
 import java.util.Scanner;
 import java.util.function.Consumer;
 
-public class CLI implements OnChallengeArrivedListener {
+public class CLI implements ChallengeListener {
 
     private static final String COMMAND_LINE_START = "> ";
     private final Scanner scanner;
@@ -17,7 +16,7 @@ public class CLI implements OnChallengeArrivedListener {
     private boolean challengeArrived = false;
     private Consumer<Boolean> onChallengeResponse;
 
-    public CLI() throws Exception {
+    public CLI() {
         this.scanner = new Scanner(System.in);
     }
 
@@ -53,31 +52,40 @@ public class CLI implements OnChallengeArrivedListener {
     }
 
     @Override
-    public void onChallengeEnd() {
-
+    public void onChallengeTimeout() {
+        System.out.println("\rSfida terminata");
+        System.out.print(COMMAND_LINE_START);
     }
 
     public void loop(WQInterface wqInterface) throws Exception {
         if (wqInterface == null) return;
         this.wqInterface = wqInterface;
         boolean run = true;
+        String nextItWord;
         while(run) {
-            boolean accepted = false;
+            boolean accepted;
             String line = getNextLine();
-            if (line.isBlank()) continue;
-            synchronized (mutex) {
-                if (challengeArrived) {
-                    challengeArrived = false;
-                    accepted = line.equals("si") || line.equals("s");
-                    onChallengeResponse.accept(accepted);
-                    if (!accepted) continue;
+            if (line.isBlank()) continue;   //ignore a blank or empty line
+            if (!wqInterface.isPlaying()) {
+                synchronized (mutex) {
+                    if (challengeArrived) {
+                        challengeArrived = false;
+                        if (line.equals("si") || line.equals("s")) {
+                            onChallengeResponse.accept(true);
+                            nextItWord = startChallenge();
+                        } else {
+                            onChallengeResponse.accept(false);
+                        }
+                        continue;   //message was processed so go next loop cycle
+                    }
                 }
-            }
-            if (accepted) {
-                playChallenge();
+            } else {
+                //TODO send the translated word and wait for the next
+                System.out.println("Invio la traduzione ed ottengo la successiva");
+                System.out.printf("Challenge %d/%d: %s\n",
+                        wqInterface.getWordCounter(), wqInterface.getChallengeWords(), "NEXT");
                 continue;
             }
-
             UserCommand userCommand = new UserCommand(line);
             switch (userCommand.getCmd().toLowerCase()) {
                 case UserCommand.REGISTER_USER:
@@ -111,9 +119,8 @@ public class CLI implements OnChallengeArrivedListener {
                     if (userCommand.hasParams(1)) {
                         accepted = handleSendChallengeRequest(userCommand.getParam(0));
                         if (accepted) {
-                            playChallenge();
+                            startChallenge();
                         }
-                        //TODO start the game when play == true
                     } else {
                         onBadCommandSintax(UserCommand.getCommandUsage(UserCommand.CHALLENGE));
                     }
@@ -138,17 +145,18 @@ public class CLI implements OnChallengeArrivedListener {
     }
 
     /** Method invoked when the challenge starts */
-    private void playChallenge() throws Exception {
-        String nextItWord = wqInterface.onChallengeStart();
+    private String startChallenge() throws Exception {
         System.out.println("Via alla sfida di traduzione!");
+        String nextItWord = wqInterface.onChallengeStart();
         if (nextItWord.isEmpty()) {
             System.out.println(Messages.SOMETHING_WENT_WRONG);
-            return;
+            return "";
         }
         System.out.printf("Avete %d secondi per tradurre correttamente %d parole.\n",
                 wqInterface.getChallengeLength(), wqInterface.getChallengeWords());
-        int wordCounter = 1;
-        System.out.printf("Challenge %d/%d: %s\n", wordCounter, wqInterface.getChallengeWords(), nextItWord);
+        System.out.printf("Challenge %d/%d: %s\n",
+                wqInterface.getWordCounter(), wqInterface.getChallengeWords(), nextItWord);
+        return nextItWord;
     }
 
     /** Method invoked when the user types a command with bad syntax */
@@ -224,7 +232,7 @@ public class CLI implements OnChallengeArrivedListener {
         } else if (result.isEmpty()) {
             System.out.println("Sfida inviata a "+friendUsername+". In attesa di risposta...");
             StringBuffer response = new StringBuffer();
-            boolean accepted = wqInterface.getChallengeResponse(response);
+            boolean accepted = wqInterface.waitChallengeResponse(response);
             System.out.println(response);
             return accepted;
         } else {

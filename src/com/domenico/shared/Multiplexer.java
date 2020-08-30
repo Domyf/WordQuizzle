@@ -103,6 +103,7 @@ public abstract class Multiplexer {
      */
     public void stopProcessing() {
         running = false;
+        selector.wakeup();
     }
 
     protected abstract void onTimeout() throws IOException;

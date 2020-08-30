@@ -2,7 +2,7 @@ package com.domenico.client;
 
 import java.util.function.Consumer;
 
-public interface OnChallengeArrivedListener {
+public interface ChallengeListener {
 
     /**
      * Invoked when a challenge request arrives. The caller also gives the consumer object that must be consumed when
@@ -19,5 +19,9 @@ public interface OnChallengeArrivedListener {
      */
     void onChallengeArrivedTimeout();
 
-    void onChallengeEnd();
+    /**
+     * Invoked during a challenge when it times out for example after 60 seconds
+     */
+    void onChallengeTimeout();
+
 }

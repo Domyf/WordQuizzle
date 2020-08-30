@@ -10,25 +10,16 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.LinkedList;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
-public class TCPNClient extends Multiplexer implements Runnable {
+public class TCPMultiplexer extends Multiplexer implements Runnable {
 
     private final TCPConnection tcpConnection;
-    private final TCPListener listener;
+    private final Consumer<ConnectionData> listener;
     private final Object mutex = new Object();
     private final LinkedList<ConnectionData> sendQueue = new LinkedList<>();
 
-    private static class Attachment {
-        CompletableFuture<ConnectionData> future;
-        ConnectionData connectionData;
-
-        public Attachment(CompletableFuture<ConnectionData> future, ConnectionData connectionData) {
-            this.future = future;
-            this.connectionData = connectionData;
-        }
-    }
-
-    public TCPNClient(SocketChannel channel, TCPListener listener) throws IOException {
+    public TCPMultiplexer(SocketChannel channel, Consumer<ConnectionData> listener) throws IOException {
         super(channel, SelectionKey.OP_READ);
         this.tcpConnection = new TCPConnection(channel);
         this.listener = listener;
@@ -50,7 +41,7 @@ public class TCPNClient extends Multiplexer implements Runnable {
     @Override
     protected void onReadable(SelectionKey key) throws IOException {
         ConnectionData received = tcpConnection.receiveData();
-        listener.onTCPDataReceived(received);
+        listener.accept(received);
     }
 
     @Override

@@ -58,7 +58,6 @@ public class Translations {
             }
             translations.append(new String(bytes, StandardCharsets.UTF_8));
             end_index = translations.indexOf("\"", end_index + 1);
-        System.out.println(end_index+" "+translations);
         }
         //Close the stream
         is.close();
