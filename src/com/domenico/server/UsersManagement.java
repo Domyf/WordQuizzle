@@ -75,11 +75,11 @@ public class UsersManagement {
         return userData.getScore();
     }
 
-    public void setScore(String username, int newScore) throws UsersManagementException {
+    public void addScore(String username, int newScore) throws UsersManagementException {
         UserData userData = serverData.get(username);
         if (userData == null)
             throw new UsersManagementException("Username non valida");
-        userData.setScore(newScore);
+        userData.addScore(newScore);
         Persistence.saveOnDisk(serverData);
     }
 

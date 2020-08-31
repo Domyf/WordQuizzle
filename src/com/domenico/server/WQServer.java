@@ -205,8 +205,13 @@ public class WQServer implements WQHandler {
 
     private void handleChallengeEnd(TCPServer.Attachment first, TCPServer.Attachment second) {
         System.out.printf("Challenge ended (%s vs %s)\n", first.username, second.username);
+        Challenge challenge = first.challenge; // first.chellenge == second.challenge
         if (first.challenge != null && second.challenge != null) {
             first.challenge.onChallengeEnded(); //first.challenge == second.challenge
+            try {
+                usersManagement.addScore(first.username, challenge.getPoints(first.username));
+                usersManagement.addScore(second.username, challenge.getPoints(second.username));
+            } catch (UsersManagementException ignored) {}
             first.challenge = null;
             second.challenge = null;
         }

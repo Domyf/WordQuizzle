@@ -73,7 +73,7 @@
       <recent name="com.domenico.communication" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.Run Server">
+  <component name="RunManager" selected="Application.Run Client (2)">
     <configuration name="Run Client (1)" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="com.domenico.client.MainClassWQClient" />
       <module name="WordQuizzle" />
@@ -194,7 +194,8 @@
       <workItem from="1598281637947" duration="18653000" />
       <workItem from="1598346174837" duration="110187000" />
       <workItem from="1598689105846" duration="68616000" />
-      <workItem from="1598870672215" duration="8936000" />
+      <workItem from="1598870672215" duration="9246000" />
+      <workItem from="1598902920316" duration="1167000" />
     </task>
     <servers />
   </component>
@@ -258,22 +259,22 @@
       <screen x="0" y="0" width="1536" height="864" />
     </state>
     <state x="475" y="175" key="FileChooserDialogImpl/0.0.1536.864@0.0.1536.864" timestamp="1598721559502" />
-    <state width="1493" height="303" key="GridCell.Tab.0.bottom" timestamp="1598884629375">
+    <state width="1493" height="303" key="GridCell.Tab.0.bottom" timestamp="1598904130943">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state width="1493" height="303" key="GridCell.Tab.0.bottom/0.0.1536.864@0.0.1536.864" timestamp="1598884629375" />
-    <state width="1493" height="303" key="GridCell.Tab.0.center" timestamp="1598884629375">
+    <state width="1493" height="303" key="GridCell.Tab.0.bottom/0.0.1536.864@0.0.1536.864" timestamp="1598904130943" />
+    <state width="1493" height="303" key="GridCell.Tab.0.center" timestamp="1598904130943">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state width="1493" height="303" key="GridCell.Tab.0.center/0.0.1536.864@0.0.1536.864" timestamp="1598884629375" />
-    <state width="1493" height="303" key="GridCell.Tab.0.left" timestamp="1598884629374">
+    <state width="1493" height="303" key="GridCell.Tab.0.center/0.0.1536.864@0.0.1536.864" timestamp="1598904130943" />
+    <state width="1493" height="303" key="GridCell.Tab.0.left" timestamp="1598904130943">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state width="1493" height="303" key="GridCell.Tab.0.left/0.0.1536.864@0.0.1536.864" timestamp="1598884629374" />
-    <state width="1493" height="303" key="GridCell.Tab.0.right" timestamp="1598884629375">
+    <state width="1493" height="303" key="GridCell.Tab.0.left/0.0.1536.864@0.0.1536.864" timestamp="1598904130943" />
+    <state width="1493" height="303" key="GridCell.Tab.0.right" timestamp="1598904130943">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state width="1493" height="303" key="GridCell.Tab.0.right/0.0.1536.864@0.0.1536.864" timestamp="1598884629375" />
+    <state width="1493" height="303" key="GridCell.Tab.0.right/0.0.1536.864@0.0.1536.864" timestamp="1598904130943" />
     <state x="250" y="8" key="SettingsEditor" timestamp="1593288766924">
       <screen x="0" y="0" width="1536" height="864" />
     </state>

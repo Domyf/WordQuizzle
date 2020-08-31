@@ -77,6 +77,10 @@ public class UserData implements JSONStreamAware {
         return score;
     }
 
+    public void addScore(int score) {
+        this.score += score;
+    }
+
     public void setScore(int score) {
         this.score = score;
     }
