@@ -8,7 +8,7 @@ import java.util.Scanner;
 
 public class CLI implements ChallengeListener {
 
-    private static final String COMMAND_LINE_START = "> ";
+    private static final String COMMAND_LINE_START = "\r> ";
     private final Scanner scanner;
     private WQInterface wqInterface;
     private final Object mutex = new Object();
@@ -51,6 +51,7 @@ public class CLI implements ChallengeListener {
     public void onChallengeEnd() {
         System.out.println("\rSfida terminata");
         System.out.println("Adesso scriverò le statistiche appena gestisco la fine della sfida lato server");
+        System.out.print(COMMAND_LINE_START);
     }
 
     public void loop(WQInterface wqInterface) throws Exception {

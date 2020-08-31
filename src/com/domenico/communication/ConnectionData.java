@@ -126,8 +126,10 @@ public class ConnectionData {
                     case CHALLENGE_END:
                         return newChallengeEnd();
                     case CHALLENGE_WORD:
-                        if (params.length == 1)
-                            return newChallengeWord(params[0]);
+                        if (params.length >= 1) {
+                            String word = params.length == 1 ? params[0] : Utils.stringify(params, " ");
+                            return newChallengeWord(word);
+                        }
                         break;
                     case SCORE_REQUEST:
                         if (params.length == 1)
