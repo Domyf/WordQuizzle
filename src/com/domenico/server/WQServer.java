@@ -141,7 +141,8 @@ public class WQServer implements WQHandler {
         if (nextItWordFrom != null && nextItWordTo != null) {
             tcpServer.sendToClient(ConnectionData.Factory.newChallengeStart(Settings.MAX_CHALLENGE_LENGTH, Settings.CHALLENGE_WORDS, nextItWordFrom), fromKey);
             tcpServer.sendToClient(ConnectionData.Factory.newChallengeStart(Settings.MAX_CHALLENGE_LENGTH, Settings.CHALLENGE_WORDS, nextItWordTo), toKey);
-            TimeIsUp.schedule(this::handleChallengeTimeout, Settings.MAX_CHALLENGE_LENGTH, fromKey, toKey);
+            TimerTask timer = TimeIsUp.schedule(this::handleChallengeTimeout, Settings.MAX_CHALLENGE_LENGTH, fromKey, toKey);
+            fromUser.challenge.setTimer(timer);
         } else {
             toUser.challenge = null;
             fromUser.challenge = null;
@@ -173,47 +174,48 @@ public class WQServer implements WQHandler {
 
     @Override
     public synchronized ConnectionData handleTranslationArrived(ConnectionData received, SelectionKey key) {
-        TCPServer.Attachment attachment = (TCPServer.Attachment) key.attachment();
-        Challenge challenge = attachment.challenge;
-        challenge.checkAndGoNext(attachment.username, received.getResponseData());
+        TCPServer.Attachment thisAttch = (TCPServer.Attachment) key.attachment();
+        Challenge challenge = thisAttch.challenge;
+        challenge.checkAndGoNext(thisAttch.username, received.getResponseData());
         //If the challenge is ended for both
         if (challenge.isGameEnded()) {
             SelectionKey otherKey;
-            if (challenge.getFrom().equals(attachment.username))
-                otherKey = mapToKey.get(attachment.challenge.getTo());
+            if (challenge.getFrom().equals(thisAttch.username))
+                otherKey = mapToKey.get(thisAttch.challenge.getTo());
             else
-                otherKey = mapToKey.get(attachment.challenge.getFrom());
-            attachment.challenge = null;
-            ((TCPServer.Attachment) otherKey.attachment()).challenge = null;
-            //Sends to both that the challenge ended
+                otherKey = mapToKey.get(thisAttch.challenge.getFrom());
+            thisAttch.challenge.cancelTimer();
+            handleChallengeEnd(key, otherKey);
+            //Sends to the other that the challenge ended
             tcpServer.sendToClient(ConnectionData.Factory.newChallengeEnd(), otherKey);
+            //Sends to this player that the challenge ended
             return ConnectionData.Factory.newChallengeEnd();
-        } else if (!challenge.hasPlayerEnded(attachment.username)) {
-            String nextItWord = attachment.challenge.getNextItWord(attachment.username);
+        } else if (!challenge.hasPlayerEnded(thisAttch.username)) { //If this was not the last word then sends the next one
+            String nextItWord = thisAttch.challenge.getNextItWord(thisAttch.username);
+            //Sends the next word
             return ConnectionData.Factory.newChallengeWord(nextItWord);
         }
 
-        //The user or both users have ended the challenge
+        //The user or both users have ended the challenge. Do not send a reply to this user
+        //because it has already got the challenge end message
         return null;
     }
 
+    private void handleChallengeEnd(SelectionKey key, SelectionKey otherKey) {
+        TCPServer.Attachment first = (TCPServer.Attachment) key.attachment();
+        TCPServer.Attachment second = (TCPServer.Attachment) otherKey.attachment();
+        System.out.printf("Challenge ended (%s vs %s)\n", first.username, second.username);
+        if (first.challenge != null && second.challenge != null) {
+            first.challenge.onChallengeEnded(); //first.challenge == second.challenge
+            first.challenge = null;
+            second.challenge = null;
+        }
+    }
+
+    //Just small work because it is called by a timer
     private synchronized void handleChallengeTimeout(SelectionKey ...users) {
-        TCPServer.Attachment fromUser = (TCPServer.Attachment) users[0].attachment();
-        TCPServer.Attachment toUser = (TCPServer.Attachment) users[1].attachment();
-        System.out.printf("Challenge ended (%s vs %s)\n", fromUser.username, toUser.username);
-        if (fromUser.challenge != null) {
-            fromUser.challenge.onChallengeEnded();
-            fromUser.challenge = null;
-            tcpServer.sendToClient(ConnectionData.Factory.newChallengeEnd(), users[0]);
-        } else {
-            System.out.println("from user null");
-        }
-        if (toUser.challenge != null) {
-            toUser.challenge.onChallengeEnded();
-            toUser.challenge = null;
-            tcpServer.sendToClient(ConnectionData.Factory.newChallengeEnd(), users[1]);
-        } else {
-            System.out.println("to user null");
-        }
+        handleChallengeEnd(users[0], users[1]);
+        tcpServer.sendToClient(ConnectionData.Factory.newChallengeEnd(), users[0]);
+        tcpServer.sendToClient(ConnectionData.Factory.newChallengeEnd(), users[1]);
     }
 }

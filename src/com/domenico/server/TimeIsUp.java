@@ -11,14 +11,17 @@ public class TimeIsUp<T> extends TimerTask {
     private final Consumer<T[]> function;
     private final T[] args;
 
-    public TimeIsUp(Consumer<T[]> function, T ...args) {
+    public TimeIsUp(Consumer<T[]> function, final T[] args) {
         this.function = function;
         this.args = args;
     }
 
-    public static <T> void schedule(Consumer<T[]> function, long delay, T ...args) {
+    @SafeVarargs
+    public static <T> TimerTask schedule(Consumer<T[]> function, long delay, final T ...args) {
         Timer timer = new Timer();
-        timer.schedule(new TimeIsUp<T>(function, args), delay);
+        TimerTask timerTask = new TimeIsUp<>(function, args);
+        timer.schedule(timerTask, delay);
+        return timerTask;
     }
 
     @Override

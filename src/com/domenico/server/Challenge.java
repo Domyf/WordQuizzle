@@ -1,6 +1,7 @@
 package com.domenico.server;
 
 import java.util.List;
+import java.util.TimerTask;
 
 //TODO this doc
 public class Challenge {
@@ -16,13 +17,14 @@ public class Challenge {
     private boolean timedOut;
     private boolean ended;
 
-    //Related to the words picking phase
+    //Related to the gaming phase
     private List<String> itWords = null;
     private List<String> enWords = null;
     private int fromIndex;
     private int toIndex;
     private int fromPoints;
     private int toPoints;
+    private TimerTask timer;
 
     public Challenge(String from, String to) {
         this.from = from;
@@ -144,5 +146,16 @@ public class Challenge {
             addPoints(from, Settings.EXTRA_POINTS);
         else if (toPoints > fromPoints)
             addPoints(to, Settings.EXTRA_POINTS);
+    }
+
+    public void setTimer(TimerTask timer) {
+        this.timer = timer;
+    }
+
+    public void cancelTimer() {
+        if (timer != null) {
+            timer.cancel();
+            timer = null;
+        }
     }
 }
