@@ -21,7 +21,7 @@ import java.nio.channels.Selector;
  * to wait that the DatagramChannel is readable.
  * The UDPClient will then wake up when {@link #onChallengeResponse(Boolean)} is called by the challenge handler or
  * when the server sends that the challenge has timed out. On that case, the challenge handler is notified via
- * {@link ChallengeListener#onChallengeArrivedTimeout()} and this thread comes back to wait messages from the
+ * {@link ChallengeListener#onChallengeRequestTimeout()} and this thread comes back to wait messages from the
  * server.
  * One remote but still probable case is that a client accepts or declines a challenge while the server sends that
  * the challenge is timedout. On that case, the timeout event is more importante and the user is notified that the
@@ -124,7 +124,6 @@ public class UDPClient extends Multiplexer implements Runnable {
 
     @Override
     protected void onEndConnection(SelectionKey key) throws IOException {
-        System.out.println("End connection");
         this.stopProcessing();
     }
 

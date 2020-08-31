@@ -3,40 +3,38 @@ package com.domenico.client;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-import java.io.IOException;
-
 public interface WQInterface {
 
-    String onRegisterUser(String username, String password) throws Exception;
+    String register(String username, String password) throws Exception;
 
-    String onLogin(String username, String password) throws Exception;
+    String login(String username, String password) throws Exception;
 
-    String onLogout() throws Exception;
+    String logout() throws Exception;
 
-    String onAddFriend(String friendUsername) throws Exception;
+    String addFriend(String friendUsername) throws Exception;
 
-    JSONArray onShowFriendList() throws Exception;
+    JSONArray getFriendList() throws Exception;
 
-    String onSendChallengeRequest(String friendUsername) throws Exception;
+    String sendChallengeRequest(String friendUsername) throws Exception;
 
     boolean waitChallengeResponse(StringBuffer response) throws Exception;
 
+    void sendChallengeResponse(boolean accepted) throws Exception;
+
     String onChallengeStart() throws Exception;
 
-    String getNextWord() throws Exception;
+    String giveTranslation(String enWord) throws Exception;
 
-    boolean sendTranslation(String enWord);
+    String getScore() throws Exception;
 
-    String onShowScore() throws Exception;
-
-    JSONObject onShowLeaderboard() throws Exception;
+    JSONObject getLeaderBoard() throws Exception;
 
     /**
      * @return true if the client's user is logged in, false otherwise
      */
     boolean isLoggedIn();
 
-    void onExit() throws Exception;
+    void exit() throws Exception;
 
     int getChallengeLength();
 
@@ -45,4 +43,6 @@ public interface WQInterface {
     boolean isPlaying();
 
     int getWordCounter();
+
+    void waitChallengeEnd() throws Exception;
 }

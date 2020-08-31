@@ -25,8 +25,10 @@ public class TCPClient {
     }
 
     public void onTCPDataReceived(ConnectionData received) {
-        if (ConnectionData.Validator.isChallengeEnd(received)) {
-            wqClient.onChallengeTimeout();
+        if (ConnectionData.Validator.isChallengeWord(received)) {
+            wqClient.setNextWord(received.getResponseData());
+        } else if (ConnectionData.Validator.isChallengeEnd(received)) {
+            wqClient.onChallengeEnd();
         } else {
             synchronized (mutex) {
                 this.received = received;
@@ -109,13 +111,6 @@ public class TCPClient {
         return ConnectionData.Validator.isSuccessResponse(data);
     }
 
-    public String getNextWord() throws IOException, InterruptedException {
-        ConnectionData data = waitResponseFromServer();
-        if (ConnectionData.Validator.isChallengeWord(data))
-            return data.getResponseData();
-        return null;
-    }
-
     public String showScore(String username) throws IOException, InterruptedException {
         ConnectionData request = ConnectionData.Factory.newScoreRequest(username);
         tcpMultiplexer.sendToServer(request);
@@ -145,5 +140,10 @@ public class TCPClient {
 
     public void exit() {
         tcpMultiplexer.stopProcessing();
+    }
+
+    public void sendTranslation(String translation) {
+        ConnectionData request = ConnectionData.Factory.newChallengeWord(translation);
+        tcpMultiplexer.sendToServer(request);
     }
 }

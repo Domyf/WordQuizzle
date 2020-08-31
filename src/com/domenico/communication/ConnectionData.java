@@ -151,10 +151,6 @@ public class ConnectionData {
             return newFailResponse("Invalid command");
         }
 
-        private static ConnectionData newChallengeStart(String param) {
-            return null;
-        }
-
         /**
          * Builds a ConnectionData object that represents a login request
          * @param username the username of who is sending the request
@@ -230,7 +226,7 @@ public class ConnectionData {
 
         /**
          * Build a ConnectionData object that represents the next word that the user should translate or the translated
-         * word. The first case occurs when the server sends this as request to the user while the second case occurs
+         * word. The first case occurs when the server sends this kind of object to the user while the second case occurs
          * when the user sends this type of ConnectionData object to the server.
          *
          * @param word the word that the user should translate

@@ -89,6 +89,9 @@ public class TCPServer extends Multiplexer {
             } else if (ConnectionData.Validator.isChallengeRequest(received)) {
                 attachment.response = handler.handleChallengeRequest(received, key);
 
+            } else if (ConnectionData.Validator.isChallengeWord(received)) {
+                attachment.response = handler.handleTranslationArrived(received, key);
+
             } else if (ConnectionData.Validator.isScoreRequest(received)) {
                 attachment.response = handler.handleScoreRequest(received);
 

@@ -5,7 +5,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.util.Scanner;
-import java.util.function.Consumer;
 
 public class CLI implements ChallengeListener {
 
@@ -14,7 +13,6 @@ public class CLI implements ChallengeListener {
     private WQInterface wqInterface;
     private final Object mutex = new Object();
     private boolean challengeArrived = false;
-    private Consumer<Boolean> onChallengeResponse;
 
     public CLI() {
         this.scanner = new Scanner(System.in);
@@ -32,58 +30,60 @@ public class CLI implements ChallengeListener {
     }
 
     @Override
-    public void onChallengeArrived(String from, Consumer<Boolean> onResponse) {
+    public void onChallengeArrived(String from) {
         synchronized (mutex) {
             System.out.println("\rArrivata una sfida da "+from+". Vuoi accettare la sfida?");
             System.out.print(COMMAND_LINE_START);
             this.challengeArrived = true;
-            this.onChallengeResponse = onResponse;
         }
     }
 
     @Override
-    public void onChallengeArrivedTimeout() {
+    public void onChallengeRequestTimeout() {
         synchronized (mutex) {
             challengeArrived = false;
-            this.onChallengeResponse = null;
             System.out.println("\rIl tempo è scaduto");
             System.out.print(COMMAND_LINE_START);
         }
     }
 
     @Override
-    public void onChallengeTimeout() {
+    public void onChallengeEnd() {
         System.out.println("\rSfida terminata");
-        System.out.print(COMMAND_LINE_START);
+        System.out.println("Adesso scriverò le statistiche appena gestisco la fine della sfida lato server");
     }
 
     public void loop(WQInterface wqInterface) throws Exception {
         if (wqInterface == null) return;
         this.wqInterface = wqInterface;
         boolean run = true;
-        String nextItWord;
         while(run) {
             boolean accepted;
             String line = getNextLine();
             if (line.isBlank()) continue;   //ignore a blank or empty line
+
             if (!wqInterface.isPlaying()) {
                 synchronized (mutex) {
                     if (challengeArrived) {
                         challengeArrived = false;
                         if (line.equals("si") || line.equals("s")) {
-                            onChallengeResponse.accept(true);
-                            nextItWord = startChallenge();
+                            wqInterface.sendChallengeResponse(true);
+                            startChallenge();
                         } else {
-                            onChallengeResponse.accept(false);
+                            wqInterface.sendChallengeResponse(false);
                         }
-                        continue;   //message was processed so go next loop cycle
+                        continue;   //message was processed, so go next loop cycle
                     }
                 }
-            } else {
-                //TODO send the translated word and wait for the next
-                System.out.println("Invio la traduzione ed ottengo la successiva");
-                System.out.printf("Challenge %d/%d: %s\n",
-                        wqInterface.getWordCounter(), wqInterface.getChallengeWords(), "NEXT");
+            }
+            if (wqInterface.isPlaying()) {
+                String nextWord = wqInterface.giveTranslation(line);
+                if (!nextWord.isEmpty()) {
+                    printChallengeWord(nextWord);
+                } else {
+                    System.out.println("Hai tradotto tutte le parole. In attesa che la sfida termini...");
+                    wqInterface.waitChallengeEnd();
+                }
                 continue;
             }
             UserCommand userCommand = new UserCommand(line);
@@ -141,22 +141,21 @@ public class CLI implements ChallengeListener {
                     CLI.printCommandsUsage();
             }
         }
-        wqInterface.onExit();
+        wqInterface.exit();
+    }
+
+    private void printChallengeWord(String nextWord) {
+        System.out.printf("Challenge %d/%d: %s\n",
+                wqInterface.getWordCounter(), wqInterface.getChallengeWords(), nextWord);
     }
 
     /** Method invoked when the challenge starts */
-    private String startChallenge() throws Exception {
+    private void startChallenge() throws Exception {
         System.out.println("Via alla sfida di traduzione!");
-        String nextItWord = wqInterface.onChallengeStart();
-        if (nextItWord.isEmpty()) {
-            System.out.println(Messages.SOMETHING_WENT_WRONG);
-            return "";
-        }
+        String nextWord = wqInterface.onChallengeStart();
         System.out.printf("Avete %d secondi per tradurre correttamente %d parole.\n",
                 wqInterface.getChallengeLength(), wqInterface.getChallengeWords());
-        System.out.printf("Challenge %d/%d: %s\n",
-                wqInterface.getWordCounter(), wqInterface.getChallengeWords(), nextItWord);
-        return nextItWord;
+        printChallengeWord(nextWord);
     }
 
     /** Method invoked when the user types a command with bad syntax */
@@ -167,7 +166,7 @@ public class CLI implements ChallengeListener {
 
     /** Method invoked when the user types registra_utente <nickUtente> <password> */
     private void handleRegister(String username, String password) throws Exception {
-        String response = wqInterface.onRegisterUser(username, password);
+        String response = wqInterface.register(username, password);
         if (response == null) {
             System.out.println(Messages.SOMETHING_WENT_WRONG);
         } else {
@@ -183,7 +182,7 @@ public class CLI implements ChallengeListener {
 
     /** Method invoked when the user types login <nickUtente> <password> */
     private void handleLogin(String username, String password) throws Exception {
-        String response = wqInterface.onLogin(username, password);
+        String response = wqInterface.login(username, password);
         if (response == null)
             System.out.println(Messages.SOMETHING_WENT_WRONG);
         else
@@ -192,7 +191,7 @@ public class CLI implements ChallengeListener {
 
     /** Method invoked when the user types logout */
     private void handleLogout() throws Exception {
-        String response = wqInterface.onLogout();
+        String response = wqInterface.logout();
         if (response == null)
             System.out.println(Messages.SOMETHING_WENT_WRONG);
         else
@@ -201,7 +200,7 @@ public class CLI implements ChallengeListener {
 
     /** Method invoked when the user types aggiungi_amico <nickAmico> */
     private void handleAddFriend(String friendUsername) throws Exception {
-        String response = wqInterface.onAddFriend(friendUsername);
+        String response = wqInterface.addFriend(friendUsername);
         if (response == null)
             System.out.println(Messages.SOMETHING_WENT_WRONG);
         else
@@ -210,7 +209,7 @@ public class CLI implements ChallengeListener {
 
     /** Method invoked when the user types mostra_amici */
     private void handleShowFriendList() throws Exception {
-        JSONArray friends = wqInterface.onShowFriendList();
+        JSONArray friends = wqInterface.getFriendList();
         if (friends == null) {
             System.out.println(Messages.SOMETHING_WENT_WRONG);
         } else if (friends.isEmpty()) {
@@ -226,7 +225,7 @@ public class CLI implements ChallengeListener {
      * @return true if the challenge has been accepted, false otherwise
      * */
     private boolean handleSendChallengeRequest(String friendUsername) throws Exception {
-        String result = wqInterface.onSendChallengeRequest(friendUsername);
+        String result = wqInterface.sendChallengeRequest(friendUsername);
         if (result == null) {
             System.out.println(Messages.SOMETHING_WENT_WRONG);
         } else if (result.isEmpty()) {
@@ -243,7 +242,7 @@ public class CLI implements ChallengeListener {
 
     /** Method invoked when the user types mostra_punteggio */
     private void handleShowScore() throws Exception {
-        String response = wqInterface.onShowScore();
+        String response = wqInterface.getScore();
         if (response == null)
             System.out.println(Messages.SOMETHING_WENT_WRONG);
         else
@@ -252,7 +251,7 @@ public class CLI implements ChallengeListener {
 
     /** Method invoked when the user types mostra_classifica */
     private void handleShowLeaderboard() throws Exception {
-        JSONObject leaderboard = wqInterface.onShowLeaderboard();
+        JSONObject leaderboard = wqInterface.getLeaderBoard();
         if (leaderboard == null) {
             System.out.println(Messages.SOMETHING_WENT_WRONG);
         } else {    //print the leaderboard

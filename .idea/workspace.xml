@@ -33,6 +33,7 @@
     <property name="aspect.path.notification.shown" value="true" />
     <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary" value="JUnit5" />
     <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit5" value="" />
+    <property name="extract.method.default.visibility" value="private" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/../../University/Reti di Calcolatori/EserciziLab" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
@@ -71,7 +72,7 @@
       <recent name="com.domenico.communication" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.Run Client (1)">
+  <component name="RunManager" selected="Application.Run Server">
     <configuration name="Run Client (1)" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="com.domenico.client.MainClassWQClient" />
       <module name="WordQuizzle" />
@@ -202,7 +203,7 @@
       <workItem from="1598192869638" duration="9416000" />
       <workItem from="1598281637947" duration="18653000" />
       <workItem from="1598346174837" duration="110187000" />
-      <workItem from="1598689105846" duration="55858000" />
+      <workItem from="1598689105846" duration="68616000" />
     </task>
     <servers />
   </component>
@@ -218,10 +219,10 @@
       <screen x="0" y="0" width="1536" height="864" />
     </state>
     <state x="225" y="88" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1536.864@0.0.1536.864" timestamp="1598478095652" />
-    <state x="575" y="149" key="#com.intellij.ide.util.MemberChooser" timestamp="1598800119418">
+    <state x="575" y="149" key="#com.intellij.ide.util.MemberChooser" timestamp="1598829105234">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state x="575" y="149" key="#com.intellij.ide.util.MemberChooser/0.0.1536.864@0.0.1536.864" timestamp="1598800119418" />
+    <state x="575" y="149" key="#com.intellij.ide.util.MemberChooser/0.0.1536.864@0.0.1536.864" timestamp="1598829105234" />
     <state x="500" y="224" key="#com.intellij.ide.util.TreeClassChooserDialog" timestamp="1593203725516">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
@@ -266,22 +267,22 @@
       <screen x="0" y="0" width="1536" height="864" />
     </state>
     <state x="475" y="175" key="FileChooserDialogImpl/0.0.1536.864@0.0.1536.864" timestamp="1598721559502" />
-    <state width="1493" height="303" key="GridCell.Tab.0.bottom" timestamp="1598803982905">
+    <state width="1493" height="303" key="GridCell.Tab.0.bottom" timestamp="1598833435674">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state width="1493" height="303" key="GridCell.Tab.0.bottom/0.0.1536.864@0.0.1536.864" timestamp="1598803982905" />
-    <state width="1493" height="303" key="GridCell.Tab.0.center" timestamp="1598803982905">
+    <state width="1493" height="303" key="GridCell.Tab.0.bottom/0.0.1536.864@0.0.1536.864" timestamp="1598833435674" />
+    <state width="1493" height="303" key="GridCell.Tab.0.center" timestamp="1598833435674">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state width="1493" height="303" key="GridCell.Tab.0.center/0.0.1536.864@0.0.1536.864" timestamp="1598803982905" />
-    <state width="1493" height="303" key="GridCell.Tab.0.left" timestamp="1598803982905">
+    <state width="1493" height="303" key="GridCell.Tab.0.center/0.0.1536.864@0.0.1536.864" timestamp="1598833435674" />
+    <state width="1493" height="303" key="GridCell.Tab.0.left" timestamp="1598833435674">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state width="1493" height="303" key="GridCell.Tab.0.left/0.0.1536.864@0.0.1536.864" timestamp="1598803982905" />
-    <state width="1493" height="303" key="GridCell.Tab.0.right" timestamp="1598803982905">
+    <state width="1493" height="303" key="GridCell.Tab.0.left/0.0.1536.864@0.0.1536.864" timestamp="1598833435674" />
+    <state width="1493" height="303" key="GridCell.Tab.0.right" timestamp="1598833435674">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state width="1493" height="303" key="GridCell.Tab.0.right/0.0.1536.864@0.0.1536.864" timestamp="1598803982905" />
+    <state width="1493" height="303" key="GridCell.Tab.0.right/0.0.1536.864@0.0.1536.864" timestamp="1598833435674" />
     <state x="250" y="8" key="SettingsEditor" timestamp="1593288766924">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
@@ -294,10 +295,14 @@
       <screen x="0" y="0" width="1536" height="864" />
     </state>
     <state x="541" y="240" key="com.intellij.testIntegration.createTest.CreateTestDialog/0.0.1536.864@0.0.1536.864" timestamp="1598476949715" />
-    <state x="500" y="184" key="extract.method.dialog" timestamp="1592491977058">
+    <state x="321" y="169" width="895" height="627" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2" timestamp="1598833076564">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state x="500" y="184" key="extract.method.dialog/0.0.1536.864@0.0.1536.864" timestamp="1592491977058" />
+    <state x="321" y="169" width="895" height="627" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2/0.0.1536.864@0.0.1536.864" timestamp="1598833076564" />
+    <state x="500" y="184" key="extract.method.dialog" timestamp="1598832493089">
+      <screen x="0" y="0" width="1536" height="864" />
+    </state>
+    <state x="500" y="184" key="extract.method.dialog/0.0.1536.864@0.0.1536.864" timestamp="1598832493089" />
     <state x="477" y="191" key="refactoring.ChangeSignatureDialog" timestamp="1598799761367">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
@@ -318,6 +323,10 @@
           <url>jar://$PROJECT_DIR$/json-simple-1.1.1.jar!/org/json/simple/JSONValue.class</url>
           <option name="timeStamp" value="1" />
         </line-breakpoint>
+        <breakpoint enabled="true" type="java-exception">
+          <properties class="java.lang.OutOfMemoryError" package="java.lang" />
+          <option name="timeStamp" value="2" />
+        </breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>

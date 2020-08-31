@@ -9,7 +9,6 @@ import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.LinkedList;
-import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 public class TCPMultiplexer extends Multiplexer implements Runnable {
@@ -26,7 +25,6 @@ public class TCPMultiplexer extends Multiplexer implements Runnable {
     }
 
     public void sendToServer(ConnectionData connectionData) {
-        CompletableFuture<ConnectionData> future = new CompletableFuture<>();
         synchronized (mutex) {
             sendQueue.push(connectionData);
             wakeUp();

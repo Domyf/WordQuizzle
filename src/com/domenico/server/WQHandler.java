@@ -26,4 +26,6 @@ public interface WQHandler {
     ConnectionData handleLeaderboardRequest(ConnectionData received) throws UsersManagementException;
 
     void handleUserDisconnected(SelectionKey key);
+
+    ConnectionData handleTranslationArrived(ConnectionData received, SelectionKey key);
 }

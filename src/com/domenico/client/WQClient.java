@@ -17,6 +17,8 @@ public class WQClient implements WQInterface {
     private int challengeWords;
     private boolean playing;
     private int wordCounter;
+    private final Object mutex = new Object();
+    private String nextWord;
 
     public WQClient(ChallengeListener listener) throws IOException, NotBoundException {
         this.loggedUserName = null;
@@ -28,7 +30,7 @@ public class WQClient implements WQInterface {
     }
 
     @Override
-    public String onRegisterUser(String username, String password) throws Exception {
+    public String register(String username, String password) throws Exception {
         if (!isLoggedIn()) {
             return rmiClient.register(username, password);
         } else {
@@ -37,7 +39,7 @@ public class WQClient implements WQInterface {
     }
 
     @Override
-    public String onLogin(String username, String password) throws Exception {
+    public String login(String username, String password) throws Exception {
         if (!isLoggedIn()) {
             String result = tcpClient.login(username, password, udpClient.getUDPPort());
             if (result != null && result.isEmpty()) {
@@ -51,7 +53,7 @@ public class WQClient implements WQInterface {
     }
 
     @Override
-    public String onLogout() throws Exception {
+    public String logout() throws Exception {
         if (isLoggedIn()) {
             String result = tcpClient.logout(loggedUserName);
             if (result != null && result.isEmpty()) {
@@ -66,7 +68,7 @@ public class WQClient implements WQInterface {
     }
 
     @Override
-    public String onAddFriend(String friendUsername) throws Exception {
+    public String addFriend(String friendUsername) throws Exception {
         if (isLoggedIn()) {
             return tcpClient.addFriend(loggedUserName, friendUsername);
         } else {
@@ -75,7 +77,7 @@ public class WQClient implements WQInterface {
     }
 
     @Override
-    public JSONArray onShowFriendList() throws Exception {
+    public JSONArray getFriendList() throws Exception {
         if (isLoggedIn()) {
             return tcpClient.friendList(loggedUserName);
         } else {
@@ -84,7 +86,7 @@ public class WQClient implements WQInterface {
     }
 
     @Override
-    public String onShowScore() throws Exception {
+    public String getScore() throws Exception {
         if (isLoggedIn()) {
             return tcpClient.showScore(loggedUserName);
         } else {
@@ -93,7 +95,7 @@ public class WQClient implements WQInterface {
     }
 
     @Override
-    public JSONObject onShowLeaderboard() throws Exception {
+    public JSONObject getLeaderBoard() throws Exception {
         if (isLoggedIn()) {
             return tcpClient.showLeaderboard(loggedUserName);
         } else {
@@ -102,7 +104,7 @@ public class WQClient implements WQInterface {
     }
 
     @Override
-    public String onSendChallengeRequest(String friendUsername) throws Exception {
+    public String sendChallengeRequest(String friendUsername) throws Exception {
         if (isLoggedIn()) {
             return tcpClient.sendChallengeRequest(loggedUserName, friendUsername);
         } else {
@@ -112,36 +114,50 @@ public class WQClient implements WQInterface {
 
     @Override
     public boolean waitChallengeResponse(StringBuffer response) throws Exception {
-        boolean accepted = tcpClient.getChallengeResponse(response);
-        playing = accepted;
-        return accepted;
+        playing = tcpClient.getChallengeResponse(response);
+        return playing;
+    }
+
+    @Override
+    public void sendChallengeResponse(boolean accepted) throws Exception {
+        udpClient.onChallengeResponse(accepted);
+        this.playing = accepted;
     }
 
     @Override
     public String onChallengeStart() throws Exception {
         String[] challengeSettings = new String[2];
-        String nextItWord = tcpClient.onChallengeStart(challengeSettings);
-        if (nextItWord.isEmpty()) return "";
+        String word = tcpClient.onChallengeStart(challengeSettings);
         challengeLengthSec = Integer.parseUnsignedInt(challengeSettings[0]) / 1000;
         challengeWords = Integer.parseUnsignedInt(challengeSettings[1]);
         playing = true;
         wordCounter = 1;
-        return nextItWord;
+        nextWord = null;
+        return word;
     }
 
     @Override
-    public String getNextWord() throws Exception {
-        wordCounter++;
-        return tcpClient.getNextWord();
+    public String giveTranslation(String enWord) throws Exception {
+        tcpClient.sendTranslation(enWord);
+        if (wordCounter == challengeWords)
+            return "";
+        String next;
+        synchronized (mutex) {
+            while (nextWord == null) {
+                mutex.wait();
+            }
+            next = nextWord;
+            nextWord = null;
+            wordCounter++;
+        }
+        return next;
     }
 
     @Override
-    public boolean sendTranslation(String enWord) {
-        return false;
-    }
-
-    @Override
-    public void onExit() {
+    public void exit() {
+        synchronized (mutex) {
+            mutex.notifyAll();
+        }
         this.udpClient.stopProcessing();
         this.tcpClient.exit();
     }
@@ -161,23 +177,35 @@ public class WQClient implements WQInterface {
     @Override
     public int getWordCounter() { return wordCounter; }
 
-    public void onChallengeTimeout() {
+    @Override
+    public void waitChallengeEnd() throws Exception {
+        synchronized (mutex) {
+            while (playing) {
+                mutex.wait();
+            }
+        }
+    }
+
+    public void onChallengeEnd() {
         this.wordCounter = 1;
         this.playing = false;
-        challengeListener.onChallengeTimeout();
+        setNextWord("");
+        challengeListener.onChallengeEnd();
     }
 
     public void onChallengeArrived(String from) {
-        challengeListener.onChallengeArrived(from, this::onChallengeResponse);
-    }
-
-    public void onChallengeResponse(Boolean accepted) {
-        udpClient.onChallengeResponse(accepted);
-        this.playing = accepted;
+        challengeListener.onChallengeArrived(from);
     }
 
     public void onChallengeArrivedTimeout() {
         this.playing = false;
-        challengeListener.onChallengeArrivedTimeout();
+        challengeListener.onChallengeRequestTimeout();
+    }
+
+    public void setNextWord(String nextWord) {
+        synchronized (mutex) {
+            this.nextWord = nextWord;
+            mutex.notify();
+        }
     }
 }

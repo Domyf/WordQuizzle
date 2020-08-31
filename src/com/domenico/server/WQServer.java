@@ -133,7 +133,6 @@ public class WQServer implements WQHandler {
 
     @Override
     public void handleChallengeWordsReady(Challenge challenge, SelectionKey fromKey, SelectionKey toKey) {
-        //TODO handle the readiness of the challenge's words and send the first word to both
         TCPServer.Attachment fromUser = (TCPServer.Attachment) fromKey.attachment();
         TCPServer.Attachment toUser = (TCPServer.Attachment) toKey.attachment();
         String nextItWordFrom = challenge.getNextItWord(fromUser.username);
@@ -172,17 +171,49 @@ public class WQServer implements WQHandler {
         } catch (UsersManagementException ignored) { }
     }
 
-    private void handleChallengeTimeout(SelectionKey ...users) {
+    @Override
+    public synchronized ConnectionData handleTranslationArrived(ConnectionData received, SelectionKey key) {
+        TCPServer.Attachment attachment = (TCPServer.Attachment) key.attachment();
+        Challenge challenge = attachment.challenge;
+        challenge.checkAndGoNext(attachment.username, received.getResponseData());
+        //If the challenge is ended for both
+        if (challenge.isGameEnded()) {
+            SelectionKey otherKey;
+            if (challenge.getFrom().equals(attachment.username))
+                otherKey = mapToKey.get(attachment.challenge.getTo());
+            else
+                otherKey = mapToKey.get(attachment.challenge.getFrom());
+            attachment.challenge = null;
+            ((TCPServer.Attachment) otherKey.attachment()).challenge = null;
+            //Sends to both that the challenge ended
+            tcpServer.sendToClient(ConnectionData.Factory.newChallengeEnd(), otherKey);
+            return ConnectionData.Factory.newChallengeEnd();
+        } else if (!challenge.hasPlayerEnded(attachment.username)) {
+            String nextItWord = attachment.challenge.getNextItWord(attachment.username);
+            return ConnectionData.Factory.newChallengeWord(nextItWord);
+        }
+
+        //The user or both users have ended the challenge
+        return null;
+    }
+
+    private synchronized void handleChallengeTimeout(SelectionKey ...users) {
         TCPServer.Attachment fromUser = (TCPServer.Attachment) users[0].attachment();
         TCPServer.Attachment toUser = (TCPServer.Attachment) users[1].attachment();
         System.out.printf("Challenge ended (%s vs %s)\n", fromUser.username, toUser.username);
         if (fromUser.challenge != null) {
             fromUser.challenge.onChallengeEnded();
-            toUser.challenge = null;
             fromUser.challenge = null;
             tcpServer.sendToClient(ConnectionData.Factory.newChallengeEnd(), users[0]);
-            tcpServer.sendToClient(ConnectionData.Factory.newChallengeEnd(), users[1]);
+        } else {
+            System.out.println("from user null");
         }
-        //TODO shouldn't it be synchronized?!
+        if (toUser.challenge != null) {
+            toUser.challenge.onChallengeEnded();
+            toUser.challenge = null;
+            tcpServer.sendToClient(ConnectionData.Factory.newChallengeEnd(), users[1]);
+        } else {
+            System.out.println("to user null");
+        }
     }
 }
