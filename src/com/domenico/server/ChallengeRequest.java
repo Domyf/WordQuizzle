@@ -38,9 +38,9 @@ public class ChallengeRequest implements Runnable {
             //If the challenge is accepted, get random italian words and their english translations
             List<String> itWords = new ArrayList<>(Settings.CHALLENGE_WORDS);
             Utils.randomSubList(words, Settings.CHALLENGE_WORDS, itWords);
-            List<String> enWords = Arrays.asList(Translations.translate(itWords));
-            for (String translation : enWords) {
-                System.out.print(translation);
+            List<String> enWords = new ArrayList<>(Arrays.asList(Translations.translate(itWords)));
+            for (String en : enWords) {
+                System.out.printf("%s ,", en);
             }
             System.out.println();
             challenge.setWords(itWords, enWords);

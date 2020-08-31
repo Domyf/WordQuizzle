@@ -24,6 +24,10 @@ public class Challenge {
     private int toIndex;
     private int fromPoints;
     private int toPoints;
+    private int fromRight;
+    private int toRight;
+    private int fromWrong;
+    private int toWrong;
     private TimerTask timer;
 
     public Challenge(String from, String to) {
@@ -92,20 +96,33 @@ public class Challenge {
     }
 
     public void checkAndGoNext(String username, String enWord) {
-        String rightEnWord = null;
+        boolean isRight;
+        String rightEnWord;
         if (username.equals(from)) {
-            rightEnWord = itWords.get(fromIndex);
+            rightEnWord = enWords.get(fromIndex);
             fromIndex++;
+            isRight = rightEnWord != null && rightEnWord.equalsIgnoreCase(enWord);
+            if (isRight)
+                fromRight++;
+            else
+                fromWrong++;
         } else if (username.equals(to)) {
-            rightEnWord = itWords.get(toIndex);
+            rightEnWord = enWords.get(toIndex);
+            isRight = rightEnWord != null && rightEnWord.equalsIgnoreCase(enWord);
             toIndex++;
+            if (isRight)
+                toRight++;
+            else
+                toWrong++;
+        } else {
+            return;
         }
 
-        boolean isRight = rightEnWord != null && rightEnWord.equalsIgnoreCase(enWord);
         if (isRight)
             addPoints(username, Settings.POINTS_RIGHT_TRANSLATION);
         else
             subtractPoints(username, Settings.POINTS_ERROR_PENALTY);
+
         if (hasPlayerEnded(from) && hasPlayerEnded(to))
             onChallengeEnded();
     }
@@ -121,6 +138,42 @@ public class Challenge {
 
     public boolean isGameEnded() {
         return ended || (hasPlayerEnded(from) && hasPlayerEnded(to));
+    }
+
+    public int getPoints(String username) {
+        if (username.equals(from)) {
+            return fromPoints;
+        } else if (username.equals(to)) {
+            return toPoints;
+        }
+        return 0;
+    }
+
+    public int getOtherPoints(String username) {
+        if (username.equals(from)) {
+            return toPoints;
+        } else if (username.equals(to)) {
+            return fromPoints;
+        }
+        return 0;
+    }
+
+    public int getRightCounter(String username) {
+        if (username.equals(from)) {
+            return fromRight;
+        } else if (username.equals(to)) {
+            return toRight;
+        }
+        return 0;
+    }
+
+    public int getWrongCounter(String username) {
+        if (username.equals(from)) {
+            return fromWrong;
+        } else if (username.equals(to)) {
+            return toWrong;
+        }
+        return 0;
     }
 
     private void addPoints(String username, int amount) {

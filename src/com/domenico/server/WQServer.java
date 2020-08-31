@@ -184,12 +184,14 @@ public class WQServer implements WQHandler {
                 otherKey = mapToKey.get(thisAttch.challenge.getTo());
             else
                 otherKey = mapToKey.get(thisAttch.challenge.getFrom());
-            thisAttch.challenge.cancelTimer();
-            handleChallengeEnd(key, otherKey);
+            challenge.cancelTimer();
+            TCPServer.Attachment otherAttach = (TCPServer.Attachment) otherKey.attachment();
+            handleChallengeEnd(thisAttch, otherAttach);
+
             //Sends to the other that the challenge ended
-            tcpServer.sendToClient(ConnectionData.Factory.newChallengeEnd(), otherKey);
+            tcpServer.sendToClient(getChallengeEndByUsername(otherAttach.username, challenge), otherKey);
             //Sends to this player that the challenge ended
-            return ConnectionData.Factory.newChallengeEnd();
+            return getChallengeEndByUsername(thisAttch.username, challenge);
         } else if (!challenge.hasPlayerEnded(thisAttch.username)) { //If this was not the last word then sends the next one
             String nextItWord = thisAttch.challenge.getNextItWord(thisAttch.username);
             //Sends the next word
@@ -201,9 +203,7 @@ public class WQServer implements WQHandler {
         return null;
     }
 
-    private void handleChallengeEnd(SelectionKey key, SelectionKey otherKey) {
-        TCPServer.Attachment first = (TCPServer.Attachment) key.attachment();
-        TCPServer.Attachment second = (TCPServer.Attachment) otherKey.attachment();
+    private void handleChallengeEnd(TCPServer.Attachment first, TCPServer.Attachment second) {
         System.out.printf("Challenge ended (%s vs %s)\n", first.username, second.username);
         if (first.challenge != null && second.challenge != null) {
             first.challenge.onChallengeEnded(); //first.challenge == second.challenge
@@ -214,8 +214,22 @@ public class WQServer implements WQHandler {
 
     //Just small work because it is called by a timer
     private synchronized void handleChallengeTimeout(SelectionKey ...users) {
-        handleChallengeEnd(users[0], users[1]);
-        tcpServer.sendToClient(ConnectionData.Factory.newChallengeEnd(), users[0]);
-        tcpServer.sendToClient(ConnectionData.Factory.newChallengeEnd(), users[1]);
+        TCPServer.Attachment first = (TCPServer.Attachment) users[0].attachment();
+        TCPServer.Attachment second = (TCPServer.Attachment) users[1].attachment();
+        Challenge challenge = first.challenge; //first.challenge == second.challenge
+        handleChallengeEnd(first, second);
+        tcpServer.sendToClient(getChallengeEndByUsername(first.username, challenge), users[0]);
+        tcpServer.sendToClient(getChallengeEndByUsername(second.username, challenge), users[1]);
+    }
+
+    private synchronized ConnectionData getChallengeEndByUsername(String username, Challenge challenge) {
+        int correct = challenge.getRightCounter(username);
+        int wrong = challenge.getWrongCounter(username);
+        int notransl = Settings.CHALLENGE_WORDS - (correct + wrong);
+        int yourscore = challenge.getPoints(username);
+        int otherscore = challenge.getOtherPoints(username);
+        int extrapoints = yourscore > otherscore ? Settings.EXTRA_POINTS : 0;
+
+        return ConnectionData.Factory.newChallengeEnd(correct, wrong, notransl, yourscore, otherscore, extrapoints);
     }
 }

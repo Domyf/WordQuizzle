@@ -39,6 +39,14 @@ public class Utils {
      * @return a string that contains all the elements of the array. Each element is separated by the given divider
      */
     public static String stringify(Object[] objects, String divider) {
+        return stringify(divider, objects);
+    }
+
+    /**
+     * Same implementation of {@link #stringify(Object[], String)} but with an array of objects.
+     * Look at {@link #stringify(Object[], String)} documentation for information about this method.
+     */
+    public static String stringify(String divider, Object ...objects) {
         StringBuilder builder = new StringBuilder();
         int i = 0;
         for (; i < objects.length-1; i++) {

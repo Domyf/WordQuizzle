@@ -48,9 +48,20 @@ public class CLI implements ChallengeListener {
     }
 
     @Override
-    public void onChallengeEnd() {
+    public void onChallengeEnd(int correct, int wrong, int notransl, int yourscore, int otherscore, int extrapoints) {
         System.out.println("\rSfida terminata");
-        System.out.println("Adesso scriverò le statistiche appena gestisco la fine della sfida lato server");
+        System.out.printf("Hai tradotto correttamente %d parole, ne hai sbagliate %d e non risposto a %d.\n",
+                correct, wrong, notransl);
+        System.out.printf("Hai totalizzato %d punti.\n", yourscore);
+        System.out.printf("Il tuo avversario ha totalizzato %d punti.\n", otherscore);
+        if (yourscore > otherscore) {   //WINNER
+            System.out.printf("Congratulazioni hai vinto! Hai guadagnato %d punti extra, per un totale di %d punti!\n",
+                    extrapoints, (yourscore + extrapoints));
+        } else if (yourscore == otherscore) {   //NO ONE WON
+            System.out.println("Una partita avvincente ma terminata in pareggio!");
+        } else {    //LOSER
+            System.out.println("Peccato, hai perso!");
+        }
         System.out.print(COMMAND_LINE_START);
     }
 

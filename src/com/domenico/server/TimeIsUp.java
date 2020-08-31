@@ -8,6 +8,7 @@ import java.util.function.Function;
 //TODO this doc
 public class TimeIsUp<T> extends TimerTask {
 
+    private static final Timer timer = new Timer();
     private final Consumer<T[]> function;
     private final T[] args;
 
@@ -18,7 +19,6 @@ public class TimeIsUp<T> extends TimerTask {
 
     @SafeVarargs
     public static <T> TimerTask schedule(Consumer<T[]> function, long delay, final T ...args) {
-        Timer timer = new Timer();
         TimerTask timerTask = new TimeIsUp<>(function, args);
         timer.schedule(timerTask, delay);
         return timerTask;

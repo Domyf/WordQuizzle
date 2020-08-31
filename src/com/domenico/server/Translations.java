@@ -4,13 +4,16 @@ import java.io.*;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.StringTokenizer;
+import java.util.regex.Pattern;
 
 //TODO fare doc
 public class Translations {
 
     private final static int START_LEN = 34;
     private final static int BUF_LEN = 32;
-    private final static String WORD_DIVIDER = ".%20";
+    private final static String WORD_DIVIDER = "\\. ";
+    private final static String WORD_DIVIDER_HTTP = ".%20";
 
     public static String[] translate(List<String> itWords) {
         if (itWords == null || itWords.isEmpty())
@@ -19,7 +22,7 @@ public class Translations {
         StringBuilder words = new StringBuilder();
         int i = 0;
         for (; i < itWords.size()-1; i++) {
-            words.append(itWords.get(i)).append(WORD_DIVIDER);
+            words.append(itWords.get(i)).append(WORD_DIVIDER_HTTP);
         }
         if (i < itWords.size()) {
             words.append(itWords.get(itWords.size() - 1));
@@ -30,6 +33,7 @@ public class Translations {
             URL url = new URL("https://api.mymemory.translated.net/get?q="+words+"&langpair=it|en");
             result = getTranslationsFromURL(url);
         } catch (IOException ignored) { }
+        System.out.println("result: "+result);
 
         return result.split(WORD_DIVIDER);
     }

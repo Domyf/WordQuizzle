@@ -20,6 +20,6 @@ public interface ChallengeListener {
     /**
      * Invoked during a challenge when it times out for example after 60 seconds
      */
-    void onChallengeEnd();
+    void onChallengeEnd(int correct, int wrong, int notransl, int yourscore, int otherscore, int extrapoints);
 
 }

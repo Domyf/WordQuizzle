@@ -60,9 +60,8 @@ public class ConnectionData {
 
     public String getResponseData() { return responseData; }
 
-    public String[] splitResponseData() {
-        return responseData.split(RESPONSE_DATA_DIVIDER);
-    }
+    /** Splits the response data into an array. Used when the message is that kind of custom messages */
+    public String[] splitResponseData() { return responseData.split(RESPONSE_DATA_DIVIDER); }
 
     /**
      * Transforms this into a string. The returned string has the following pattern: <command> <parameter1> <parameter2> ...
@@ -121,10 +120,12 @@ public class ConnectionData {
                         break;
                     case CHALLENGE_START:
                         if (params.length == 1)
-                            return newCustomFromData(CMD.CHALLENGE_START, params[0]);
+                            return newChallengeStart(params[0]);
                         break;
                     case CHALLENGE_END:
-                        return newChallengeEnd();
+                        if (params.length == 1)
+                            return newChallengeEnd(params[0]);
+                        break;
                     case CHALLENGE_WORD:
                         if (params.length >= 1) {
                             String word = params.length == 1 ? params[0] : Utils.stringify(params, " ");
@@ -218,12 +219,41 @@ public class ConnectionData {
         }
 
         /**
-         * Builds a ConnectionData object that represents an challenge end response
+         * Builds a ConnectionData object that represents a challenge start response
+         *
+         * @return a ConnectionData object that represents a challenge start response
+         */
+        public static ConnectionData newChallengeStart(long maxChallengeLength, int challengeWords, String nextItWord) {
+            String data = Utils.stringify(RESPONSE_DATA_DIVIDER, maxChallengeLength, challengeWords, nextItWord);
+            return newCustomFromData(CMD.CHALLENGE_START, data);
+        }
+
+        /**
+         * Builds a ConnectionData object that represents a challenge start response
+         *
+         * @return a ConnectionData object that represents a challenge start response
+         */
+        public static ConnectionData newChallengeStart(String data) {
+            return newCustomFromData(CMD.CHALLENGE_START, data);
+        }
+
+        /**
+         * Builds a ConnectionData object that represents a challenge end response
          *
          * @return a ConnectionData object that represents a challenge end response
          */
-        public static ConnectionData newChallengeEnd() {
-            return new ConnectionData(CMD.CHALLENGE_END, new String[]{});
+        public static ConnectionData newChallengeEnd(int correct, int wrong, int notransl, int yourscore, int otherscore, int extrapoints) {
+            String data = Utils.stringify(RESPONSE_DATA_DIVIDER, correct, wrong, notransl, yourscore, otherscore, extrapoints);
+            return newCustomFromData(CMD.CHALLENGE_END, data);
+        }
+
+        /**
+         * Builds a ConnectionData object that represents a challenge end response
+         *
+         * @return a ConnectionData object that represents a challenge end response
+         */
+        public static ConnectionData newChallengeEnd(String data) {
+            return newCustomFromData(CMD.CHALLENGE_END, data);
         }
 
         /**
@@ -303,12 +333,11 @@ public class ConnectionData {
             return new ConnectionData(CMD.FAIL_RESPONSE, new String[]{});
         }
 
-        //TODO this doc
-        public static ConnectionData newChallengeStart(long maxChallengeLength, int challengeWords, String nextItWord) {
-            String data = maxChallengeLength+RESPONSE_DATA_DIVIDER+challengeWords+RESPONSE_DATA_DIVIDER+nextItWord;
-            return newCustomFromData(CMD.CHALLENGE_START, data);
-        }
-
+        /**
+         * Builds a custom ConnectionData object with the given CMD field and given response data.
+         *
+         * @return a ConnectionData object that represents a custom message with a custom response data
+         */
         private static ConnectionData newCustomFromData(CMD cmd, String data) {
             ConnectionData connectionData = new ConnectionData(cmd, new String[]{data});
             connectionData.responseData = data;
@@ -412,7 +441,16 @@ public class ConnectionData {
             return hasSameCMD(CMD.CHALLENGE_WORD, data.cmd) && notNull(data.responseData);
         }
 
-        //TODO this doc
+        /**
+         * Checks if the given data represents a valid challenge start data, which means it has the right CMD and
+         * a custom response data that contains how much long can this challenge run, how many words this challenge
+         * will have and the first word.
+         * The return value is true if the given data is a valid challenge start data, false otherwise.
+         *
+         * @param data the data that should be evaluated
+         * @return true if the data has the challenge data's cmd and contains how much long can this challenge run,
+         * how many words this challenge will have and the first word, false otherwise.
+         */
         public static boolean isChallengeStart(ConnectionData data) {
             return hasSameCMD(CMD.CHALLENGE_START, data.cmd) && notNull(data.responseData)
                     && data.responseData.indexOf(RESPONSE_DATA_DIVIDER) != data.responseData.lastIndexOf(RESPONSE_DATA_DIVIDER);

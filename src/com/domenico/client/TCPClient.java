@@ -28,7 +28,14 @@ public class TCPClient {
         if (ConnectionData.Validator.isChallengeWord(received)) {
             wqClient.setNextWord(received.getResponseData());
         } else if (ConnectionData.Validator.isChallengeEnd(received)) {
-            wqClient.onChallengeEnd();
+            String[] splitted = received.splitResponseData();
+            int correct = Integer.parseUnsignedInt(splitted[0]);
+            int wrong = Integer.parseUnsignedInt(splitted[1]);
+            int notransl = Integer.parseUnsignedInt(splitted[2]);
+            int yourscore = Integer.parseInt(splitted[3]);
+            int otherscore = Integer.parseInt(splitted[4]);
+            int extrapoints = Integer.parseUnsignedInt(splitted[5]);
+            wqClient.onChallengeEnd(correct, wrong, notransl, yourscore, otherscore, extrapoints);
         } else {
             synchronized (mutex) {
                 this.received = received;

@@ -186,11 +186,11 @@ public class WQClient implements WQInterface {
         }
     }
 
-    public void onChallengeEnd() {
+    public void onChallengeEnd(int correct, int wrong, int notransl, int yourscore, int otherscore, int extrapoints) {
         this.wordCounter = 1;
         this.playing = false;
         setNextWord("");
-        challengeListener.onChallengeEnd();
+        challengeListener.onChallengeEnd(correct, wrong, notransl, yourscore, otherscore, extrapoints);
     }
 
     public void onChallengeArrived(String from) {
