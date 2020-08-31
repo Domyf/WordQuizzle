@@ -209,8 +209,8 @@ public class WQServer implements WQHandler {
         if (first.challenge != null && second.challenge != null) {
             first.challenge.onChallengeEnded(); //first.challenge == second.challenge
             try {
-                usersManagement.addScore(first.username, challenge.getPoints(first.username));
-                usersManagement.addScore(second.username, challenge.getPoints(second.username));
+                usersManagement.addScore(first.username, challenge.getFinalPoints(first.username));
+                usersManagement.addScore(second.username, challenge.getFinalPoints(second.username));
             } catch (UsersManagementException ignored) {}
             first.challenge = null;
             second.challenge = null;

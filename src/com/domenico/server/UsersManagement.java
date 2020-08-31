@@ -79,6 +79,7 @@ public class UsersManagement {
         UserData userData = serverData.get(username);
         if (userData == null)
             throw new UsersManagementException("Username non valida");
+
         userData.addScore(newScore);
         Persistence.saveOnDisk(serverData);
     }

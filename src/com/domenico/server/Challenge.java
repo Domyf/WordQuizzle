@@ -1,6 +1,7 @@
 package com.domenico.server;
 
 import java.util.List;
+import java.util.Set;
 import java.util.TimerTask;
 
 //TODO this doc
@@ -102,26 +103,27 @@ public class Challenge {
             rightEnWord = enWords.get(fromIndex);
             fromIndex++;
             isRight = rightEnWord != null && rightEnWord.equalsIgnoreCase(enWord);
-            if (isRight)
+            if (isRight) {
                 fromRight++;
-            else
+                fromPoints += Settings.POINTS_RIGHT_TRANSLATION;
+            } else {
                 fromWrong++;
+                fromPoints -= Settings.POINTS_ERROR_PENALTY;
+            }
         } else if (username.equals(to)) {
             rightEnWord = enWords.get(toIndex);
             isRight = rightEnWord != null && rightEnWord.equalsIgnoreCase(enWord);
             toIndex++;
-            if (isRight)
+            if (isRight) {
                 toRight++;
-            else
+                toPoints += Settings.POINTS_RIGHT_TRANSLATION;
+            } else {
                 toWrong++;
+                toPoints -= Settings.POINTS_ERROR_PENALTY;
+            }
         } else {
             return;
         }
-
-        if (isRight)
-            addPoints(username, Settings.POINTS_RIGHT_TRANSLATION);
-        else
-            subtractPoints(username, Settings.POINTS_ERROR_PENALTY);
 
         if (hasPlayerEnded(from) && hasPlayerEnded(to))
             onChallengeEnded();
@@ -156,6 +158,12 @@ public class Challenge {
             return fromPoints;
         }
         return 0;
+    }
+
+    public int getFinalPoints(String username) {
+        int points = getPoints(username);
+        if (hasWon(username)) points += Settings.EXTRA_POINTS;
+        return points;
     }
 
     public int getRightCounter(String username) {
@@ -195,10 +203,14 @@ public class Challenge {
     public void onChallengeEnded() {
         if (this.ended) return;
         this.ended = true;
-        if (fromPoints > toPoints)
-            addPoints(from, Settings.EXTRA_POINTS);
-        else if (toPoints > fromPoints)
-            addPoints(to, Settings.EXTRA_POINTS);
+    }
+
+    public boolean hasWon(String username) {
+        if (username.equals(from))
+            return fromPoints > toPoints;
+        else if (username.equals(to))
+            return toPoints > fromPoints;
+        return false;
     }
 
     public void setTimer(TimerTask timer) {
