@@ -3,6 +3,8 @@ package com.domenico.client;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import java.util.LinkedHashMap;
+
 public interface WQInterface {
 
     String register(String username, String password) throws Exception;
@@ -27,7 +29,7 @@ public interface WQInterface {
 
     String getScore() throws Exception;
 
-    JSONObject getLeaderBoard() throws Exception;
+    LinkedHashMap<String, Integer> getLeaderBoard() throws Exception;
 
     /**
      * @return true if the client's user is logged in, false otherwise

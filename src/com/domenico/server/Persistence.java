@@ -13,8 +13,9 @@ public class Persistence {
     private final static File dataFile = new File(pathname);
 
     /**
-     * Rende i dati sul disco persistenti. La scrittura reale è bufferizzata quindi verrà svolta quando il buffer è pieno
-     * altrimenti in fase di chiusura del programma.
+     * Saves the server's data into a local file
+     *
+     * @param serverData server's data
      */
     public static void saveOnDisk(Map serverData) {
         //Scrivo sul file in maniera efficiente perchè prima bufferizzo il tutto e poi scrivo effettivamente
@@ -24,6 +25,12 @@ public class Persistence {
         } catch (Exception ignored) {}
     }
 
+    /**
+     * Reads the server's data from the local file. This method creates the file if it doesn't exist
+     *
+     * @return the server's data read
+     * @throws IOException if an error occurs while reading from file
+     */
     public static Map<String, UserData> readFromDisk() throws IOException {
         Map<String, UserData> data = new HashMap<>();
         //Leggo dal file se esiste già oppure se la creazione avviene con successo
@@ -38,9 +45,7 @@ public class Persistence {
                     data.put((String) key, userData);
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        } catch (Exception e) { throw new IOException(e); }
 
         return data;
     }

@@ -4,6 +4,8 @@ import com.domenico.shared.Utils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 public class CLI implements ChallengeListener {
@@ -262,8 +264,13 @@ public class CLI implements ChallengeListener {
     }
 
     /** Method invoked when the user types mostra_classifica */
-    private void handleShowLeaderboard() throws Exception {
-        JSONObject leaderboard = wqInterface.getLeaderBoard();
+    private void handleShowLeaderboard() {
+        Map<String, Integer> leaderboard = null;
+        try {
+            leaderboard = wqInterface.getLeaderBoard();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         if (leaderboard == null) {
             System.out.println(Messages.SOMETHING_WENT_WRONG);
         } else {    //print the leaderboard
@@ -271,10 +278,10 @@ public class CLI implements ChallengeListener {
             if (!leaderboard.isEmpty()) {   //print header
                 System.out.printf(" %" + left_space + "s%10s%7s%s\n", "", "Utente", "", "Punteggio");
                 int pos = 1;
-                for (Object key : leaderboard.keySet()) {
-                    String points = leaderboard.get(key).toString();
+                for (Map.Entry<String, Integer> user : leaderboard.entrySet()) {
+                    String points = user.getValue().toString();
                     System.out.printf("#%-" + left_space + "d", pos);   //print position
-                    System.out.print(Utils.getCenteredString((String) key, 15));    //print username
+                    System.out.print(Utils.getCenteredString(user.getKey(), 15));    //print username
                     System.out.println(Utils.getCenteredString(points, 14));    //print points and then new line
                     pos++;
                 }

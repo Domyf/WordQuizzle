@@ -107,10 +107,10 @@ public class UsersManagement {
         UserData userData = serverData.get(username);
         if (userData == null)
             throw new UsersManagementException("Username non valida");
-        List<String> friends = userData.getFriends();
+
         JSONObject obj = new JSONObject();
         obj.put(username, userData.getScore());
-        for (String friend:friends) {
+        for (String friend:userData.getFriends()) {
             obj.put(friend, serverData.get(friend).getScore());
         }
         return obj;

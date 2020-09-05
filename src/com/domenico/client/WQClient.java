@@ -6,6 +6,10 @@ import org.json.simple.JSONObject;
 
 import java.io.IOException;
 import java.rmi.NotBoundException;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 public class WQClient implements WQInterface {
 
@@ -99,9 +103,19 @@ public class WQClient implements WQInterface {
     }
 
     @Override
-    public JSONObject getLeaderBoard() throws Exception {
+    public LinkedHashMap<String, Integer> getLeaderBoard() throws Exception {
         if (isLoggedIn()) {
-            return tcpClient.showLeaderboard(loggedUserName);
+            JSONObject leaderboard = tcpClient.showLeaderboard(loggedUserName);
+            //sort the leaderboard
+            List<Map.Entry<String, Long>> list = new ArrayList<>(leaderboard.entrySet());
+            list.sort(Map.Entry.comparingByValue());
+            //create a new (sorted) linked hash map
+            LinkedHashMap<String, Integer> sortedLeaderboard = new LinkedHashMap<>();
+            for (int i = list.size() - 1; i >= 0; i--) {
+                Map.Entry<String, Long> entry = list.get(i);
+                sortedLeaderboard.put(entry.getKey(), entry.getValue().intValue());
+            }
+            return sortedLeaderboard;
         } else {
             return null;
         }
