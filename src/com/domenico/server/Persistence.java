@@ -17,17 +17,11 @@ public class Persistence {
      * altrimenti in fase di chiusura del programma.
      */
     public static void saveOnDisk(Map serverData) {
-        /*TODO rimuovere le frasi seguenti
-        The point of BufferedWriter is basically to consolidate lots of little writes into far fewer big writes,
-        as that's usually more efficient (but more of a pain to code for). You shouldn't need to do anything special
-        to get it to work properly though, other than making sure you flush it when you're finished with it
-        - and calling close() will do this and flush/close the underlying writer anyway.
-         */
+        //Scrivo sul file in maniera efficiente perchè prima bufferizzo il tutto e poi scrivo effettivamente
+        //grandi blocchi di bytes
         try (Writer writer = new BufferedWriter(new FileWriter(dataFile, false))) {
-            //Scrivo sul file in maniera efficiente perchè prima bufferizzo il tutto e poi scrivo effettivamente
-            //grandi blocchi di bytes
             JSONValue.writeJSONString(serverData, writer);
-        } catch (Exception e) {}
+        } catch (Exception ignored) {}
     }
 
     public static Map<String, UserData> readFromDisk() throws IOException {

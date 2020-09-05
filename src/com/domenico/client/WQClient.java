@@ -1,5 +1,6 @@
 package com.domenico.client;
 
+import com.domenico.shared.Utils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -8,6 +9,7 @@ import java.rmi.NotBoundException;
 
 public class WQClient implements WQInterface {
 
+    private static final String ENCRYPTION_ALGORITHM = "SHA-256";   //the algorithm used to encrypt the user's password
     private final RMIClient rmiClient;
     private final TCPClient tcpClient;
     private final UDPClient udpClient;
@@ -32,7 +34,8 @@ public class WQClient implements WQInterface {
     @Override
     public String register(String username, String password) throws Exception {
         if (!isLoggedIn()) {
-            return rmiClient.register(username, password);
+            String encyptedPassword = Utils.encrypt(password, ENCRYPTION_ALGORITHM);
+            return rmiClient.register(username, encyptedPassword);
         } else {
             return Messages.LOGOUT_NEEDED;
         }
@@ -41,7 +44,8 @@ public class WQClient implements WQInterface {
     @Override
     public String login(String username, String password) throws Exception {
         if (!isLoggedIn()) {
-            String result = tcpClient.login(username, password, udpClient.getUDPPort());
+            String encyptedPassword = Utils.encrypt(password, ENCRYPTION_ALGORITHM);
+            String result = tcpClient.login(username, encyptedPassword, udpClient.getUDPPort());
             if (result != null && result.isEmpty()) {
                 loggedUserName = username;
                 return Messages.LOGIN_SUCCESS;

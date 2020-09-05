@@ -1,12 +1,20 @@
 package com.domenico.server;
 
+import com.domenico.shared.Utils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONStreamAware;
 
+import javax.xml.datatype.DatatypeFactory;
 import java.io.IOException;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.Provider;
+import java.security.Security;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 public class UserData implements JSONStreamAware {
@@ -14,6 +22,7 @@ public class UserData implements JSONStreamAware {
     private final static String JSON_PASSWORD = "password";
     private final static String JSON_FRIENDS = "friends";
     private final static String JSON_SCORE = "score";
+    private final static String ENCRYPTION_ALGORITHM = "SHA-256";
 
     private final String password;
     private List<String> friends;
