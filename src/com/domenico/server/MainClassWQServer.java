@@ -20,6 +20,7 @@ public class MainClassWQServer {
         }
     }
 
+    /** Loads from the local file all the italian words */
     private static List<String> loadItalianWords() throws IOException {
         ArrayList<String> words = new ArrayList<>();
         //file downloaded from https://github.com/napolux/paroleitaliane/tree/master/paroleitaliane

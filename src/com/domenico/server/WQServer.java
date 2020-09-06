@@ -113,11 +113,11 @@ public class WQServer implements WQHandler {
         TCPServer.Attachment fromUser = (TCPServer.Attachment) fromKey.attachment();
         TCPServer.Attachment toUser = (TCPServer.Attachment) toKey.attachment();
         ConnectionData response;
-        if (challenge.isTimedOut()) {
+        if (challenge.isRequestTimedOut()) {
             response = ConnectionData.Factory.newFailResponse("Tempo scaduto");
             //notify via udp who was challenged
             udpServer.challengeTimedout(challenge, toUser.address);
-        } else if (challenge.isAccepted()) {
+        } else if (challenge.isRequestAccepted()) {
             response = ConnectionData.Factory.newSuccessResponse(challenge.getTo() + " ha accettato la sfida");
         } else {
             response = ConnectionData.Factory.newFailResponse(challenge.getTo() + " ha rifiutato la sfida");
@@ -125,7 +125,7 @@ public class WQServer implements WQHandler {
         //notify via tcp who has sent the challenge
         tcpServer.sendToClient(response, fromKey);
         //Remove the challenge if it has not been accepted or it has timedout
-        if (!challenge.isAccepted()) {
+        if (!challenge.isRequestAccepted()) {
             toUser.challenge = null;
             fromUser.challenge = null;
         }

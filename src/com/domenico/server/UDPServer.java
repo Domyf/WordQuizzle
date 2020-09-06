@@ -67,7 +67,7 @@ public class UDPServer extends Multiplexer implements Runnable {
         //Sends a new challenge request or sends that the challenge timed out
         if (forward != null) {
             ConnectionData data;
-            if (forward.challenge.isTimedOut()) {
+            if (forward.challenge.isRequestTimedOut()) {
                 mapAddress.remove(forward.toAddress, forward.challenge);
                 data = ConnectionData.Factory.newFailResponse("Tempo scaduto"); //TODO change into ChallengeTimeout
             } else {
@@ -90,7 +90,7 @@ public class UDPServer extends Multiplexer implements Runnable {
         ConnectionData response = udpConnection.receiveData();
         InetSocketAddress address = (InetSocketAddress) udpConnection.getAddress();
         Challenge challenge = mapAddress.remove(address);
-        challenge.setAccepted(ConnectionData.Validator.isSuccessResponse(response));
+        challenge.setRequestAccepted(ConnectionData.Validator.isSuccessResponse(response));
     }
 
     @Override

@@ -7,7 +7,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-//TODO this doc
+/** Runnable that forwards a challenge request from the user A to the user B via UDP. After forwarding the request,
+ * it waits for a response or the challenge timeout. If the challenge has been accepted by the challenged user, then
+ * it gets random italian words and each translation. */
 public class ChallengeRequest implements Runnable {
 
     private final UDPServer udpServer;
@@ -29,17 +31,24 @@ public class ChallengeRequest implements Runnable {
         TCPServer.Attachment toUserAttachment = (TCPServer.Attachment) toKey.attachment();
         Challenge challenge = toUserAttachment.challenge;
         System.out.println("Forwarding challenge request from " + challenge.getFrom() + " to " + challenge.getTo());
+        //forward the challenge via udp
         udpServer.forwardChallenge(challenge, toUserAttachment.address);
         try {
+            //wait the challenge response or timeout
             challenge.waitResponseOrTimeout(Settings.MAX_WAITING_TIME);
         } catch (InterruptedException e) { return; }
+        //handle the response or the timeout
         handler.handleChallengeResponse(challenge, fromKey, toKey);
-        if (challenge.isAccepted()) {
-            //If the challenge is accepted, get random italian words and their english translations
+        //if the challenge is accepted, get random italian words and their english translations
+        if (challenge.isRequestAccepted()) {
+            //get random italian words
             List<String> itWords = new ArrayList<>(Settings.CHALLENGE_WORDS);
             Utils.randomSubList(words, Settings.CHALLENGE_WORDS, itWords);
+            //get the english translations
             List<String> enWords = new ArrayList<>(Arrays.asList(Translations.translate(itWords)));
+            //print the selected words
             printSelectedWords(itWords, enWords);
+            //update the challenge and notify that the words are ready
             challenge.setWords(itWords, enWords);
             handler.handleChallengeWordsReady(challenge, fromKey, toKey);
         }
