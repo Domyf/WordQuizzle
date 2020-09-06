@@ -4,10 +4,9 @@ import java.io.*;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.StringTokenizer;
-import java.util.regex.Pattern;
 
-//TODO fare doc
+/** Class with all the functionalities to get the translations from the MyMemory API. It is optimized to get
+ * N translations in just one HTTP GET request. */
 public class Translations {
 
     private final static int START_LEN = 34;
@@ -33,7 +32,6 @@ public class Translations {
             URL url = new URL("https://api.mymemory.translated.net/get?q="+words+"&langpair=it|en");
             result = getTranslationsFromURL(url);
         } catch (IOException ignored) { }
-        System.out.println("result: "+result);
 
         return result.split(WORD_DIVIDER);
     }

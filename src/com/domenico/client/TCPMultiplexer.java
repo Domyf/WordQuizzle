@@ -11,19 +11,24 @@ import java.nio.channels.SocketChannel;
 import java.util.LinkedList;
 import java.util.function.Consumer;
 
+/** Runnable that handles all the TCP communications. When a message arrives, calls the message handler which will think
+ * about handling the message while this class can continue its work. It is possibile so send a message to the server.
+ * In that case, the messages that should be sent are put in a queue and sent to the server in the same order the
+ * client asked to this class to send the messages. */
 public class TCPMultiplexer extends Multiplexer implements Runnable {
 
     private final TCPConnection tcpConnection;
-    private final Consumer<ConnectionData> listener;
+    private final Consumer<ConnectionData> handler;
     private final Object mutex = new Object();
     private final LinkedList<ConnectionData> sendQueue = new LinkedList<>();
 
-    public TCPMultiplexer(SocketChannel channel, Consumer<ConnectionData> listener) throws IOException {
+    public TCPMultiplexer(SocketChannel channel, Consumer<ConnectionData> handler) throws IOException {
         super(channel, SelectionKey.OP_READ);
         this.tcpConnection = new TCPConnection(channel);
-        this.listener = listener;
+        this.handler = handler;
     }
 
+    /** Sends the given message to the server */
     public void sendToServer(ConnectionData connectionData) {
         synchronized (mutex) {
             sendQueue.push(connectionData);
@@ -32,14 +37,12 @@ public class TCPMultiplexer extends Multiplexer implements Runnable {
     }
 
     @Override
-    public void run() {
-        this.startProcessing();
-    }
+    public void run() { this.startProcessing(); }
 
     @Override
     protected void onReadable(SelectionKey key) throws IOException {
         ConnectionData received = tcpConnection.receiveData();
-        listener.accept(received);
+        handler.accept(received);
     }
 
     @Override

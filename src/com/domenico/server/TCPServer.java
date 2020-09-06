@@ -5,7 +5,6 @@ import com.domenico.communication.TCPConnection;
 import com.domenico.shared.Multiplexer;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.SocketAddress;

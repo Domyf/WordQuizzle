@@ -90,7 +90,7 @@ public class UDPClient extends Multiplexer implements Runnable {
             wqClient.onChallengeArrived(data.getUsername());
         } else if (ConnectionData.Validator.isFailResponse(data)) {
             challengeTimeout = true;
-            wqClient.onChallengeArrivedTimeout();
+            wqClient.onChallengeRequestTimeout();
         }
         channel.register(selector, SelectionKey.OP_READ);
     }

@@ -108,17 +108,6 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration default="true" type="ArquillianJUnit" factoryName="" nameIsGenerated="true">
-      <option name="arquillianRunConfiguration">
-        <value>
-          <option name="containerStateName" value="" />
-        </value>
-      </option>
-      <option name="TEST_OBJECT" value="class" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
     <configuration name="UserDataTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="WordQuizzle" />
       <extension name="coverage">
@@ -208,7 +197,10 @@
       <workItem from="1598870672215" duration="9246000" />
       <workItem from="1598902920316" duration="1167000" />
       <workItem from="1598905269589" duration="1492000" />
-      <workItem from="1599316149404" duration="7091000" />
+      <workItem from="1599316149404" duration="8641000" />
+      <workItem from="1599324935683" duration="249000" />
+      <workItem from="1599333885913" duration="4577000" />
+      <workItem from="1599378435295" duration="3722000" />
     </task>
     <servers />
   </component>
@@ -252,10 +244,10 @@
       <screen x="0" y="0" width="1536" height="864" />
     </state>
     <state x="487" y="241" key="#com.intellij.refactoring.move.moveMembers.MoveMembersDialog/0.0.1536.864@0.0.1536.864" timestamp="1593203727951" />
-    <state x="246" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1598799078779">
+    <state x="246" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1599338273070">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state x="246" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.0.1536.864@0.0.1536.864" timestamp="1598799078779" />
+    <state x="246" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.0.1536.864@0.0.1536.864" timestamp="1599338273070" />
     <state x="500" y="180" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1598777301971">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
@@ -272,26 +264,30 @@
       <screen x="0" y="0" width="1536" height="864" />
     </state>
     <state x="475" y="175" key="FileChooserDialogImpl/0.0.1536.864@0.0.1536.864" timestamp="1598721559502" />
-    <state width="1493" height="303" key="GridCell.Tab.0.bottom" timestamp="1599323317829">
+    <state width="1493" height="303" key="GridCell.Tab.0.bottom" timestamp="1599380746871">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state width="1493" height="303" key="GridCell.Tab.0.bottom/0.0.1536.864/-1920.0.1920.1080@0.0.1536.864" timestamp="1599323317829" />
-    <state width="1493" height="303" key="GridCell.Tab.0.bottom/0.0.1536.864@0.0.1536.864" timestamp="1598906773347" />
-    <state width="1493" height="303" key="GridCell.Tab.0.center" timestamp="1599323317829">
+    <state width="1493" height="303" key="GridCell.Tab.0.bottom/0.0.1536.864/-1920.0.1920.1080@0.0.1536.864" timestamp="1599324882077" />
+    <state width="1493" height="303" key="GridCell.Tab.0.bottom/0.0.1536.864@0.0.1536.864" timestamp="1599380746871" />
+    <state width="1493" height="303" key="GridCell.Tab.0.bottom/0.0.1920.1080@0.0.1920.1080" timestamp="1599338497951" />
+    <state width="1493" height="303" key="GridCell.Tab.0.center" timestamp="1599380746871">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state width="1493" height="303" key="GridCell.Tab.0.center/0.0.1536.864/-1920.0.1920.1080@0.0.1536.864" timestamp="1599323317829" />
-    <state width="1493" height="303" key="GridCell.Tab.0.center/0.0.1536.864@0.0.1536.864" timestamp="1598906773347" />
-    <state width="1493" height="303" key="GridCell.Tab.0.left" timestamp="1599323317829">
+    <state width="1493" height="303" key="GridCell.Tab.0.center/0.0.1536.864/-1920.0.1920.1080@0.0.1536.864" timestamp="1599324882077" />
+    <state width="1493" height="303" key="GridCell.Tab.0.center/0.0.1536.864@0.0.1536.864" timestamp="1599380746871" />
+    <state width="1493" height="303" key="GridCell.Tab.0.center/0.0.1920.1080@0.0.1920.1080" timestamp="1599338497951" />
+    <state width="1493" height="303" key="GridCell.Tab.0.left" timestamp="1599380746871">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state width="1493" height="303" key="GridCell.Tab.0.left/0.0.1536.864/-1920.0.1920.1080@0.0.1536.864" timestamp="1599323317829" />
-    <state width="1493" height="303" key="GridCell.Tab.0.left/0.0.1536.864@0.0.1536.864" timestamp="1598906773347" />
-    <state width="1493" height="303" key="GridCell.Tab.0.right" timestamp="1599323317829">
+    <state width="1493" height="303" key="GridCell.Tab.0.left/0.0.1536.864/-1920.0.1920.1080@0.0.1536.864" timestamp="1599324882077" />
+    <state width="1493" height="303" key="GridCell.Tab.0.left/0.0.1536.864@0.0.1536.864" timestamp="1599380746871" />
+    <state width="1493" height="303" key="GridCell.Tab.0.left/0.0.1920.1080@0.0.1920.1080" timestamp="1599338497951" />
+    <state width="1493" height="303" key="GridCell.Tab.0.right" timestamp="1599380746871">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state width="1493" height="303" key="GridCell.Tab.0.right/0.0.1536.864/-1920.0.1920.1080@0.0.1536.864" timestamp="1599323317829" />
-    <state width="1493" height="303" key="GridCell.Tab.0.right/0.0.1536.864@0.0.1536.864" timestamp="1598906773347" />
+    <state width="1493" height="303" key="GridCell.Tab.0.right/0.0.1536.864/-1920.0.1920.1080@0.0.1536.864" timestamp="1599324882077" />
+    <state width="1493" height="303" key="GridCell.Tab.0.right/0.0.1536.864@0.0.1536.864" timestamp="1599380746871" />
+    <state width="1493" height="303" key="GridCell.Tab.0.right/0.0.1920.1080@0.0.1920.1080" timestamp="1599338497951" />
     <state x="250" y="8" key="SettingsEditor" timestamp="1593288766924">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
@@ -312,10 +308,10 @@
       <screen x="0" y="0" width="1536" height="864" />
     </state>
     <state x="500" y="184" key="extract.method.dialog/0.0.1536.864@0.0.1536.864" timestamp="1598832493089" />
-    <state x="477" y="191" key="refactoring.ChangeSignatureDialog" timestamp="1598799761367">
+    <state x="477" y="191" key="refactoring.ChangeSignatureDialog" timestamp="1599380379154">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state x="477" y="191" key="refactoring.ChangeSignatureDialog/0.0.1536.864@0.0.1536.864" timestamp="1598799761367" />
+    <state x="477" y="191" key="refactoring.ChangeSignatureDialog/0.0.1536.864@0.0.1536.864" timestamp="1599380379154" />
     <state x="426" y="197" key="run.anything.popup" timestamp="1599316369586">
       <screen x="0" y="0" width="1536" height="864" />
     </state>

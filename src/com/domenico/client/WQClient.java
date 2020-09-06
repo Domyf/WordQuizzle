@@ -11,7 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class WQClient implements WQInterface {
+public class WQClient implements WQInterface, ChallengeListener {
 
     private static final String ENCRYPTION_ALGORITHM = "SHA-256";   //the algorithm used to encrypt the user's password
     private final RMIClient rmiClient;
@@ -19,10 +19,10 @@ public class WQClient implements WQInterface {
     private final UDPClient udpClient;
     private final ChallengeListener challengeListener;  //listener used to signal the events relative to the challenge request
     private String loggedUserName;
-    private int challengeLengthSec;
-    private int challengeWords;
-    private boolean playing;
-    private int wordCounter;
+    private int challengeLengthSec; //how many seconds the challenge is long
+    private int challengeWords; //how many words the user should translate in the challenge
+    private boolean playing;    //true if the user is playing a challenge, false otherwise
+    private int wordCounter;    //how many translations has the user sent
     private final Object mutex = new Object();
     private String nextWord;
 
@@ -49,12 +49,12 @@ public class WQClient implements WQInterface {
     public String login(String username, String password) throws Exception {
         if (!isLoggedIn()) {
             String encyptedPassword = Utils.encrypt(password, ENCRYPTION_ALGORITHM);
-            String result = tcpClient.login(username, encyptedPassword, udpClient.getUDPPort());
-            if (result != null && result.isEmpty()) {
+            String failureMessage = tcpClient.login(username, encyptedPassword, udpClient.getUDPPort());
+            if (failureMessage != null && failureMessage.isEmpty()) {
                 loggedUserName = username;
-                return Messages.LOGIN_SUCCESS;
+                return "";
             }
-            return result;
+            return failureMessage;
         } else {
             return Messages.LOGOUT_NEEDED;
         }
@@ -66,7 +66,7 @@ public class WQClient implements WQInterface {
             String result = tcpClient.logout(loggedUserName);
             if (result != null && result.isEmpty()) {
                 loggedUserName = null;
-                return Messages.LOGOUT_SUCCESS;
+                return "";
             } else {
                 return result;
             }
@@ -94,11 +94,12 @@ public class WQClient implements WQInterface {
     }
 
     @Override
-    public String getScore() throws Exception {
+    public int getScore(StringBuffer failMessage) throws Exception {
         if (isLoggedIn()) {
             return tcpClient.showScore(loggedUserName);
         } else {
-            return Messages.LOGIN_NEEDED;
+            failMessage.append(Messages.LOGIN_NEEDED);
+            return -1;
         }
     }
 
@@ -204,6 +205,7 @@ public class WQClient implements WQInterface {
         }
     }
 
+    @Override
     public void onChallengeEnd(int correct, int wrong, int notransl, int yourscore, int otherscore, int extrapoints) {
         this.wordCounter = 1;
         this.playing = false;
@@ -211,15 +213,18 @@ public class WQClient implements WQInterface {
         challengeListener.onChallengeEnd(correct, wrong, notransl, yourscore, otherscore, extrapoints);
     }
 
+    @Override
     public void onChallengeArrived(String from) {
         challengeListener.onChallengeArrived(from);
     }
 
-    public void onChallengeArrivedTimeout() {
+    @Override
+    public void onChallengeRequestTimeout() {
         this.playing = false;
         challengeListener.onChallengeRequestTimeout();
     }
 
+    /** Sets the next word with the one specified */
     public void setNextWord(String nextWord) {
         synchronized (mutex) {
             this.nextWord = nextWord;

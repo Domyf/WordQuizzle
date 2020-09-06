@@ -2,12 +2,13 @@ package com.domenico.client;
 
 import com.domenico.shared.Utils;
 import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Scanner;
 
+/**
+ * This class implements the command line interface of the Word Quizzle game
+ */
 public class CLI implements ChallengeListener {
 
     private static final String COMMAND_LINE_START = "\r> ";
@@ -72,7 +73,6 @@ public class CLI implements ChallengeListener {
         this.wqInterface = wqInterface;
         boolean run = true;
         while(run) {
-            boolean accepted;
             String line = getNextLine();
             if (line.isBlank()) continue;   //ignore a blank or empty line
 
@@ -100,6 +100,7 @@ public class CLI implements ChallengeListener {
                 }
                 continue;
             }
+            //Handle the next command
             UserCommand userCommand = new UserCommand(line);
             switch (userCommand.getCmd().toLowerCase()) {
                 case UserCommand.REGISTER_USER:
@@ -131,7 +132,7 @@ public class CLI implements ChallengeListener {
                     break;
                 case UserCommand.CHALLENGE:
                     if (userCommand.hasParams(1)) {
-                        accepted = handleSendChallengeRequest(userCommand.getParam(0));
+                        boolean accepted = handleSendChallengeRequest(userCommand.getParam(0));
                         if (accepted) {
                             startChallenge();
                         }
@@ -158,6 +159,7 @@ public class CLI implements ChallengeListener {
         wqInterface.exit();
     }
 
+    /** Print the challenge's word */
     private void printChallengeWord(String nextWord) {
         System.out.printf("Challenge %d/%d: %s\n",
                 wqInterface.getWordCounter(), wqInterface.getChallengeWords(), nextWord);
@@ -188,6 +190,7 @@ public class CLI implements ChallengeListener {
                 System.out.println(Messages.REGISTRATION_SUCCESS);
             else
                 System.out.println(response);
+            //in case of success, ask if the user wants to log in
             if (response.isEmpty() && askChoice(Messages.ASK_LOGIN)) {
                 handleLogin(username, password);
             }
@@ -199,6 +202,8 @@ public class CLI implements ChallengeListener {
         String response = wqInterface.login(username, password);
         if (response == null)
             System.out.println(Messages.SOMETHING_WENT_WRONG);
+        else if (response.isEmpty())
+            System.out.println(Messages.LOGIN_SUCCESS);
         else
             System.out.println(response);
     }
@@ -208,6 +213,8 @@ public class CLI implements ChallengeListener {
         String response = wqInterface.logout();
         if (response == null)
             System.out.println(Messages.SOMETHING_WENT_WRONG);
+        else if (response.isEmpty())
+            System.out.println(Messages.LOGOUT_SUCCESS);
         else
             System.out.println(response);
     }
@@ -217,6 +224,8 @@ public class CLI implements ChallengeListener {
         String response = wqInterface.addFriend(friendUsername);
         if (response == null)
             System.out.println(Messages.SOMETHING_WENT_WRONG);
+        else if (response.isEmpty())
+            System.out.println("Tu e "+friendUsername+" siete ora amici!");
         else
             System.out.println(response);
     }
@@ -256,21 +265,19 @@ public class CLI implements ChallengeListener {
 
     /** Method invoked when the user types mostra_punteggio */
     private void handleShowScore() throws Exception {
-        String response = wqInterface.getScore();
-        if (response == null)
+        StringBuffer failMessage = new StringBuffer();
+        int score = wqInterface.getScore(failMessage);
+        if (score >= 0)
+            System.out.printf("Il tuo punteggio è %d\n", score);
+        else if (failMessage.toString().isEmpty())
             System.out.println(Messages.SOMETHING_WENT_WRONG);
         else
-            System.out.println(response);
+            System.out.println(failMessage);
     }
 
     /** Method invoked when the user types mostra_classifica */
-    private void handleShowLeaderboard() {
-        Map<String, Integer> leaderboard = null;
-        try {
-            leaderboard = wqInterface.getLeaderBoard();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    private void handleShowLeaderboard() throws Exception {
+        Map<String, Integer> leaderboard = wqInterface.getLeaderBoard();
         if (leaderboard == null) {
             System.out.println(Messages.SOMETHING_WENT_WRONG);
         } else {    //print the leaderboard

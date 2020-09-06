@@ -28,7 +28,7 @@ public class ChallengeRequest implements Runnable {
     public void run() {
         TCPServer.Attachment toUserAttachment = (TCPServer.Attachment) toKey.attachment();
         Challenge challenge = toUserAttachment.challenge;
-        print("Forwarding challenge request from " + challenge.getFrom() + " to " + challenge.getTo());
+        System.out.println("Forwarding challenge request from " + challenge.getFrom() + " to " + challenge.getTo());
         udpServer.forwardChallenge(challenge, toUserAttachment.address);
         try {
             challenge.waitResponseOrTimeout(Settings.MAX_WAITING_TIME);
@@ -39,15 +39,21 @@ public class ChallengeRequest implements Runnable {
             List<String> itWords = new ArrayList<>(Settings.CHALLENGE_WORDS);
             Utils.randomSubList(words, Settings.CHALLENGE_WORDS, itWords);
             List<String> enWords = new ArrayList<>(Arrays.asList(Translations.translate(itWords)));
-            for (String en : enWords) {
-                System.out.printf("%s ,", en);
-            }
-            System.out.println();
+            printSelectedWords(itWords, enWords);
             challenge.setWords(itWords, enWords);
             handler.handleChallengeWordsReady(challenge, fromKey, toKey);
         }
     }
 
-    public void print(String str) { System.out.println("[UDP]: "+str); }
-
+    /** Prints each italian word selected together with the translation got */
+    private void printSelectedWords(List<String> itWords, List<String> enWords) {
+        System.out.print("Selected words: [");
+        for (int i = 0; i < Settings.CHALLENGE_WORDS; i++) {
+            System.out.printf("(%s, %s)", itWords.get(i), enWords.get(i));
+            if (i == Settings.CHALLENGE_WORDS - 1)
+                System.out.println("]");
+            else
+                System.out.print(", ");
+        }
+    }
 }
