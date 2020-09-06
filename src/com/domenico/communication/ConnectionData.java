@@ -12,7 +12,6 @@ import java.util.Arrays;
  */
 public class ConnectionData {
 
-
     private enum CMD {
         LOGIN_REQUEST,
         LOGOUT_REQUEST,

@@ -106,6 +106,10 @@ public abstract class Multiplexer {
         selector.wakeup();
     }
 
+    /**
+     * Called when the method select() times out.
+     * @throws IOException if an I/O error occurs
+     */
     protected abstract void onTimeout() throws IOException;
 
     /**

@@ -27,11 +27,13 @@ public class UDPConnection extends Connection {
         this.address = address;
     }
 
+    /** Sends the specified data to the given address */
     public void sendData(ConnectionData data, SocketAddress address) throws IOException {
         this.address = address;
         sendData(data);
     }
 
+    /** Returns the address to which the UDP data is sent */
     public SocketAddress getAddress() {
         return address;
     }

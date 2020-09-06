@@ -3,6 +3,7 @@ package com.domenico.communication;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
+/** Interface with all the Word Quizzle functionalities that should be done via RMI */
 public interface RMIConnection extends Remote {
 
     String SERVICE_NAME = "REGISTER_USER_SERVICE";
