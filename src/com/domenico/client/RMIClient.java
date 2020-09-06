@@ -8,9 +8,10 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
+/** This class implements all the Word Quizzle functionalities that should be done via RMI */
 public class RMIClient {
 
-    private RMIConnection rmiConnection;
+    private final RMIConnection rmiConnection;
 
     public RMIClient() throws RemoteException, NotBoundException {
         Registry registry = LocateRegistry.getRegistry(RMIConnection.REGISTRY_PORT);
@@ -18,6 +19,7 @@ public class RMIClient {
         this.rmiConnection = (RMIConnection) remoteObj;
     }
 
+    /** Register a new user with the given username and (encrypted) password */
     public String register(String username, String password) throws RemoteException {
         return rmiConnection.register(username, password);
     }

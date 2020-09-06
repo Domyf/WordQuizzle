@@ -17,15 +17,15 @@ import java.nio.channels.Selector;
  * WordQuizzle server. Such communications are all related to challenge requests. A challenge request is sent from the
  * server to a client via UDP. The client waits that the DatagramChannel is readable, and then it reads the challenge
  * request and sends it to the challenge handler (which is a {@link ChallengeListener}
- * that is passed when this class is instantiated). While the challenger handler will do its work, this thread comes back
+ * that is passed when this class is instantiated). While the challenge handler will do its work, this thread comes back
  * to wait that the DatagramChannel is readable.
  * The UDPClient will then wake up when {@link #onChallengeResponse(Boolean)} is called by the challenge handler or
  * when the server sends that the challenge has timed out. On that case, the challenge handler is notified via
  * {@link ChallengeListener#onChallengeRequestTimeout()} and this thread comes back to wait messages from the
  * server.
  * One remote but still probable case is that a client accepts or declines a challenge while the server sends that
- * the challenge is timedout. On that case, the timeout event is more importante and the user is notified that the
- * challenge has timedout without sending to the server if the user has accepted or declined the challenge.
+ * the challenge is timedout. On that case, the timeout event is more important and the user is notified that the
+ * challenge has timedout without sending to the server that the user has accepted or declined the challenge.
  */
 public class UDPClient extends Multiplexer implements Runnable {
 

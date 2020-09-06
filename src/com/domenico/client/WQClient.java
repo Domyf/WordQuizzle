@@ -6,19 +6,26 @@ import org.json.simple.JSONObject;
 
 import java.io.IOException;
 import java.rmi.NotBoundException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeoutException;
 
+/** Implementation of the WordQuizzle client. It runs the RMI service and two threads which handles the UDP and TCP
+ * communications */
 public class WQClient implements WQInterface, ChallengeListener {
 
+    public static final int SERVER_RESPONSE_TIMEOUT = 20000; //max waiting time for a server response (in milliseconds)
     private static final String ENCRYPTION_ALGORITHM = "SHA-256";   //the algorithm used to encrypt the user's password
+
     private final RMIClient rmiClient;
     private final TCPClient tcpClient;
     private final UDPClient udpClient;
-    private final ChallengeListener challengeListener;  //listener used to signal the events relative to the challenge request
-    private String loggedUserName;
+    //listener used to signal the events relative to the challenge request
+    private final ChallengeListener challengeListener;
+    private String loggedUserName = null;  //logged user's username or null if the user is not logged
     private int challengeLengthSec; //how many seconds the challenge is long
     private int challengeWords; //how many words the user should translate in the challenge
     private boolean playing;    //true if the user is playing a challenge, false otherwise
@@ -27,7 +34,6 @@ public class WQClient implements WQInterface, ChallengeListener {
     private String nextWord;
 
     public WQClient(ChallengeListener listener) throws IOException, NotBoundException {
-        this.loggedUserName = null;
         this.rmiClient = new RMIClient();
         this.tcpClient = new TCPClient(this);
         this.udpClient = new UDPClient(this);
@@ -38,7 +44,9 @@ public class WQClient implements WQInterface, ChallengeListener {
     @Override
     public String register(String username, String password) throws Exception {
         if (!isLoggedIn()) {
+            //encrypt the password
             String encyptedPassword = Utils.encrypt(password, ENCRYPTION_ALGORITHM);
+            //register the user by its username and its encrypted password
             return rmiClient.register(username, encyptedPassword);
         } else {
             return Messages.LOGOUT_NEEDED;
@@ -46,7 +54,7 @@ public class WQClient implements WQInterface, ChallengeListener {
     }
 
     @Override
-    public String login(String username, String password) throws Exception {
+    public String login(String username, String password) throws TimeoutException, NoSuchAlgorithmException {
         if (!isLoggedIn()) {
             String encyptedPassword = Utils.encrypt(password, ENCRYPTION_ALGORITHM);
             String failureMessage = tcpClient.login(username, encyptedPassword, udpClient.getUDPPort());
@@ -61,7 +69,7 @@ public class WQClient implements WQInterface, ChallengeListener {
     }
 
     @Override
-    public String logout() throws Exception {
+    public String logout() throws TimeoutException {
         if (isLoggedIn()) {
             String result = tcpClient.logout(loggedUserName);
             if (result != null && result.isEmpty()) {
@@ -76,7 +84,7 @@ public class WQClient implements WQInterface, ChallengeListener {
     }
 
     @Override
-    public String addFriend(String friendUsername) throws Exception {
+    public String addFriend(String friendUsername) throws TimeoutException {
         if (isLoggedIn()) {
             return tcpClient.addFriend(loggedUserName, friendUsername);
         } else {
@@ -85,7 +93,7 @@ public class WQClient implements WQInterface, ChallengeListener {
     }
 
     @Override
-    public JSONArray getFriendList() throws Exception {
+    public JSONArray getFriendList() throws TimeoutException {
         if (isLoggedIn()) {
             return tcpClient.friendList(loggedUserName);
         } else {
@@ -94,7 +102,7 @@ public class WQClient implements WQInterface, ChallengeListener {
     }
 
     @Override
-    public int getScore(StringBuffer failMessage) throws Exception {
+    public int getScore(StringBuffer failMessage) throws TimeoutException {
         if (isLoggedIn()) {
             return tcpClient.showScore(loggedUserName);
         } else {
@@ -104,7 +112,7 @@ public class WQClient implements WQInterface, ChallengeListener {
     }
 
     @Override
-    public LinkedHashMap<String, Integer> getLeaderBoard() throws Exception {
+    public LinkedHashMap<String, Integer> getLeaderBoard() throws TimeoutException {
         if (isLoggedIn()) {
             JSONObject leaderboard = tcpClient.showLeaderboard(loggedUserName);
             //sort the leaderboard
@@ -123,7 +131,7 @@ public class WQClient implements WQInterface, ChallengeListener {
     }
 
     @Override
-    public String sendChallengeRequest(String friendUsername) throws Exception {
+    public String sendChallengeRequest(String friendUsername) throws TimeoutException {
         if (isLoggedIn()) {
             return tcpClient.sendChallengeRequest(loggedUserName, friendUsername);
         } else {
@@ -132,19 +140,19 @@ public class WQClient implements WQInterface, ChallengeListener {
     }
 
     @Override
-    public boolean waitChallengeResponse(StringBuffer response) throws Exception {
+    public boolean waitChallengeResponse(StringBuffer response) throws TimeoutException {
         playing = tcpClient.getChallengeResponse(response);
         return playing;
     }
 
     @Override
-    public void sendChallengeResponse(boolean accepted) throws Exception {
+    public void sendChallengeResponse(boolean accepted) {
         udpClient.onChallengeResponse(accepted);
         this.playing = accepted;
     }
 
     @Override
-    public String onChallengeStart() throws Exception {
+    public String onChallengeStart() throws TimeoutException {
         String[] challengeSettings = new String[2];
         String word = tcpClient.onChallengeStart(challengeSettings);
         challengeLengthSec = Integer.parseUnsignedInt(challengeSettings[0]) / 1000;

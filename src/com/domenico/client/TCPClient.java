@@ -9,17 +9,20 @@ import org.json.simple.JSONValue;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.SocketChannel;
+import java.util.concurrent.TimeoutException;
 
-/**
- * This class implements the client's functionalities that should be done via TCP.
- */
+/** This class implements the client's functionalities that should be done via TCP. It runs a separated thread that
+ * does the TCP communication with the server while this class acts like an handler for all the WordQuizzle
+ * functionalities that should be done via TCP. */
 public class TCPClient {
 
-    private final TCPMultiplexer tcpMultiplexer;    //the object that handles all the tcp communications
-    private final WQClient wqClient;    //the word quizzle client
-    private final Object mutex = new Object();  //mutex to protect the arrived message from not synchronized read and write
-    private ConnectionData received = null; //the message arrived. Protected by the mutex
-    private boolean exit;
+    //the runnable that handles all the tcp communications
+    private final TCPMultiplexer tcpMultiplexer;
+    //the word quizzle client
+    private final WQClient wqClient;
+    //the message arrived. Protected by the mutex
+    private final Object mutex = new Object();
+    private ConnectionData received = null;
 
     public TCPClient(WQClient wqClient) throws IOException {
         InetSocketAddress socketAddress = new InetSocketAddress(TCPConnection.SERVER_HOST, TCPConnection.SERVER_PORT);
@@ -55,23 +58,29 @@ public class TCPClient {
     /**
      * Wait until the server sends back a response and returns it
      * @return the server response
-     * @throws InterruptedException if any thread interrupted the current thread before or while the current thread was
-     * waiting.
+     * @throws TimeoutException if the server doesn't reply to the request
      */
-    private ConnectionData waitResponseFromServer() throws InterruptedException {
+    private ConnectionData waitResponseFromServer() throws TimeoutException {
         ConnectionData response;
         synchronized (mutex) {
-            while (!exit && this.received == null) {
-                mutex.wait();
+            long now = System.currentTimeMillis();
+            long end = now + WQClient.SERVER_RESPONSE_TIMEOUT;
+            while (this.received == null && now < end) {
+                try {
+                    mutex.wait(end - now);
+                } catch (InterruptedException e) {
+                    throw new TimeoutException("Connection ended with the server");
+                }
+                now = System.currentTimeMillis();
             }
-            if (!exit) {
+            if (this.received != null) {
                 response = this.received;
                 this.received = null;
+                return response;
             } else {
-                response = ConnectionData.Factory.newFailResponse();
+                throw new TimeoutException("Connection timeout");
             }
         }
-        return response;
     }
 
     /**
@@ -84,10 +93,9 @@ public class TCPClient {
      * @param udpPort user's udp port on which the UDP communication can be done
      * @return an empty string in case of success, an error string if something went wrong (like the username or
      * password are invalid), null if the response from the server is invalid
-     * @throws InterruptedException if any thread interrupted the current thread before or while the current thread was
-     * waiting.
+     * @throws TimeoutException if the server doesn't reply to the request
      */
-    public String login(String username, String password, int udpPort) throws InterruptedException {
+    public String login(String username, String password, int udpPort) throws TimeoutException {
         ConnectionData request = ConnectionData.Factory.newLoginRequest(username, password, udpPort);
         tcpMultiplexer.sendToServer(request);
         ConnectionData response = waitResponseFromServer();
@@ -103,10 +111,9 @@ public class TCPClient {
      * @param username user's username
      * @return an empty string in case of success, an error string if something went wrong (like the username is
      * invalid), null if the response from the server is invalid
-     * @throws InterruptedException if any thread interrupted the current thread before or while the current thread was
-     * waiting.
+     * @throws TimeoutException if the server doesn't reply to the request
      */
-    public String logout(String username) throws InterruptedException {
+    public String logout(String username) throws TimeoutException {
         ConnectionData request = ConnectionData.Factory.newLogoutRequest(username);
         tcpMultiplexer.sendToServer(request);
         ConnectionData response = waitResponseFromServer();
@@ -123,10 +130,9 @@ public class TCPClient {
      * @param friendUsername user's friend username
      * @return an empty string in case of success, an error string if something went wrong (like the username is
      * invalid), null if the response from the server is invalid
-     * @throws InterruptedException if any thread interrupted the current thread before or while the current thread was
-     * waiting.
+     * @throws TimeoutException if the server doesn't reply to the request
      */
-    public String addFriend(String username, String friendUsername) throws InterruptedException {
+    public String addFriend(String username, String friendUsername) throws TimeoutException {
         ConnectionData request = ConnectionData.Factory.newAddFriendRequest(username, friendUsername);
         tcpMultiplexer.sendToServer(request);
         ConnectionData response = waitResponseFromServer();
@@ -142,10 +148,9 @@ public class TCPClient {
      * @param username user's username
      * @return a JSONArray that contains the usernames of all the user's friends or null in case of a bad response from
      * the server
-     * @throws InterruptedException if any thread interrupted the current thread before or while the current thread was
-     * waiting.
+     * @throws TimeoutException if the server doesn't reply to the request
      */
-    public JSONArray friendList(String username) throws InterruptedException {
+    public JSONArray friendList(String username) throws TimeoutException {
         ConnectionData request = ConnectionData.Factory.newFriendListRequest(username);
         tcpMultiplexer.sendToServer(request);
         ConnectionData response = waitResponseFromServer();
@@ -162,10 +167,9 @@ public class TCPClient {
      * @param friendUsername user's friend username
      * @return an empty string in case of success, an error string if something went wrong (like the usernames are
      * invalid), null if the response from the server is invalid
-     * @throws InterruptedException if any thread interrupted the current thread before or while the current thread was
-     * waiting.
+     * @throws TimeoutException if the server doesn't reply to the request
      */
-    public String sendChallengeRequest(String username, String friendUsername) throws InterruptedException {
+    public String sendChallengeRequest(String username, String friendUsername) throws TimeoutException {
         ConnectionData request = ConnectionData.Factory.newChallengeRequest(username, friendUsername);
         tcpMultiplexer.sendToServer(request);
         ConnectionData response = waitResponseFromServer();
@@ -181,10 +185,9 @@ public class TCPClient {
      * Wait until the challenge response arrives.
      * @param response object to which append the server's response
      * @return true if the challenge has been accepted, false otherwise
-     * @throws InterruptedException if any thread interrupted the current thread before or while the current thread was
-     * waiting.
+     * @throws TimeoutException if the server doesn't reply to the request
      */
-    public boolean getChallengeResponse(StringBuffer response) throws InterruptedException {
+    public boolean getChallengeResponse(StringBuffer response) throws TimeoutException {
         ConnectionData data = waitResponseFromServer();
         response.append(data.getResponseData());
 
@@ -195,10 +198,9 @@ public class TCPClient {
      * Get the user's score.
      * @param username user's username
      * @return the score in case of success, -1 if something went wrong
-     * @throws InterruptedException if any thread interrupted the current thread before or while the current thread was
-     * waiting.
+     * @throws TimeoutException if the server doesn't reply to the request
      */
-    public int showScore(String username) throws InterruptedException {
+    public int showScore(String username) throws TimeoutException {
         ConnectionData request = ConnectionData.Factory.newScoreRequest(username);
         tcpMultiplexer.sendToServer(request);
         ConnectionData response = waitResponseFromServer();
@@ -218,10 +220,9 @@ public class TCPClient {
      * @param username user's username
      * @return a JSONObject which represent the leaderboard or null in case of a bad response from
      * the server
-     * @throws InterruptedException if any thread interrupted the current thread before or while the current thread was
-     * waiting.
+     * @throws TimeoutException if the server doesn't reply to the request
      */
-    public JSONObject showLeaderboard(String username) throws InterruptedException {
+    public JSONObject showLeaderboard(String username) throws TimeoutException {
         ConnectionData request = ConnectionData.Factory.newLeaderboardRequest(username);
         tcpMultiplexer.sendToServer(request);
         ConnectionData response = waitResponseFromServer();
@@ -234,10 +235,9 @@ public class TCPClient {
      * Waits until the server sends the message with all the challenge's settings and the first word.
      * @param challengeSettings array which should be modified with the challenge settings
      * @return the first word of the challenge or an empty string in case of error
-     * @throws InterruptedException if any thread interrupted the current thread before or while the current thread was
-     * waiting.
+     * @throws TimeoutException if the server doesn't reply to the request
      */
-    public String onChallengeStart(String[] challengeSettings) throws InterruptedException {
+    public String onChallengeStart(String[] challengeSettings) throws TimeoutException {
         if (challengeSettings.length != 2)
             return "";
         ConnectionData received = waitResponseFromServer();
@@ -262,7 +262,6 @@ public class TCPClient {
     /** Stops all the TCP communications and the thread involved on it */
     public void exit() {
         synchronized (mutex) {
-            this.exit = true;
             mutex.notifyAll();
         }
         tcpMultiplexer.stopProcessing();

@@ -13,6 +13,7 @@ public class MainClassWQServer {
             //Load settings
             InputStream settingsStream = getFileFromResources(SETTINGS_FILE);
             Settings.loadSettings(settingsStream);
+            System.out.println("Settings loaded from "+SETTINGS_FILE+" file");
             //Load italian words
             InputStream inputStream = getFileFromResources(Settings.getItalianWordsFilename());
             List<String> italianWords = loadItalianWords(inputStream);

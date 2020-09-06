@@ -16,7 +16,6 @@ public interface ChallengeListener {
     /**
      * Invoked during a challenge when it times out for example after 60 seconds or when both users send the last
      * translation.
-     *
      * @param correct how many correct translations
      * @param wrong how many wrong translations
      * @param notransl how many words the user didn't translate

@@ -2,9 +2,12 @@ package com.domenico.client;
 
 import java.util.Arrays;
 
-/** This class represents a command with its cmd and its parameters */
+/** This class represents a command written by the user with its cmd and its parameters. Basically a command is in the
+ * form <CMD> <Parameters>. For example aggiungi_amico usernameAmico. Ogni parametro ha il suo specifico gruppo
+ * di parametri, i quali devono essere scritti in un determinato ordine. */
 public class UserCommand {
 
+    //List of all the commands that the user can type. It is called cmd
     public static final String REGISTER_USER = "registra_utente";
     public static final String LOGIN = "login";
     public static final String LOGOUT = "logout";
@@ -42,6 +45,7 @@ public class UserCommand {
         return params != null && params.length == howMany;
     }
 
+    /** Returns the usage of the specified command */
     public static String getCommandUsage(String command) {
         switch (command) {
             case REGISTER_USER:
