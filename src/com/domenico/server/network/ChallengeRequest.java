@@ -1,5 +1,6 @@
-package com.domenico.server;
+package com.domenico.server.network;
 
+import com.domenico.server.*;
 import com.domenico.shared.Utils;
 
 import java.nio.channels.SelectionKey;
@@ -13,26 +14,26 @@ import java.util.List;
 public class ChallengeRequest implements Runnable {
 
     private final UDPServer udpServer;
-    private final List<String> words;
+    private final List<String> italianWords;
     private final SelectionKey fromKey;
     private final SelectionKey toKey;
     private final WQHandler handler;
 
-    public ChallengeRequest(WQHandler handler, UDPServer udpServer, SelectionKey fromKey, SelectionKey toKey, List<String> words) {
+    public ChallengeRequest(WQHandler handler, UDPServer udpServer, SelectionKey fromKey, SelectionKey toKey, List<String> italianWords) {
         this.udpServer = udpServer;
         this.fromKey = fromKey;
         this.toKey = toKey;
-        this.words = words;
+        this.italianWords = italianWords;
         this.handler = handler;
     }
 
     @Override
     public void run() {
-        TCPServer.Attachment toUserAttachment = (TCPServer.Attachment) toKey.attachment();
-        Challenge challenge = toUserAttachment.challenge;
+        UserAttachment toUserAttachment = (UserAttachment) toKey.attachment();
+        Challenge challenge = toUserAttachment.getChallenge();
         System.out.println("Forwarding challenge request from " + challenge.getFrom() + " to " + challenge.getTo());
         //forward the challenge via udp
-        udpServer.forwardChallenge(challenge, toUserAttachment.address);
+        udpServer.forwardChallenge(challenge, toUserAttachment.getUdpAddress());
         try {
             //wait the challenge response or timeout
             challenge.waitResponseOrTimeout(Settings.getChallengeRequestTimeout());
@@ -43,7 +44,7 @@ public class ChallengeRequest implements Runnable {
         if (challenge.isRequestAccepted()) {
             //get random italian words
             List<String> itWords = new ArrayList<>(Settings.getChallengeWords());
-            Utils.randomSubList(words, Settings.getChallengeWords(), itWords);
+            Utils.randomSubList(italianWords, Settings.getChallengeWords(), itWords);
             //get the english translations
             List<String> enWords = new ArrayList<>(Arrays.asList(Translations.translate(itWords)));
             //print the selected words

@@ -1,9 +1,13 @@
 package com.domenico.server;
 
+import com.domenico.server.network.UserRegistrationService;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/** Starting point for the WordQuizzle server. It loads the settings and all the italian words from the resources.
+ * It also start the RMI service and the WordQuizzle server. */
 public class MainClassWQServer {
 
     public static final String SETTINGS_FILE = "wordquizzle.properties";

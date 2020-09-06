@@ -1,4 +1,4 @@
-package com.domenico.server;
+package com.domenico.server.usersmanagement;
 
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -7,14 +7,15 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
+/** Class with all the methods to save on disk and load from disk the server data */
 public class Persistence {
 
+    //json file on which the server data will be saved
     private final static String pathname = "serverdata.json";
     private final static File dataFile = new File(pathname);
 
     /**
      * Saves the server's data into a local file
-     *
      * @param serverData server's data
      */
     public static void saveOnDisk(Map serverData) {
@@ -26,8 +27,7 @@ public class Persistence {
     }
 
     /**
-     * Reads the server's data from the local file. This method creates the file if it doesn't exist
-     *
+     * Reads the server's data from the local file. This method creates the file if it doesn't exist.
      * @return the server's data read
      * @throws IOException if an error occurs while reading from file
      */

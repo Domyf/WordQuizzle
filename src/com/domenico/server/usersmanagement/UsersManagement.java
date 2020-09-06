@@ -1,11 +1,11 @@
-package com.domenico.server;
+package com.domenico.server.usersmanagement;
 
 import org.json.simple.JSONObject;
 
 import java.io.*;
 import java.util.*;
 
-//TODO write documentation for this class
+/** Singleton class that manages all the Word Quizzle users */
 public class UsersManagement {
 
     private static UsersManagement instance;

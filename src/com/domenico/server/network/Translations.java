@@ -1,4 +1,4 @@
-package com.domenico.server;
+package com.domenico.server.network;
 
 import java.io.*;
 import java.net.URL;

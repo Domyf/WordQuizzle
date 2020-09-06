@@ -1,12 +1,15 @@
 package com.domenico.server;
 
 import com.domenico.communication.ConnectionData;
+import com.domenico.server.usersmanagement.UsersManagementException;
 
 import java.net.InetAddress;
 import java.nio.channels.SelectionKey;
 
 /**
- * Handles all the WordQuizzle request arrived via the network and for some cases prepares the response to send back.
+ * Interface with all the methods that should be implemented to build a WordQuizzle handler which can handle all the
+ * Word Quizzle request arrived via the network and for some cases can prepare the response to send back. When the
+ * response is not available the handler should return and it should send back a response later when it is available
  */
 public interface WQHandler {
 

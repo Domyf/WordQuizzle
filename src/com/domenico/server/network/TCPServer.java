@@ -1,7 +1,9 @@
-package com.domenico.server;
+package com.domenico.server.network;
 
 import com.domenico.communication.ConnectionData;
 import com.domenico.communication.TCPConnection;
+import com.domenico.server.usersmanagement.UsersManagementException;
+import com.domenico.server.WQHandler;
 import com.domenico.shared.Multiplexer;
 
 import java.io.IOException;
@@ -13,12 +15,20 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.LinkedList;
 
+/** This class extends the {@link Multiplexer} class and it handles all the TCP communications from and to the clients.
+ * When a message arrives, call the right handler's method and leaves it to the rest of the job. The handler sometimes
+ * can return a message that should be sent back to the client. Otherwise this class also implements the functionalities
+ * to send async messages to the clients.
+ */
 public class TCPServer extends Multiplexer {
 
+    //The handler that will handle the received message
     private final WQHandler handler;
+    //A list, protected by its mutex, that contains each message that should be sent to a defined client
     private final Object mutex = new Object();
     private final LinkedList<ASyncResponse> aSyncResponses = new LinkedList<>();
 
+    /** Inner class that represent an async message that should be sent to a specified client */
     private static class ASyncResponse {
         ConnectionData data;
         SelectionKey key;
@@ -26,19 +36,6 @@ public class TCPServer extends Multiplexer {
         public ASyncResponse(ConnectionData data, SelectionKey key) {
             this.data = data;
             this.key = key;
-        }
-    }
-
-    public static class Attachment {
-        String username;
-        Challenge challenge;
-        InetSocketAddress address;
-        ConnectionData response;
-        TCPConnection tcpConnection;
-
-        public Attachment(SocketChannel client) {
-            this.tcpConnection = new TCPConnection(client);
-            this.response = null;
         }
     }
 
@@ -58,7 +55,7 @@ public class TCPServer extends Multiplexer {
         print("Accepted connection for "+client.getRemoteAddress());
         client.configureBlocking(false);    //non-blocking
 
-        Attachment attachment = new Attachment(client);
+        UserAttachment attachment = new UserAttachment(client);
         client.register(selector, SelectionKey.OP_READ, attachment);
     }
 
@@ -68,44 +65,44 @@ public class TCPServer extends Multiplexer {
     @Override
     protected void onReadable(SelectionKey key) throws IOException {
         SocketChannel client = (SocketChannel) key.channel();
-        Attachment attachment = (Attachment) key.attachment();
-        TCPConnection tcpConnection = attachment.tcpConnection;
+        UserAttachment attachment = (UserAttachment) key.attachment();
+        TCPConnection tcpConnection = attachment.getTcpConnection();
 
         ConnectionData received = tcpConnection.receiveData();
         try {
+            ConnectionData response = null;
             if (ConnectionData.Validator.isLoginRequest(received)) {
-                attachment.response = handler.handleLoginRequest(received, key, client.socket().getInetAddress());
+                response = handler.handleLoginRequest(received, key, client.socket().getInetAddress());
 
             } else if (ConnectionData.Validator.isLogoutRequest(received)) {
-                attachment.response = handler.handleLogoutRequest(received);
+                response = handler.handleLogoutRequest(received);
 
             } else if (ConnectionData.Validator.isAddFriendRequest(received)) {
-                attachment.response = handler.handleAddFriendRequest(received);
+                response = handler.handleAddFriendRequest(received);
 
             } else if (ConnectionData.Validator.isFriendListRequest(received)) {
-                attachment.response = handler.handleFriendListRequest(received);
+                response = handler.handleFriendListRequest(received);
 
             } else if (ConnectionData.Validator.isChallengeRequest(received)) {
-                attachment.response = handler.handleChallengeRequest(received, key);
+                response = handler.handleChallengeRequest(received, key);
 
             } else if (ConnectionData.Validator.isChallengeWord(received)) {
-                attachment.response = handler.handleTranslationArrived(received, key);
+                response = handler.handleTranslationArrived(received, key);
 
             } else if (ConnectionData.Validator.isScoreRequest(received)) {
-                attachment.response = handler.handleScoreRequest(received);
+                response = handler.handleScoreRequest(received);
 
             } else if (ConnectionData.Validator.isLeaderboardRequest(received)) {
-                attachment.response = handler.handleLeaderboardRequest(received);
+                response = handler.handleLeaderboardRequest(received);
 
-            } else {
-                attachment.response = null;
             }
+            attachment.setResponse(response);
         } catch (UsersManagementException e) {
-            attachment.response = ConnectionData.Factory.newFailResponse(e.getMessage());
+            attachment.setResponse(ConnectionData.Factory.newFailResponse(e.getMessage()));
         }
-        print(received.toString(), "<-", client.getRemoteAddress(), attachment.username);
+        print(received.toString(), "<-", client.getRemoteAddress(), attachment.getUsername());
         //If the response is already available then go write it, otherwise stay interested on read
-        if (attachment.response != null)
+        if (attachment.getResponse() != null)
             client.register(selector, SelectionKey.OP_WRITE, attachment);
     }
 
@@ -113,13 +110,14 @@ public class TCPServer extends Multiplexer {
     @Override
     protected void onWritable(SelectionKey key) throws IOException {
         SocketChannel client = (SocketChannel) key.channel();
-        Attachment attachment = (Attachment) key.attachment();
-        TCPConnection tcpConnection = attachment.tcpConnection;
+        UserAttachment attachment = (UserAttachment) key.attachment();
+        TCPConnection tcpConnection = attachment.getTcpConnection();
+        ConnectionData response = attachment.getResponse();
 
-        if (attachment.response != null) {
-            print(attachment.response.toString(), "->", client.getRemoteAddress(), attachment.username);
-            tcpConnection.sendData(attachment.response);
-            attachment.response = null;
+        if (response != null) {
+            print(response.toString(), "->", client.getRemoteAddress(), attachment.getUsername());
+            tcpConnection.sendData(response);
+            attachment.setResponse(null);
             key.interestOps(SelectionKey.OP_READ);
         }
     }
@@ -142,14 +140,19 @@ public class TCPServer extends Multiplexer {
             //If there is at least a request to forward, then go write into the socket
             while (!aSyncResponses.isEmpty()) {
                 ASyncResponse aSyncResponse = aSyncResponses.pop();
-                Attachment attachment = (Attachment) aSyncResponse.key.attachment();
-                attachment.response = aSyncResponse.data;
+                UserAttachment attachment = (UserAttachment) aSyncResponse.key.attachment();
+                attachment.setResponse(aSyncResponse.data);
                 if (aSyncResponse.key.isValid())
                     aSyncResponse.key.interestOps(SelectionKey.OP_WRITE);
             }
         }
     }
 
+    /**
+     * Sends the given message to the given client.
+     * @param data the message that should be sent
+     * @param key the key that represent the client
+     */
     public void sendToClient(ConnectionData data, SelectionKey key) {
         synchronized (mutex) {
             aSyncResponses.push(new ASyncResponse(data, key));
@@ -157,11 +160,13 @@ public class TCPServer extends Multiplexer {
         }
     }
 
-    public void print(String received, String direction, SocketAddress toAddress, String username) {
-        System.out.printf("[TCP]: %s %s %s (%s)\n", received, direction, toAddress, username);
+    /** Print the message arrived or that was sent */
+    private void print(String message, String direction, SocketAddress toAddress, String username) {
+        System.out.printf("[TCP]: %s %s %s (%s)\n", message, direction, toAddress, username);
     }
 
-    public void print(String str) {
+    /** Print a generic message */
+    private void print(String str) {
         System.out.println("[TCP]: "+str);
     }
 

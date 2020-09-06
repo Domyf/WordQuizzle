@@ -1,7 +1,8 @@
-package com.domenico.server;
+package com.domenico.server.network;
 
 import com.domenico.communication.ConnectionData;
 import com.domenico.communication.UDPConnection;
+import com.domenico.server.Challenge;
 import com.domenico.shared.Multiplexer;
 
 import java.io.IOException;
@@ -11,13 +12,21 @@ import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.util.*;
 
+/** This class extends the {@link Multiplexer} class and it handles all the UDP communications from and to the clients.
+ * Basically it forwards the given challenge requests from a client to another and waits that the other user sends a
+ * challenge response or that the challenge request times out.
+ */
 public class UDPServer extends Multiplexer implements Runnable {
 
+    //Utility object that wraps all the work that should be done to send or receive a ConnectionData object
     private final UDPConnection udpConnection;
+    //map object that maps each address to a challenge object
     private final Map<InetSocketAddress, Challenge> mapAddress;
+    //A linked list used to store all the challenges that should be forwarded
     private final Object mutex = new Object();
     private final LinkedList<Forward> forwards;
 
+    /** Inner class used to represent a challenge that should be forwarded to a given address via UDP */
     private static class Forward {
         InetSocketAddress toAddress;
         Challenge challenge;
@@ -37,14 +46,17 @@ public class UDPServer extends Multiplexer implements Runnable {
         this.forwards = new LinkedList<>();
     }
 
+    /** Forwards the given challenge to the user (specified by its address) via UDP */
     public void forwardChallenge(Challenge challenge, InetSocketAddress toAddress) {
         handleChallenge(challenge, toAddress);
     }
 
+    /** Sends to the challenged user that the challenge request has timed out */
     public void challengeTimedout(Challenge challenge, InetSocketAddress toAddress) {
         handleChallenge(challenge, toAddress);
     }
 
+    /** Handles a new challenge that should be forwarded or a challenge request timeout */
     private void handleChallenge(Challenge challenge, InetSocketAddress toAddress) {
         synchronized (mutex) {
             forwards.push(new Forward(toAddress, challenge));
@@ -69,7 +81,7 @@ public class UDPServer extends Multiplexer implements Runnable {
             ConnectionData data;
             if (forward.challenge.isRequestTimedOut()) {
                 mapAddress.remove(forward.toAddress, forward.challenge);
-                data = ConnectionData.Factory.newFailResponse("Tempo scaduto"); //TODO change into ChallengeTimeout
+                data = ConnectionData.Factory.newFailResponse("Tempo scaduto");
             } else {
                 mapAddress.put(forward.toAddress, forward.challenge);
                 data = ConnectionData.Factory.newChallengeRequest(forward.challenge.getFrom(), forward.challenge.getTo());
@@ -110,7 +122,8 @@ public class UDPServer extends Multiplexer implements Runnable {
         System.out.println("[UDP]: Server is running");
         this.startProcessing();
     }
-    
+
+    /** Prints information about the challenge that has been forwarded */
     public void print(String str, InetSocketAddress toAddress, String username) {
         System.out.printf("[UDP]: %s -> %s (%s)\n", str, toAddress, username);
     }

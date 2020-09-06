@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+/** Class that contains a method to load the settings from the server resources and all the settings stored as public
+ * static constants.
+ */
 public class Settings {
 
     //the italian words file name

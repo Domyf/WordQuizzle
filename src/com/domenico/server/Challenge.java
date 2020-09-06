@@ -3,7 +3,9 @@ package com.domenico.server;
 import java.util.List;
 import java.util.TimerTask;
 
-/** Implementation of a Word Quizzle challenge. */
+/** Implementation of a Word Quizzle challenge between two users. It manages all the data related for the request
+ * phase as well as the playing phase.
+ * */
 public class Challenge {
 
     //General info

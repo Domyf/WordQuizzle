@@ -35,6 +35,6 @@ public class TimeIsUp<T> extends TimerTask {
 
     @Override
     public void run() {
-        function.accept(args);  //call the function
+        function.accept(args);  //calls the function
     }
 }

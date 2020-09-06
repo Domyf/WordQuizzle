@@ -1,5 +1,6 @@
 package com.domenico.server;
 
+import com.domenico.server.usersmanagement.UserData;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,7 +24,7 @@ class UserDataTest {
     @BeforeEach
     void setUp() {
         data = new UserData(USERNAME_TEST);
-        data.setScore(SCORE_TEST);
+        data.addScore(SCORE_TEST);
         data.addFriend(FRIEND1_TEST);
         data.addFriend(FRIEND2_TEST);
     }

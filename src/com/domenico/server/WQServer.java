@@ -1,6 +1,12 @@
 package com.domenico.server;
 
 import com.domenico.communication.*;
+import com.domenico.server.network.ChallengeRequest;
+import com.domenico.server.network.TCPServer;
+import com.domenico.server.network.UDPServer;
+import com.domenico.server.network.UserAttachment;
+import com.domenico.server.usersmanagement.UsersManagement;
+import com.domenico.server.usersmanagement.UsersManagementException;
 import org.json.simple.JSONObject;
 
 import java.io.IOException;
@@ -11,8 +17,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * This is a worker class that manages all the TCP communications. It implements channel multiplexing to efficiently
- * manage all the clients by extending the Multiplexer class.
+ * This class implements the entire WordQuizzle server. It runs the TCP server, the UDP server and the RMI server.
+ * It also implements a Word Quizzle handler which means that it can handle all the WordQuizzle requests that can arrive
+ * from the clients.
  */
 public class WQServer implements WQHandler {
 
@@ -39,13 +46,13 @@ public class WQServer implements WQHandler {
 
     @Override
     public ConnectionData handleLoginRequest(ConnectionData connectionData, SelectionKey key, InetAddress inetAddress) throws UsersManagementException {
-        TCPServer.Attachment attachment = (TCPServer.Attachment) key.attachment();
+        UserAttachment attachment = (UserAttachment) key.attachment();
         String username = connectionData.getUsername();
         String password = connectionData.getPassword();
         usersManagement.login(username, password);
         int udpPort = Integer.parseUnsignedInt(connectionData.getResponseData());
-        attachment.address = new InetSocketAddress(inetAddress, udpPort);
-        attachment.username = username;
+        attachment.setAddress(inetAddress, udpPort);
+        attachment.setUsername(username);
         mapToKey.put(username, key);
         return ConnectionData.Factory.newSuccessResponse(); //Response is already available
     }
@@ -88,18 +95,18 @@ public class WQServer implements WQHandler {
         if (!usersManagement.isOnline(to))
             throw new UsersManagementException(to+" non è online in questo momento");
 
-        TCPServer.Attachment fromUser = (TCPServer.Attachment) key.attachment();
+        UserAttachment fromUser = (UserAttachment) key.attachment();
         SelectionKey toKey = mapToKey.get(to);
-        TCPServer.Attachment toUser = (TCPServer.Attachment) toKey.attachment();
+        UserAttachment toUser = (UserAttachment) toKey.attachment();
         //Il the user has already sent a challenge which is not timedout yet or it has not been accepted yet
-        if (toUser.challenge != null)
+        if (toUser.getChallenge() != null)
             throw new UsersManagementException(to+" ha una sfida in questo momento");
-        if (fromUser.challenge != null)
+        if (fromUser.getChallenge() != null)
             throw new UsersManagementException("Non puoi avviare più sfide contemporaneamente");
 
         Challenge challenge = new Challenge(from, to);
-        fromUser.challenge = challenge;
-        toUser.challenge = challenge;
+        fromUser.setChallenge(challenge);
+        toUser.setChallenge(challenge);
         //Handling the challenge request via udp
         executors.execute(new ChallengeRequest(this, udpServer, key, toKey, italianWords));
 
@@ -110,13 +117,13 @@ public class WQServer implements WQHandler {
     //Async call
     @Override
     public void handleChallengeResponse(Challenge challenge, SelectionKey fromKey, SelectionKey toKey) {
-        TCPServer.Attachment fromUser = (TCPServer.Attachment) fromKey.attachment();
-        TCPServer.Attachment toUser = (TCPServer.Attachment) toKey.attachment();
+        UserAttachment fromUser = (UserAttachment) fromKey.attachment();
+        UserAttachment toUser = (UserAttachment) toKey.attachment();
         ConnectionData response;
         if (challenge.isRequestTimedOut()) {
             response = ConnectionData.Factory.newFailResponse("Tempo scaduto");
             //notify via udp who was challenged
-            udpServer.challengeTimedout(challenge, toUser.address);
+            udpServer.challengeTimedout(challenge, toUser.getUdpAddress());
         } else if (challenge.isRequestAccepted()) {
             response = ConnectionData.Factory.newSuccessResponse(challenge.getTo() + " ha accettato la sfida");
         } else {
@@ -126,17 +133,17 @@ public class WQServer implements WQHandler {
         tcpServer.sendToClient(response, fromKey);
         //Remove the challenge if it has not been accepted or it has timedout
         if (!challenge.isRequestAccepted()) {
-            toUser.challenge = null;
-            fromUser.challenge = null;
+            toUser.setChallenge(null);
+            fromUser.setChallenge(null);
         }
     }
 
     @Override
     public void handleChallengeWordsReady(Challenge challenge, SelectionKey fromKey, SelectionKey toKey) {
-        TCPServer.Attachment fromUser = (TCPServer.Attachment) fromKey.attachment();
-        TCPServer.Attachment toUser = (TCPServer.Attachment) toKey.attachment();
-        String nextItWordFrom = challenge.getNextItWord(fromUser.username);
-        String nextItWordTo = challenge.getNextItWord(toUser.username);
+        UserAttachment fromUser = (UserAttachment) fromKey.attachment();
+        UserAttachment toUser = (UserAttachment) toKey.attachment();
+        String nextItWordFrom = challenge.getNextItWord(fromUser.getUsername());
+        String nextItWordTo = challenge.getNextItWord(toUser.getUsername());
         //Sends the first word via tcp to both
         if (nextItWordFrom != null && nextItWordTo != null) {
             long maxChallengeLength = Settings.getMaxChallengeLength();
@@ -148,10 +155,10 @@ public class WQServer implements WQHandler {
                     ConnectionData.Factory.newChallengeStart(maxChallengeLength, challengeWords, nextItWordTo),
                     toKey);
             TimerTask timer = TimeIsUp.schedule(this::handleChallengeTimeout, maxChallengeLength, fromKey, toKey);
-            fromUser.challenge.setTimer(timer);
+            fromUser.getChallenge().setTimer(timer);
         } else {
-            toUser.challenge = null;
-            fromUser.challenge = null;
+            toUser.setChallenge(null);
+            fromUser.setChallenge(null);
         }
     }
 
@@ -171,35 +178,35 @@ public class WQServer implements WQHandler {
 
     @Override
     public void handleUserDisconnected(SelectionKey key) {
-        TCPServer.Attachment attachment = (TCPServer.Attachment) key.attachment();
+        UserAttachment attachment = (UserAttachment) key.attachment();
         try {
-            usersManagement.logout(attachment.username);
-            mapToKey.remove(attachment.username);
+            usersManagement.logout(attachment.getUsername());
+            mapToKey.remove(attachment.getUsername());
         } catch (UsersManagementException ignored) { }
     }
 
     @Override
     public synchronized ConnectionData handleTranslationArrived(ConnectionData received, SelectionKey key) {
-        TCPServer.Attachment thisAttch = (TCPServer.Attachment) key.attachment();
-        Challenge challenge = thisAttch.challenge;
-        challenge.checkAndGoNext(thisAttch.username, received.getResponseData());
+        UserAttachment thisAttch = (UserAttachment) key.attachment();
+        Challenge challenge = thisAttch.getChallenge();
+        challenge.checkAndGoNext(thisAttch.getUsername(), received.getResponseData());
         //If the challenge is ended for both
         if (challenge.isGameEnded()) {
             SelectionKey otherKey;
-            if (challenge.getFrom().equals(thisAttch.username))
-                otherKey = mapToKey.get(thisAttch.challenge.getTo());
+            if (challenge.getFrom().equals(thisAttch.getUsername()))
+                otherKey = mapToKey.get(challenge.getTo());
             else
-                otherKey = mapToKey.get(thisAttch.challenge.getFrom());
+                otherKey = mapToKey.get(challenge.getFrom());
             challenge.cancelTimer();
-            TCPServer.Attachment otherAttach = (TCPServer.Attachment) otherKey.attachment();
+            UserAttachment otherAttach = (UserAttachment) otherKey.attachment();
             handleChallengeEnd(thisAttch, otherAttach);
 
             //Sends to the other that the challenge ended
-            tcpServer.sendToClient(getChallengeEndByUsername(otherAttach.username, challenge), otherKey);
+            tcpServer.sendToClient(getChallengeEndByUsername(otherAttach.getUsername(), challenge), otherKey);
             //Sends to this player that the challenge ended
-            return getChallengeEndByUsername(thisAttch.username, challenge);
-        } else if (!challenge.hasPlayerEnded(thisAttch.username)) { //If this was not the last word then sends the next one
-            String nextItWord = thisAttch.challenge.getNextItWord(thisAttch.username);
+            return getChallengeEndByUsername(thisAttch.getUsername(), challenge);
+        } else if (!challenge.hasPlayerEnded(thisAttch.getUsername())) { //If this was not the last word then sends the next one
+            String nextItWord = challenge.getNextItWord(thisAttch.getUsername());
             //Sends the next word
             return ConnectionData.Factory.newChallengeWord(nextItWord);
         }
@@ -209,30 +216,36 @@ public class WQServer implements WQHandler {
         return null;
     }
 
-    private void handleChallengeEnd(TCPServer.Attachment first, TCPServer.Attachment second) {
-        System.out.printf("Challenge ended (%s vs %s)\n", first.username, second.username);
-        Challenge challenge = first.challenge; // first.chellenge == second.challenge
-        if (first.challenge != null && second.challenge != null) {
-            first.challenge.onChallengeEnded(); //first.challenge == second.challenge
+    /** Handle the end of the challenged between the given two users */
+    private void handleChallengeEnd(UserAttachment first, UserAttachment second) {
+        System.out.printf("Challenge ended (%s vs %s)\n", first.getUsername(), second.getUsername());
+        Challenge challenge = first.getChallenge(); // first.chellenge == second.challenge
+        if (challenge != null && second.getChallenge() != null) {
+            challenge.onChallengeEnded(); //first.challenge == second.challenge
             try {
-                usersManagement.addScore(first.username, challenge.getFinalPoints(first.username));
-                usersManagement.addScore(second.username, challenge.getFinalPoints(second.username));
+                usersManagement.addScore(first.getUsername(), challenge.getFinalPoints(first.getUsername()));
+                usersManagement.addScore(second.getUsername(), challenge.getFinalPoints(second.getUsername()));
             } catch (UsersManagementException ignored) {}
-            first.challenge = null;
-            second.challenge = null;
+            first.setChallenge(null);
+            second.setChallenge(null);
         }
     }
 
-    //Just small work because it is called by a timer
+    /** Handle the challenge timeout. It does just small work because it is called by a timer.
+     * @param users the users involved into a challenge timeout
+     * */
     private synchronized void handleChallengeTimeout(SelectionKey ...users) {
-        TCPServer.Attachment first = (TCPServer.Attachment) users[0].attachment();
-        TCPServer.Attachment second = (TCPServer.Attachment) users[1].attachment();
-        Challenge challenge = first.challenge; //first.challenge == second.challenge
+        UserAttachment first = (UserAttachment) users[0].attachment();
+        UserAttachment second = (UserAttachment) users[1].attachment();
+        Challenge challenge = first.getChallenge(); //first.challenge == second.challenge
         handleChallengeEnd(first, second);
-        tcpServer.sendToClient(getChallengeEndByUsername(first.username, challenge), users[0]);
-        tcpServer.sendToClient(getChallengeEndByUsername(second.username, challenge), users[1]);
+        tcpServer.sendToClient(getChallengeEndByUsername(first.getUsername(), challenge), users[0]);
+        tcpServer.sendToClient(getChallengeEndByUsername(second.getUsername(), challenge), users[1]);
     }
 
+    /** By giving the username and the chellenge, it returns a ConnectionData which contains the stats of
+     * the ended challenge.
+     * */
     private synchronized ConnectionData getChallengeEndByUsername(String username, Challenge challenge) {
         int correct = challenge.getRightCounter(username);
         int wrong = challenge.getWrongCounter(username);

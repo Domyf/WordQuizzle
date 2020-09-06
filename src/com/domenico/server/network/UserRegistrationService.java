@@ -1,6 +1,8 @@
-package com.domenico.server;
+package com.domenico.server.network;
 
 import com.domenico.communication.RMIConnection;
+import com.domenico.server.usersmanagement.UsersManagement;
+import com.domenico.server.usersmanagement.UsersManagementException;
 
 import java.io.IOException;
 import java.rmi.RemoteException;

@@ -1,4 +1,4 @@
-package com.domenico.server;
+package com.domenico.server.usersmanagement;
 
 /** Exception thrown when an error related to users management occurs */
 public class UsersManagementException extends Exception {
