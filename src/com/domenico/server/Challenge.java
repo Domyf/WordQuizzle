@@ -122,10 +122,10 @@ public class Challenge {
             isRight = rightEnWord != null && rightEnWord.equalsIgnoreCase(enWord);
             if (isRight) {
                 fromRight++;
-                fromPoints += Settings.POINTS_RIGHT_TRANSLATION;
+                fromPoints += Settings.getPointsRightTranslation();
             } else {
                 fromWrong++;
-                fromPoints -= Settings.POINTS_ERROR_PENALTY;
+                fromPoints -= Settings.getPointsErrorPenalty();
             }
         } else if (username.equals(to)) {
             rightEnWord = enWords.get(toIndex);
@@ -133,10 +133,10 @@ public class Challenge {
             toIndex++;
             if (isRight) {
                 toRight++;
-                toPoints += Settings.POINTS_RIGHT_TRANSLATION;
+                toPoints += Settings.getPointsRightTranslation();
             } else {
                 toWrong++;
-                toPoints -= Settings.POINTS_ERROR_PENALTY;
+                toPoints -= Settings.getPointsErrorPenalty();
             }
         } else {
             return;
@@ -185,7 +185,7 @@ public class Challenge {
     /** Returns the points scored by the given user. If the user has won, it returns its points plus the extra points */
     public int getFinalPoints(String username) {
         int points = getPoints(username);
-        if (hasWon(username)) points += Settings.EXTRA_POINTS;
+        if (hasWon(username)) points += Settings.getExtraPoints();
         return points;
     }
 

@@ -9,6 +9,7 @@ public class MainClassWQClient {
     private static final String HELP_COMMAND_ARG = "--help";    //The program argument associated to the usage
 
     public static void main(String[] args) {
+        //Checks if the program has the help argument
         if (args.length == 1 && args[0].equals(HELP_COMMAND_ARG)) {
             System.out.println(USAGE);
             CLI.printCommandsUsage();

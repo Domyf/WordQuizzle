@@ -35,15 +35,15 @@ public class ChallengeRequest implements Runnable {
         udpServer.forwardChallenge(challenge, toUserAttachment.address);
         try {
             //wait the challenge response or timeout
-            challenge.waitResponseOrTimeout(Settings.MAX_WAITING_TIME);
+            challenge.waitResponseOrTimeout(Settings.getChallengeRequestTimeout());
         } catch (InterruptedException e) { return; }
         //handle the response or the timeout
         handler.handleChallengeResponse(challenge, fromKey, toKey);
         //if the challenge is accepted, get random italian words and their english translations
         if (challenge.isRequestAccepted()) {
             //get random italian words
-            List<String> itWords = new ArrayList<>(Settings.CHALLENGE_WORDS);
-            Utils.randomSubList(words, Settings.CHALLENGE_WORDS, itWords);
+            List<String> itWords = new ArrayList<>(Settings.getChallengeWords());
+            Utils.randomSubList(words, Settings.getChallengeWords(), itWords);
             //get the english translations
             List<String> enWords = new ArrayList<>(Arrays.asList(Translations.translate(itWords)));
             //print the selected words
@@ -57,9 +57,9 @@ public class ChallengeRequest implements Runnable {
     /** Prints each italian word selected together with the translation got */
     private void printSelectedWords(List<String> itWords, List<String> enWords) {
         System.out.print("Selected words: [");
-        for (int i = 0; i < Settings.CHALLENGE_WORDS; i++) {
+        for (int i = 0; i < Settings.getChallengeWords(); i++) {
             System.out.printf("(%s, %s)", itWords.get(i), enWords.get(i));
-            if (i == Settings.CHALLENGE_WORDS - 1)
+            if (i == Settings.getChallengeWords() - 1)
                 System.out.println("]");
             else
                 System.out.print(", ");

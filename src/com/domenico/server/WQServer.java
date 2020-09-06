@@ -139,9 +139,15 @@ public class WQServer implements WQHandler {
         String nextItWordTo = challenge.getNextItWord(toUser.username);
         //Sends the first word via tcp to both
         if (nextItWordFrom != null && nextItWordTo != null) {
-            tcpServer.sendToClient(ConnectionData.Factory.newChallengeStart(Settings.MAX_CHALLENGE_LENGTH, Settings.CHALLENGE_WORDS, nextItWordFrom), fromKey);
-            tcpServer.sendToClient(ConnectionData.Factory.newChallengeStart(Settings.MAX_CHALLENGE_LENGTH, Settings.CHALLENGE_WORDS, nextItWordTo), toKey);
-            TimerTask timer = TimeIsUp.schedule(this::handleChallengeTimeout, Settings.MAX_CHALLENGE_LENGTH, fromKey, toKey);
+            long maxChallengeLength = Settings.getMaxChallengeLength();
+            int challengeWords = Settings.getChallengeWords();
+            tcpServer.sendToClient(
+                    ConnectionData.Factory.newChallengeStart(maxChallengeLength, challengeWords, nextItWordFrom),
+                    fromKey);
+            tcpServer.sendToClient(
+                    ConnectionData.Factory.newChallengeStart(maxChallengeLength, challengeWords, nextItWordTo),
+                    toKey);
+            TimerTask timer = TimeIsUp.schedule(this::handleChallengeTimeout, maxChallengeLength, fromKey, toKey);
             fromUser.challenge.setTimer(timer);
         } else {
             toUser.challenge = null;
@@ -230,10 +236,10 @@ public class WQServer implements WQHandler {
     private synchronized ConnectionData getChallengeEndByUsername(String username, Challenge challenge) {
         int correct = challenge.getRightCounter(username);
         int wrong = challenge.getWrongCounter(username);
-        int notransl = Settings.CHALLENGE_WORDS - (correct + wrong);
+        int notransl = Settings.getChallengeWords() - (correct + wrong);
         int yourscore = challenge.getPoints(username);
         int otherscore = challenge.getOtherPoints(username);
-        int extrapoints = yourscore > otherscore ? Settings.EXTRA_POINTS : 0;
+        int extrapoints = yourscore > otherscore ? Settings.getExtraPoints() : 0;
 
         return ConnectionData.Factory.newChallengeEnd(correct, wrong, notransl, yourscore, otherscore, extrapoints);
     }
