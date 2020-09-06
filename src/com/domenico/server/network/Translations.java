@@ -44,16 +44,16 @@ public class Translations {
      * @throws IOException an error occurs while reading the web server response
      */
     private static String getTranslationsFromURL(URL url) throws IOException {
-        InputStream is = url.openStream();
+        InputStream inputStream = url.openStream();
         //skip the starting bytes
-        is.skipNBytes(START_LEN);
+        inputStream.skip(START_LEN);
         StringBuilder translations = new StringBuilder();
         int end_index = -1;
         byte[] bytes;
         //Find the end index
         while (end_index == -1) {
             end_index = 0;
-            bytes = is.readNBytes(BUF_LEN);
+            bytes = inputStream.readNBytes(BUF_LEN);
             if (bytes.length == 0) { //end of file, something went wrong
                 end_index = -1;
                 break;
@@ -62,7 +62,7 @@ public class Translations {
             end_index = translations.indexOf("\"", end_index + 1);
         }
         //Close the stream
-        is.close();
+        inputStream.close();
         //Get the words
         if (end_index != -1)
             return translations.substring(1, end_index);

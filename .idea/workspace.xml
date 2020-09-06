@@ -35,7 +35,7 @@
     <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit5" value="" />
     <property name="extract.method.default.visibility" value="private" />
     <property name="last.edited.regexp" value="Sample Text" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../University/Reti di Calcolatori/EserciziLab" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/bin/WordQuizzle" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -44,7 +44,7 @@
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="project.structure.last.edited" value="Modules" />
-    <property name="project.structure.proportion" value="0.0" />
+    <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
   </component>
@@ -72,8 +72,15 @@
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
       <recent name="com.domenico.server" />
     </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Domenico\Documents\GitHub\WordQuizzle\bin\WordQuizzle" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\Users\Domenico\Documents\GitHub\WordQuizzle\src\com\domenico\resource" />
+      <recent name="C:\Users\Domenico\Documents\GitHub\WordQuizzle\scripts\windows" />
+      <recent name="C:\Users\Domenico\Documents\GitHub\WordQuizzle\scripts\linux" />
+      <recent name="C:\Users\Domenico\Documents\GitHub\WordQuizzle\scripts" />
+      <recent name="C:\Users\Domenico\Documents\GitHub\WordQuizzle\src" />
+      <recent name="C:\Users\Domenico\Documents\GitHub\WordQuizzle\resources" />
     </key>
     <key name="ExtractSuperBase.RECENT_KEYS">
       <recent name="com.domenico.server" />
@@ -218,7 +225,7 @@
       <workItem from="1599324935683" duration="249000" />
       <workItem from="1599333885913" duration="4577000" />
       <workItem from="1599378435295" duration="13640000" />
-      <workItem from="1599409791768" duration="8561000" />
+      <workItem from="1599409791768" duration="21693000" />
     </task>
     <servers />
   </component>
@@ -292,34 +299,35 @@
       <screen x="0" y="0" width="1536" height="864" />
     </state>
     <state x="475" y="175" key="FileChooserDialogImpl/0.0.1536.864@0.0.1536.864" timestamp="1598721559502" />
-    <state width="1493" height="303" key="GridCell.Tab.0.bottom" timestamp="1599417892306">
+    <state width="1493" height="303" key="GridCell.Tab.0.bottom" timestamp="1599432581145">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state width="1493" height="303" key="GridCell.Tab.0.bottom/0.0.1536.864/-1920.0.1920.1080@0.0.1536.864" timestamp="1599417892306" />
-    <state width="1493" height="303" key="GridCell.Tab.0.bottom/0.0.1536.864@0.0.1536.864" timestamp="1599393694197" />
+    <state width="1493" height="303" key="GridCell.Tab.0.bottom/0.0.1536.864/-1920.0.1920.1080@0.0.1536.864" timestamp="1599426226552" />
+    <state width="1493" height="303" key="GridCell.Tab.0.bottom/0.0.1536.864@0.0.1536.864" timestamp="1599432581145" />
     <state width="1493" height="303" key="GridCell.Tab.0.bottom/0.0.1920.1080@0.0.1920.1080" timestamp="1599338497951" />
-    <state width="1493" height="303" key="GridCell.Tab.0.center" timestamp="1599417892306">
+    <state width="1493" height="303" key="GridCell.Tab.0.center" timestamp="1599432581144">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state width="1493" height="303" key="GridCell.Tab.0.center/0.0.1536.864/-1920.0.1920.1080@0.0.1536.864" timestamp="1599417892306" />
-    <state width="1493" height="303" key="GridCell.Tab.0.center/0.0.1536.864@0.0.1536.864" timestamp="1599393694197" />
+    <state width="1493" height="303" key="GridCell.Tab.0.center/0.0.1536.864/-1920.0.1920.1080@0.0.1536.864" timestamp="1599426226551" />
+    <state width="1493" height="303" key="GridCell.Tab.0.center/0.0.1536.864@0.0.1536.864" timestamp="1599432581144" />
     <state width="1493" height="303" key="GridCell.Tab.0.center/0.0.1920.1080@0.0.1920.1080" timestamp="1599338497951" />
-    <state width="1493" height="303" key="GridCell.Tab.0.left" timestamp="1599417892306">
+    <state width="1493" height="303" key="GridCell.Tab.0.left" timestamp="1599432581144">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state width="1493" height="303" key="GridCell.Tab.0.left/0.0.1536.864/-1920.0.1920.1080@0.0.1536.864" timestamp="1599417892306" />
-    <state width="1493" height="303" key="GridCell.Tab.0.left/0.0.1536.864@0.0.1536.864" timestamp="1599393694197" />
+    <state width="1493" height="303" key="GridCell.Tab.0.left/0.0.1536.864/-1920.0.1920.1080@0.0.1536.864" timestamp="1599426226551" />
+    <state width="1493" height="303" key="GridCell.Tab.0.left/0.0.1536.864@0.0.1536.864" timestamp="1599432581144" />
     <state width="1493" height="303" key="GridCell.Tab.0.left/0.0.1920.1080@0.0.1920.1080" timestamp="1599338497951" />
-    <state width="1493" height="303" key="GridCell.Tab.0.right" timestamp="1599417892306">
+    <state width="1493" height="303" key="GridCell.Tab.0.right" timestamp="1599432581144">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state width="1493" height="303" key="GridCell.Tab.0.right/0.0.1536.864/-1920.0.1920.1080@0.0.1536.864" timestamp="1599417892306" />
-    <state width="1493" height="303" key="GridCell.Tab.0.right/0.0.1536.864@0.0.1536.864" timestamp="1599393694197" />
+    <state width="1493" height="303" key="GridCell.Tab.0.right/0.0.1536.864/-1920.0.1920.1080@0.0.1536.864" timestamp="1599426226552" />
+    <state width="1493" height="303" key="GridCell.Tab.0.right/0.0.1536.864@0.0.1536.864" timestamp="1599432581144" />
     <state width="1493" height="303" key="GridCell.Tab.0.right/0.0.1920.1080@0.0.1920.1080" timestamp="1599338497951" />
-    <state x="250" y="8" key="SettingsEditor" timestamp="1599386834973">
+    <state x="250" y="8" key="SettingsEditor" timestamp="1599432594793">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state x="250" y="8" key="SettingsEditor/0.0.1536.864@0.0.1536.864" timestamp="1599386834973" />
+    <state x="250" y="8" key="SettingsEditor/0.0.1536.864/-1920.0.1920.1080@0.0.1536.864" timestamp="1599426222102" />
+    <state x="250" y="8" key="SettingsEditor/0.0.1536.864@0.0.1536.864" timestamp="1599432594793" />
     <state x="498" y="325" key="com.intellij.jarRepository.RepositoryAttachDialog-DOWNLOAD" timestamp="1593157436693">
       <screen x="0" y="0" width="1536" height="864" />
     </state>

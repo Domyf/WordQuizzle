@@ -1,0 +1,1 @@
+java -cp "lib/*;bin/WordQuizzle/" com/domenico/server/MainClassWQServer

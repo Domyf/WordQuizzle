@@ -10,7 +10,7 @@ import java.util.List;
  * It also start the RMI service and the WordQuizzle server. */
 public class MainClassWQServer {
 
-    public static final String SETTINGS_FILE = "wordquizzle.properties";
+    public static final String SETTINGS_FILE = "resources/wordquizzle.properties";
 
     public static void main(String[] args) {
         try {
@@ -19,7 +19,7 @@ public class MainClassWQServer {
             Settings.loadSettings(settingsStream);
             System.out.println("Settings loaded from "+SETTINGS_FILE+" file");
             //Load italian words
-            InputStream inputStream = getFileFromResources(Settings.getItalianWordsFilename());
+            InputStream inputStream = getFileFromResources("resources/"+Settings.getItalianWordsFilename());
             List<String> italianWords = loadItalianWords(inputStream);
             System.out.println("Loaded "+ italianWords.size() +" italian words");
             //Run registration service via RMI

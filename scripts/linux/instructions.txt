@@ -1,0 +1,14 @@
+# To compile the server (Linux)
+javac -d bin/WordQuizzle -cp "lib/*:bin/WordQuizzle/" src/com/domenico/shared/*.java src/com/domenico/communication/*.java src/com/domenico/server/*.java src/com/domenico/server/network/*.java src/com/domenico/server/usersmanagement/*.java
+
+# To copy the resource folder
+cp -r ./src/resources/ ./bin/WordQuizzle/resources/
+
+# To compile the client (Linux)
+javac -d ./bin/WordQuizzle -cp "lib/*:bin/WordQuizzle/" src/com/domenico/shared/*.java src/com/domenico/communication/*.java src/com/domenico/client/*.java
+
+# To run the server
+java -cp "lib/*:bin/WordQuizzle/" com/domenico/server/MainClassWQServer
+
+# To run the client
+java -cp "lib/*:bin/WordQuizzle/" com/domenico/client/MainClassWQClient
