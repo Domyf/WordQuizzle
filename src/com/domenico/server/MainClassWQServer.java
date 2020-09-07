@@ -1,6 +1,6 @@
 package com.domenico.server;
 
-import com.domenico.server.network.UserRegistrationService;
+import com.domenico.server.network.RMIServer;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -22,8 +22,6 @@ public class MainClassWQServer {
             InputStream inputStream = getFileFromResources("resources/"+Settings.getItalianWordsFilename());
             List<String> italianWords = loadItalianWords(inputStream);
             System.out.println("Loaded "+ italianWords.size() +" italian words");
-            //Run registration service via RMI
-            UserRegistrationService.newRegistrationService();
             //Run server
             WQServer server = new WQServer(italianWords);
             server.start();

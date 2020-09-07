@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
-/** Implementation of the WordQuizzle client. It runs the RMI service and two threads which handles the UDP and TCP
+/** Implementation of the WordQuizzle backend. It runs the RMI service and two threads which handles the UDP and TCP
  * communications */
 public class WQClient implements WQInterface, ChallengeListener {
 

@@ -128,6 +128,9 @@ public class CLI implements ChallengeListener {
                 if (wqInterface.isLoggedIn())
                     handleLogout();
                 return false;
+            case UserCommand.HELP:
+                CLI.printCommandsUsage();
+                break;
             default:
                 System.out.println(Messages.INVALID_COMMAND);
                 CLI.printCommandsUsage();
@@ -324,6 +327,7 @@ public class CLI implements ChallengeListener {
                 "   "+UserCommand.getCommandUsage(UserCommand.CHALLENGE)+"\n" +
                 "   "+UserCommand.getCommandUsage(UserCommand.SHOW_SCORE)+"\n" +
                 "   "+UserCommand.getCommandUsage(UserCommand.SHOW_LEADERBOARD)+"\n" +
+                "   "+UserCommand.getCommandUsage(UserCommand.HELP)+"\n" +
                 "   "+UserCommand.getCommandUsage(UserCommand.EXIT));
     }
 }

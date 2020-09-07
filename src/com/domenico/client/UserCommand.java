@@ -17,6 +17,7 @@ public class UserCommand {
     public static final String SHOW_SCORE = "mostra_punteggio";
     public static final String SHOW_LEADERBOARD = "mostra_classifica";
     public static final String EXIT = "esci";
+    public static final String HELP = "aiuto";
 
     private String cmd;
     private String[] params;
@@ -64,6 +65,8 @@ public class UserCommand {
                 return SHOW_SCORE+" mostra il punteggio dell’utente";
             case SHOW_LEADERBOARD:
                 return SHOW_LEADERBOARD+" mostra una classifica degli amici dell’utente (incluso l’utente stesso)";
+            case HELP:
+                return HELP+" mostra la lista dei comandi";
             case EXIT:
                 return EXIT+" esce dal programma";
         }

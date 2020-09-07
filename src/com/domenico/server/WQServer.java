@@ -1,10 +1,7 @@
 package com.domenico.server;
 
 import com.domenico.communication.*;
-import com.domenico.server.network.ChallengeRequest;
-import com.domenico.server.network.TCPServer;
-import com.domenico.server.network.UDPServer;
-import com.domenico.server.network.UserAttachment;
+import com.domenico.server.network.*;
 import com.domenico.server.usersmanagement.UsersManagement;
 import com.domenico.server.usersmanagement.UsersManagementException;
 import org.json.simple.JSONObject;
@@ -31,6 +28,8 @@ public class WQServer implements WQHandler {
     private final Map<String, SelectionKey> mapToKey;   //maps username -> client's tcp key
 
     public WQServer(List<String> italianWords) throws IOException {
+        //Run registration service via RMI
+        RMIServer.newRegistrationService();
         this.executors = Executors.newCachedThreadPool();
         this.udpServer = new UDPServer();
         this.tcpServer = new TCPServer(this);

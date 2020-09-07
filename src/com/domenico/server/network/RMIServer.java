@@ -12,11 +12,11 @@ import java.rmi.server.RemoteServer;
 import java.rmi.server.UnicastRemoteObject;
 
 /** This class implements the RMI connection between client and server. It is used to register a new user. */
-public class UserRegistrationService extends RemoteServer implements RMIConnection {
+public class RMIServer extends RemoteServer implements RMIConnection {
 
     private final UsersManagement usersManagement;
 
-    private UserRegistrationService() throws IOException {
+    private RMIServer() throws IOException {
         this.usersManagement = UsersManagement.getInstance();
     }
 
@@ -31,8 +31,8 @@ public class UserRegistrationService extends RemoteServer implements RMIConnecti
     }
 
     public static void newRegistrationService() throws IOException {
-        UserRegistrationService userRegistrationService = new UserRegistrationService();
-        RMIConnection stub = (RMIConnection) UnicastRemoteObject.exportObject(userRegistrationService, 0);
+        RMIServer RMIServer = new RMIServer();
+        RMIConnection stub = (RMIConnection) UnicastRemoteObject.exportObject(RMIServer, 0);
 
         LocateRegistry.createRegistry(RMIConnection.REGISTRY_PORT);
         Registry registry = LocateRegistry.getRegistry(RMIConnection.REGISTRY_PORT);
