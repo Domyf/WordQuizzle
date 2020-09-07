@@ -12,3 +12,6 @@ java -cp "lib/*:bin/WordQuizzle/" com/domenico/server/MainClassWQServer
 
 # To run the client
 java -cp "lib/*:bin/WordQuizzle/" com/domenico/client/MainClassWQClient
+
+# To run the client help
+java -cp "lib/*:bin/WordQuizzle/" com/domenico/client/MainClassWQClient --help
